@@ -1,0 +1,16 @@
+body {
+   padding-top: 40px;
+   background-color: #d0e4f7; /* Old browsers */
+}
+
+#content {
+   margin-top: 5px;
+   margin-bottom: 5px;
+}
+
+#footer {
+   margin-top: 50px;
+   height: 50px;
+   text-align: center;
+   color: #666;
+}

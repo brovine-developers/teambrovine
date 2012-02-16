@@ -1,0 +1,673 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>User Guide - Template - A CodeIgniter Library</title>
+	<style type="text/css" media="all">@import url('./userguide.css');</style>
+</head>
+
+<body>
+
+	<div id="header">
+		<span class="lib-name">Template Library for CodeIgniter, the PHP Framework</span>
+		<div id="search">
+			<form action="http://www.google.com/search" method="get">
+				<input type="hidden" value="williamsconcepts.com/codeigniter/libraries/template/" id="as_sitesearch" name="as_sitesearch"/>
+				<label for="q">Search User Guide</label>
+				<input type="text" value="" maxlength="255" size="31" id="q" name="q" style="width: 200px;" class="input"/> 
+				<input type="submit" value="Go" name="sa" class="submit"/>
+			</form>
+		</div>
+		<ul id="navigation">
+			<li><a href="./index.html">Introduction</a></li>
+			<li><a href="./start.html">Getting Started</a></li>
+			<li class="active"><a href="./reference.html">User Guide</a></li>
+			<li><a href="./download.html">Download Template Library</a></li>
+         <li><a href="./discussion.html">Discussion</a></li>
+		</ul>
+	</div>
+	
+	<!-- START CONTENT -->
+	<div id="content">
+	
+		<h1>A Guide to Using Template</h1>
+		
+		<p>Looking for documentation covering how to install Template? Head over to 
+			<a href="./start.html">Getting Started</a>. Or, learn more about the project
+			in <a href="./index.html">the Introduction</a>.</p>
+			
+		<h2>User Guide Topics</h2>
+		
+		<ul>
+			<li><a href="#configuration">Configuring Template and Defining Regions</a></li>
+			<li><a href="#master-template">Creating the Master Template</a></li>
+			<li><a href="#writing">Writing to Regions</a></li>
+         <li><a href="#manipulation">Dynamically Manipulating Template</a></li>
+         <li><a href="#parsers">Using Template Parsers</a></li>
+			<li><a href="#utilities">Additional Utilities</a></li>
+		</ul>
+		
+		<h2 id="configuration">I. Configuration</h2>
+		<p>Template uses its own configuration file <kbd>template.php</kbd>. This
+			file must be placed inside the <dfn>config</dfn> folder,
+			alongside config.php, database.php, autoload.php, et. al.</p>
+		<p>Open <dfn>config/template.php</dfn> in a text editor and you'll
+   		notice that, much like CodeIgniter's config files, all configurations for
+   		Template are stored in a singly array, except ours is stored in the <var>$template</var>
+         variable. Also, much like <dfn>config/database.php</dfn>, Template lets you define templates
+         in "groups," which allows you to use and switch between multiple templates in your
+         application.</p>
+		
+		<h2>Setting the Default Template</h2>
+		<p>Template requires that you have at least one active template group set with a master template
+         defined.</p>
+		<code>
+         $template['active_group'] = 'default';<br />
+			$template['default']['template'] = 'template.php';
+		</code>
+		<p>For <var>$template['default']['template']</var>, indicate the filename of your master 
+         template in the <dfn>views</dfn> folder.
+			Typically this file will contain a full <abbr title="eXtensible Hypertext Markup Language">HTML</abbr> 
+			or <abbr title="eXtensible Markup Language">XML</abbr> skeleton that outputs your 
+         pre-defined regions. Details
+			of this file will be <a href="#master-template">outlined below</a>.</p>
+		<p class="important"><strong>Note:</strong> Template will error if this file cannot be found
+			in your <dfn>views</dfn> folder. This can also be a relative path if you
+			desire to nest your master template in folders inside <dfn>views</dfn>.</p>
+			
+		<h2>Defining Regions</h2>
+		<p><strong>What are regions?</strong> Regions are places within the template 
+			where your content may land. They are defined in the <var>['regions']</var> array
+			following an easy-to-understand prototype. You may 
+			include default markup, wrappers and attributes here (not recommended), or
+			you can simply define region variables that you intend to use.</p>
+
+		<p>A simple regions array:</p>
+		
+		<code>$template['default']['regions'] = array(<br />
+&nbsp;&nbsp;'header',<br />
+&nbsp;&nbsp;'content',<br />
+&nbsp;&nbsp;'footer',<br />
+);
+		</code>
+		
+		<p>exposes <var>$header</var>, <var>$content</var>, and <var>$footer</var>
+			regions to be written to by your application and placed in your master template.</p>
+			
+		<p class="important"><strong>Note:</strong> Region keys must gracefully 
+		translate into variables (no spaces or dashes, etc).</p>
+
+		<p>Regions can be extended to include default contents and wrapping markup
+			if desired. To do this, turn your region keys into multidimensional arrays
+			with the following possible indeces:</p>
+			
+		<table cellspacing="1" cellpadding="0" border="0" class="tableborder" style="width: 100%;">
+			<tbody>
+				<tr>
+					<th>Index</th>
+					<th>Instructions</th>
+				</tr>
+				<tr>
+					<td class="td"><strong>content</strong></td>
+					<td class="td"><kbd>Must be an array!</kbd> Use to set default region content</td>
+				</tr>
+				<tr>
+					<td class="td"><strong>name</strong></td>
+					<td class="td">A string to identify the region, beyond how it is defined by the key.</td>
+				</tr>
+				<tr>
+					<td class="td"><strong>wrapper</strong></td>
+					<td class="td">An HTML element to wrap the region contents in. (We recommend 
+						doing this in your template file.)</td>
+				</tr>
+				<tr>
+					<td class="td"><strong>attributes</strong></td>
+					<td class="td">Multidimensional array defining HTML attributes of the wrapper. (We 
+						recommend doing this in your template file.)</td>
+				</tr>
+			</tbody>
+		</table>
+
+
+		<p>For example:</p>
+	
+		<code>$template['default']['regions'] = array(<br />
+&nbsp;&nbsp;'header' =&gt; array(<br />
+&nbsp;&nbsp;&nbsp;&nbsp;'content' =&gt; array('&lt;h1&gt;Welcome&lt;/h1&gt;','&lt;p&gt;Hello World&lt;/p&gt;'),<br />
+&nbsp;&nbsp;&nbsp;&nbsp;'name' =&gt; 'Page Header',<br />
+&nbsp;&nbsp;&nbsp;&nbsp;'wrapper' =&gt; '&lt;div&gt;',<br />
+&nbsp;&nbsp;&nbsp;&nbsp;'attributes' =&gt; array('id' => 'header', 'class' => 'clearfix')<br />
+&nbsp;&nbsp;)<br />
+);
+		</code>
+  <p>Would result in 
+  	<dfn>&lt;div id="header" class="clearfix"&gt;&lt;h1&gt;Welcome&lt;/h1&gt;&lt;p&gt;Hello World&lt;/p&gt;&lt;/div&gt;</dfn>
+  	when finally rendered by Template.</p>
+   
+   <h2>Defining Parsers</h2>
+   
+   <p>By default, Template will use CodeIgniter's
+      Template Parser class. To use an additional template parser, set <var>['parser']</var> and
+      <var>['parser_method']</var> variables in your template group accordingly:</p>
+   
+   <code>$template['default']['parser'] = 'smarty_parser';<br />
+      // Template will call smarty_parser::parse()<br /><br />
+      $template['default']['parser'] = 'frog_parser';<br />
+      $template['default']['parser_method'] = 'frog';<br />
+      // Template will call frog_parser::frog()</code>
+   
+   <p>For <var>['parser']</var> you will provide the name of the parser class
+      located in <dfn>application/libraries</dfn>, and, if necessary, the method that is responsible
+      for handling the request will be supplied to <var>['parser_method']</var> (if other than "parse()").</p>
+   
+   <p>Finally, to have Template use a parser for rendering your regions, rather than Views, set the
+      <var>['parse_template']</var> variable to TRUE:</p>
+   
+   <code>$template['default']['parse_template'] = TRUE;</code>
+   
+   <p>Parser classes and methods can be altered at any time throughout your application. See the
+      <a href="#parsers">Using Template Parsers</a> section for more information.</p>
+   
+   <h2 id="master-template">II. Creating the Master Template</h2>
+   
+   <p>Let's start using Template by creating a master template. We've got a basic design that's going to
+      fulfill 95% of page views for our imaginary site:</p>
+      
+   <p><span class="figure"><img src="images/design_example.png" alt="A simple two-column design with a header and a footer" />
+   <span class="caption"><strong>Fig. 1</strong> A simple two-column design with a header and a footer</span></span></p>
+   
+   <p>Based on this design, we can define a few pieces that work well as regions&mdash;parts of the design
+      that might change per page. So, let's configure <dfn>config/template.php</dfn> with the following regions:</p>
+   
+   <code>$template['default']['regions'] = array(<br />
+   &nbsp;&nbsp;'header',<br />
+   &nbsp;&nbsp;'title',<br />
+   &nbsp;&nbsp;'content',<br />
+   &nbsp;&nbsp;'sidebar',<br />
+   &nbsp;&nbsp;'footer',<br />
+   );</code>
+   
+   <p>It looks like our <var>header</var> and <var>footer</var> regions will have the same content on just
+      about every page. Keeping them as regions will make our template flexible, but we can also define
+      default content for these regions, which we can either append or overwrite from our code. We'll add
+      these lines of code to the bottom of <dfn>config/template.php</dfn>:</p>
+      
+   <code>$template['default']['regions']['header'] = array('content' =&gt; array('&lt;h1&gt;CI Rocks!&lt;/h1&gt;'));<br />
+   $template['default']['regions']['footer'] = array('content' =&gt; array('&lt;p id="copyright"&gt;&copy; Our Company Inc.&lt;/p&gt;'));</code>
+   
+   <p><strong>Finally!</strong> We're all set. Let's code our master template file at <dfn>views/template.php</dfn>,
+      outputting our regions in the appropriate places: <em>(For the sake of brevity, this example will be 
+      poorly structured HTML and make use of PHP short tags.)</em></p>
+   
+   <p><textarea class="textarea" rows="26" cols="80">&lt;html&gt;
+   &lt;head&gt;
+      &lt;title&gt;&lt;?= $title ?&gt;&lt;/title&gt;
+      &lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;main.css&quot; /&gt;
+   &lt;/head&gt;
+   &lt;body&gt;
+      &lt;div id=&quot;wrapper&quot;&gt;
+         &lt;div id=&quot;header&quot;&gt;
+            &lt;?= $header ?&gt;
+         &lt;/div&gt;
+         &lt;div id=&quot;main&quot;&gt;
+            &lt;div id=&quot;content&quot;&gt;
+               &lt;h2&gt;&lt;?= $title ?&gt;&lt;/h2&gt;
+               &lt;div class=&quot;post&quot;&gt;
+                  &lt;?= $content ?&gt;
+               &lt;/div&gt;
+            &lt;/div&gt;
+            &lt;div id=&quot;sidebar&quot;&gt;
+               &lt;?= $sidebar ?&gt;
+            &lt;/div&gt;
+         &lt;/div&gt;
+         &lt;div id=&quot;footer&quot;&gt;
+            &lt;?= $footer ?&gt;
+         &lt;/div&gt;
+      &lt;/div&gt;
+   &lt;/body&gt;
+&lt;/html&gt;</textarea></p>
+
+   <p><strong>That's all!</strong> For now at least. Continue on to see how to make use of this template and 
+      regions throughout your application's Controllers.</p>
+   
+   <!-- III. Writing to Regions ================================================================================== -->
+   
+   <h2 id="writing">III. Writing to Regions</h2>
+   
+   <p>With our regions defined and the basic structure of our template in place, we can start writing
+      to our template from our controller. But first, let's see how to output our final compiled template.</p>
+      
+   <h2>$this-&gt;template-&gt;render(<var>$region = NULL</var>, <samp>$buffer = FALSE</samp>, <kbd>$parse = FALSE</kbd>)</h2>
+      
+   <p>This is the method that, by default, outputs our rendered template to the browser or other client. <strong>This method
+      should be the last thing called from any public Controller methods that make use of the Template
+      Libary</strong>.</p>
+      
+   <p>To only render a specific region's contents, pass the region name in the first parameter. When
+      a valid region name is supplied, render() will <strong>always</strong> only return the rendered string,
+      and parsing does not apply.</p>
+      
+   <code>$title = $this-&gt;template-&gt;render('title');<br />
+      echo $title;</code>
+      
+   <p>To store an entire rendered template in a variable without outputing it to the client, pass 
+      TRUE in the second argument:</p>
+      
+   <code>$this-&gt;template-&gt;set_template('email');<br />
+      $email_message = $this-&gt;template-&gt;render('', TRUE);<br /><br />
+      $this-&gt;email-&gt;message($email_message);<br />
+      $this-&gt;email-&gt;send();</code>
+      
+   <p>The third <kbd>$parse</kbd> argument instructs Template to either use the defined parser class
+      or Views when rendering the regions. See <a href="#parsers">Using Template Parsers</a> for more information.</p>
+   
+   <p>Let's start with a basic controller called 'page' that, by default, renders our template <em>as is</em> by only calling
+      <samp>$this->template->render()</samp>:</p>
+   
+   <p><textarea class="textarea" rows="12" cols="30">class Page extends Controller {
+   
+   function Page()
+   {
+      parent::Controller();
+   }
+   
+   function index()
+   {
+      $this-&gt;template-&gt;render();
+   }
+   
+}</textarea></p>
+
+   <p>Now, when we load this page in the browser, we see:</p>
+   
+   <p><span class="figure"><img src="images/template_1.png" alt="The template has an empty content and sidebar because we haven't written anything to these regions." />
+   <span class="caption"><strong>Fig. 2</strong> Our template is loaded with only default content appearing.</span></span></p>
+   
+   <p>As you can see, the <var>content</var>, <var>title</var> and <var>sidebar</var> regions are showing empty
+      because we've yet to write content to those regions, and we didn't configure any default content in <dfn>config/template.php</dfn>.
+      Additionally, our validator is probably screaming at us because we've got an empty <samp>&lt;h2&gt;</samp> tag where <var>$title</var> should
+      be. Let's take care of that.</p>
+      
+   <h2>$this-&gt;template-&gt;write(<var>$region</var>, <kbd>$content</kbd>, <samp>$overwrite = FALSE</samp>)</h2>
+    
+   <p>Template's <samp>write()</samp> method is the most basic way of writing content to a region.
+      At a minimum, this method must be passed:</p>
+   <ul>
+      <li><var>$region</var>: a string defining to which region
+      we wish to write, and</li>
+      <li><kbd>$content</kbd>: a string containing the content we wish to write.</li>
+   </ul>
+   <p>The default behavior of the <samp>write()</samp> method is to append <kbd>$content</kbd> to what has
+      already been written to the given <var>$region</var>, but we can alter this behavior and overwrite
+      all existing region contents by passing TRUE as a third argument.</p>
+      
+   <code>$this-&gt;template-&gt;write('content', 'You one ');<br />
+      $this-&gt;template-&gt;write('content', 'bad mother...');<br />
+      // $content region = "You one bad mother..."<br /><br />
+      $this-&gt;template-&gt;write('content', "Shut'yo mouth!", TRUE);<br />
+      // $content region = "Shut'yo mouth!"</code>
+      
+   <h2>$this-&gt;template-&gt;write_view(<var>$region</var>, <kbd>$view_file</kbd>, <samp>$view_data</samp>, <dfn>$overwrite = FALSE</dfn>)</h2>
+   
+   <p>Using the <samp>write()</samp> method, we could load the result of a View into a variable and
+      then write it to a region in our template, but Template provides the <samp>write_view()</samp>
+      method to expedite the process and save you from writing at least one extra line of code per use!</p>
+      
+   <p>Like <samp>write()</samp>, we define the region we wish to write to in the first argument of
+      <samp>write_view()</samp>. For the second and third arguments, we pass a view file (with or
+      without the ".php" extension) and optionally pass a data array to our view, respectively, just
+      as is typically done with CI's <samp>$this-&gt;load-&gt;view()</samp> method. Again, if we wish to overwrite any
+      existing content in the region, we can pass TRUE as a fourth argument.</p>
+      
+   <code>$data = array('name' =&gt; 'John Smith', 'birthdate' =&gt; '11/15/1950');<br />
+      $this-&gt;template-&gt;write_view('content', 'user/profile', $data, TRUE);<br />&nbsp; <br />
+      /* Template loads the views/user/profile.php view with the $data array passed in<br />
+      and writes the result to the $content region, overwriting any previous content in the region */</code>
+      
+   <p>Let's use these two methods to fill out our template:</p>
+   
+   <p><textarea class="textarea" rows="22" cols="30">class Page extends Controller {
+   
+   function Page()
+   {
+      parent::Controller();
+   }
+   
+   function index()
+   {
+      // Write to $title
+      $this-&gt;template-&gt;write('title', 'Welcome to the Template Library Docs!');
+      
+      // Write to $content
+      $this-&gt;template-&gt;write_view('content', 'post');
+      
+      // Write to $sidebar
+      $this-&gt;template-&gt;write_view('sidebar', 'common/sidebar');
+      
+      // Render the template
+      $this-&gt;template-&gt;render();
+   }
+   
+}</textarea></p>
+   
+	<p>Now, when we load up our Page controller in the browser, we see our completed Web page:</p>
+   
+   <p><span class="figure"><img src="images/design_example.png" alt="A simple two-column design with a header and a footer" />
+      <span class="caption"><strong>Fig. 3</strong> Avoiding messy code and calling views from within views,
+      we've filled out our template with just a few calls to Template methods in our Page controller.</span></span></p>
+   
+   <h3>Cascading Views</h3>
+   
+   <p>A core principle of the Template library is flexibility, so the <samp>write_view()</samp> method
+      lets you suggest other View files to load if the defualt View file you passed in the first argument doesn't exist.
+      To suggest other View files for Template to use, pass them discretely, starting with the 5th argument:</p>
+      
+   <code>$data['posts'] = $this-&gt;blog-&gt;get_recent(5);<br />
+      $this-&gt;template-&gt;write_view('content', 'blog/front', $data, FALSE, 'blog/posts');</code>
+      
+   <p>If this was a blog application, using this method lets us create a View file at <dfn>views/blog/front.php</dfn>
+      to format blog posts distinctly when they appear on the front page, or opt-out and let our
+      standard <dfn>views/blog/posts.php</dfn> handle the output. We could suggest more fallbacks if needed
+      in the 6th, 7th, 8th arguments, and so on.</p>
+      
+   <h3>What happens if I write to a region that I hadn't previously defined?</h3>
+   
+   <p>Template will show an error if you attempt to write to a region that was not previously defined
+      in the config file or otherwise. See how to manipulate templates and template regions in the
+      following section, "Dynamically Manipulating Template."</p>
+      
+   <h3>"My template uses other variables that aren't necessarily regions. How do I supply those
+      within Template?"</h3>
+   
+   <p>You most likely will use variables in your main template that aren't content regions. For example,
+   		you might have a <var>$body_id</var> variable that you apply to the &lt;body&gt; element that
+   		you use in your CSS to apply styles to specific pages. This certainly could be a region, but
+   		it wouldn't quite fit the metaphor.</p>
+   		
+   <p>To supply these variables to your master template, use CodeIgniter's 
+   		<a href="http://codeigniter.com/user_guide/libraries/loader.html"><samp>$this-&gt;load-&gt;vars()</samp></a>
+   		mechanism.</p>
+   		
+   <p class="important"><strong>Note:</strong> Unfortunately, I do not believe the $this-&gt;load-&gt;vars() function works for
+   		most or any parsers. Creating regions for these variables or using the Config class might be
+   		the only viable solutions.</p>
+      
+   <!-- IV. Dynamically Manipulating Template ================================================== -->
+   
+   <h2 id="manipulation">IV. Dynamically Manipulating Template</h2>
+   
+   <p>The whole idea of Template is to improve the interface between your application's business logic
+      and presentational markup by providing a very flexible wrapper to CI's Views implementation.
+      Consider an application that required two or more markedly different templates for different
+      pages or sections (like a blog with a main HTML template and RSS feed template).
+      Or, consider if a plugin architecture was to allow for making components available to all your pages
+      (like a User plugin that provides a login form).
+      Rather than limiting it to using the regions defined in your configuration, a plugin should be
+      able to dynamically provide its own regions for writing. These methods allow for these and 
+      other development scenarios.</p>
+      
+   <h2>$this-&gt;template-&gt;set_template(<var>$group</var>)</h2>
+   
+   <p>The set_template() method is how you switch between different template groups defined in your
+      <dfn>config/template.php</dfn> file. Template will throw an error if you attempt to set a
+      template group not previously defined or dynamically added.</p>
+      
+   <code>$this-&gt;template-&gt;set_template('rss');<br /><br />
+   // Template will now use the master template and regions from the $template['rss'] group</code>
+   
+   <p><strong>Tip</strong>: Use this method in Controller constructors where the entire Controller
+      uses a separate template.</p>
+   
+   <h2>$this-&gt;template-&gt;add_template(<var>$group</var>, <kbd>$template</kbd>, <samp>$switch</samp>)</h2>
+   
+   <p>Not all templates must be defined in <dfn>config/template.php</dfn>. The add_template() method
+      allows templates to be dynamically added, and you can pass TRUE as a third parameter to switch
+      to the added template.</p>
+      
+   <code>$rss['template'] = 'rss.php';<br />
+      $rss['regions'] = array('name', 'items');<br />
+      $this-&gt;template-&gt;add_template('rss', $rss, TRUE);<br /><br />
+      // Template will now use the master template and regions from the supplied $rss template group 
+      configuration</code>
+   
+   <ul>
+      <li><var>$group</var> is the handle that would be needed if this template was later invoked by the
+         set_template() method</li>
+      <li><kbd>$template</kbd> is the properly formed template group configuration array, defining the
+         master template and available regions</li>
+      <li><samp>$switch</samp> can be set to TRUE to automatically invoke this new template group settings</li>
+   </ul>
+   
+   <h2>$this-&gt;template-&gt;set_master_template(<var>$filename</var>)</h2>
+   
+   <p>In some cases you might only want to change the master template file of the current template
+      configuration. This is useful for when multiple templates must share common regions and parser
+      settings.</p>
+      
+   <p>To swap the master template, call <samp>set_master_template()</samp> with
+      the desired path and filename of the new master template:</p>
+      
+   <code>$theme = 'lovely_butterflies';<br />
+      $this-&gt;template-&gt;set_master_template('themes/'. $theme .'/template.php');</code>
+      
+   <p>Template will now render the template file located at
+      <dfn>application/views/themes/lovely_butterfiles/template.php</dfn></p>
+      
+   <p class="important">The ".php" extension is not necessarily required. Template will use the <var>EXT</var>
+      constant if one is not supplied.</p>
+   
+   <h2>$this-&gt;template-&gt;add_region(<var>$name</var>, <kbd>$settings = array()</kbd>)</h2>
+   
+   <p>The add_region() method allows one to dynamically add regions for writing. At a minimum, a
+      <var>$name</var> must be supplied to identify the region. Optionally, a <kbd>$settings</kbd>
+      array can be passed in to provide default content, wrappers and attributes.</p>
+   
+   <code>$this-&gt;template-&gt;add_region('user_login');<br />
+      $this-&gt;template-&gt;write_view('user_login', 'user/login_block');</code>
+   
+   <p>Template will throw an error if the region defined by <var>$name</var> already exists.</p>
+   
+   <!-- V. Using Template Parsers ============================================================== -->
+   
+   <h2 id="parsers">V. Using Template Parsers</h2>
+   
+   <p>In addition to interfacing with Views, Template provides a standard way to use template parsers
+      when writing data to regions or rendering your master template. Although Template uses CodeIgniter's
+      Template Parser class by default, one can provide any parser or engine (like Smarty) for Template 
+      to use.</p>
+   
+   <h2>$this-&gt;template-&gt;parse_view(<var>$region</var>, <kbd>$view_file</kbd>, <samp>$view_data</samp>, <dfn>$overwrite = FALSE</dfn>)</h2>
+   
+   <p>To use CodeIgniter's <a href="http://codeigniter.com/user_guide/libraries/parser.html">Template
+      Parser class</a>, or an alternative parser like Smarty, to parse a View, use the parse_view()
+      method. parse_view() works identically to write_view(), so you can also discretely suggest other 
+      Views to parse, starting with the 5th argument.</p>
+   
+   <code>$data = array(<br />
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'blog_title' =&gt; 'My Blog Title',<br />
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'blog_heading' =&gt; 'My Blog Heading'<br />
+      );<br />
+      $this-&gt;template-&gt;parse_view('content', 'blog_template', $data);</code>
+   
+   <h2>Introducing Additional Parsers</h2>
+   
+   <h3>Method 1: Set parser instructions in <dfn>config/template.php</dfn></h3>
+   
+   <p>You can add instructions to your template group configurations, telling template what parser class
+      and method to use. Template will attempt to use the parse() method of the given <var>['parser']</var>
+      unless a <var>['parser_method']</var> is supplied:</p>
+      
+   <code>$template['default']['parser'] = 'smarty_parser';<br />
+      // Template will call smarty_parser::parse()<br /><br />
+      $template['default']['parser'] = 'frog_parser';<br />
+      $template['default']['parser_method'] = 'frog';<br />
+      // Template will call frog_parser::frog()</code>
+   
+   <h3>Method 2: Set parser instructions dynamically</h3>
+   
+   <p>Alternatively, you can dynamically instruct Template to use a parser class and method with the
+      <samp>set_parser()</samp> method:</p>
+      
+   <code>$this-&gt;template-&gt;set_parser('smarty_parser');<br />
+      // Template will call smarty_parser::parse()<br /><br />
+      $this-&gt;template-&gt;set_parser('frog_parser', 'frog');<br />
+      // Template will call frog_parser::frog()</code>
+   
+   <h2>Anatomy of a Parser Class</h2>
+   
+   <p>A parser class is simply a CodeIgniter Library that provides a method which parses a given template
+      file with the supplied data and returns its output. Let's write our own very simple parser class
+      to see how it works:</p>
+      
+   <textarea class="textarea" rows="10" cols="80">&lt;?php  if (!defined('BASEPATH')) exit('No direct script access allowed');
+
+class Lame_parser {
+
+   function parse($template, $data = array())
+   {
+        return "This parser is lame.";
+   }
+
+}</textarea>
+
+   <p>We'll save this file as a library at <dfn>application/libraries/Lame_parser.php</dfn>. As you 
+      can see, a parser class' parser method will be passed <var>$template</var>, the template file 
+      to be parsed, and <samp>$data</samp>, an array of key/value pairs used in parsing the given template's
+      pseudo code. Also note that a parser method should ALWAYS return the result of the parsed template
+      and not echo it. Template will always supply a 3rd argument as TRUE to instruct some parser methods
+      to do this by default.</p>
+   
+   <p>Now, let's configure a template to use our lame parser:</p>
+   
+   <code>$tpl = array(<br />
+      &nbsp;&nbsp;'template' =&gt; 'lame_template.php'<br />
+      );<br />
+      $this-&gt;template-&gt;add_template('lame', $tpl, TRUE);<br />
+      $this-&gt;template-&gt;add_region('content');<br />
+      $this-&gt;template-&gt;set_parser('lame_parser');<br /><br />
+      $this-&gt;template-&gt;parse_view('content', 'templates/lamer', array('stuff' =&gt; 'things'));<br /><br />
+      echo $this-&gt;template-&gt;render('content'); // Just render the 'content' region</code>
+      
+   <p>Running the above results in <dfn>This parser is lame.</dfn> Obviously a parser is actually going
+      do more, but this shows the process: The returned value of <kbd>Lame_parser::parse()</kbd> is
+      written to our 'content' region.</p>
+   
+   <h2><span id="smarty">Using the Smarty Template Engine as a Parser</span></h2>
+   
+   <p>Most people who don't use CI's Template Parser class are going to want to use the popular Smarty
+      Template Engine. Luckily, the CI community has already ported a Smarty_parser library that fits
+      right in to Template's parser interface. Follow this quick guide to begin using Smarty with
+      Template:</p>
+      
+   <ol>
+      <li>Follow the directions for installing the Smarty_parser library found here: <a href="http://codeigniter.com/forums/viewthread/60050/">Yet Another Smarty Thread</a></li>
+      <li>Configure your template group to use the Smarty_parser library:
+         <code>$template['default']['template'] = 'template.tpl';<br />
+            $template['default']['regions'] = array('header', 'content', 'footer');<br />
+            $template['default']['parser'] = 'smarty_parser';<br />
+            $template['default']['parse_template'] = TRUE;</code></li>
+   </ol>
+   
+   <p>That's ALL! Template will now use the Smarty_parser library when the parse_view() method is employed,
+      and your master template will be parsed by Smarty as well.</p>
+      
+   <p class="important">NOTE: There is no guarantee that the third-party Smarty_parser library will
+      work 100% as advertised. Please raise issues in the appropriate CodeIgniter forum threads.</p>
+   
+   <h2>Parsing the Master Template</h2>
+   
+   <p>By default, Template will render your master template as if it were a View, but you can use a
+      parser class to render it instead. There are 3 ways you can instruct Template to parse the master
+      template:</p>
+   
+   <ol>
+      <li>In <dfn>config/template.php</dfn>, set <var>['parse_template']</var>
+         to TRUE for the necessary template group configuration:
+         <code>$template['default']['parse_template'] = TRUE;</code></li>
+      <li>Dynamically set the <var>parse_template</var> property of the Template class to TRUE, then
+         render the template:
+         <code>$this-&gt;template-&gt;parse_template = TRUE;<br />
+            $this-&gt;template-&gt;render();</code></li>
+      <li>Supply a third parameter as TRUE when calling render(). Remember to pass the first two arguments
+         properly:
+         <code>$this-&gt;template-&gt;render(NULL, FALSE, TRUE);</code></li>
+   </ol>
+   
+   <!-- VI. Utilities ========================================================================== -->
+   
+   <h2 id="utilities">VI. Additional Utilities</h2>
+   
+   <p>CSS defines the style of your HTML template and JavaScript defines its behavior, so I've included
+      two methods to easily include these important assets on-demand.</p>
+      
+   <h3>$this-&gt;template-&gt;add_js(<var>$script</var>, <kbd>$type = 'import'</kbd>, <samp>$defer = FALSE</samp>)</h3>
+   
+   <ol>
+      <li><var>$script</var>: Depending on the value of the <kbd>$type</kbd> argument, either a path
+         to the JavaScript file (including file extension) relative to <var>$config['base_path']</var>
+         or inline JavaScript code.</li>
+      <li><kbd>$type</kbd>: Either 'import' or 'embed' Use 'import' to include an external JavaScript file
+         or 'embed' to wrap JavaScript code in &lt;script&gt; tags.</li>
+      <li><samp>$defer</samp>: Set to TRUE to include <strong>defer="defer"</strong> declaration on
+         script tag.</li>
+   </ol>
+   
+   <code>$this-&gt;template-&gt;add_js('js/jquery.js');<br />
+      $this-&gt;template-&gt;add_js('alert("Hello!");', 'embed');</code>
+      
+   <p><strong>Echo <var>$_scripts</var> in your template (preferably in the &lt;head&gt; section) to 
+      utilize JavaScript added via this method.</strong></p>
+      
+   <h3>$this-&gt;template-&gt;add_css(<var>$style</var>, <kbd>$type = 'link'</kbd>, <samp>$media = FALSE</samp>)</h3>
+   
+   <ol>
+      <li><var>$style</var>: Depending on the value of the <kbd>$type</kbd> argument, either a path
+         to the CSS file (including file extension) relative to <var>$config['base_path']</var>
+         or inline CSS code.</li>
+      <li><kbd>$type</kbd>: Either 'link', 'import' or 'embed' Use 'link' to include an external CSS file,
+         'import' to include an external CSS file via the @import command,
+         or 'embed' to wrap inline CSS code in &lt;style&gt; tags.</li>
+      <li><samp>$media</samp>: Set media declaration, like 'all', 'screen', 'print', 'handheld', etc.</li>
+   </ol>
+   
+   <code>$this-&gt;template-&gt;add_css('css/main.css');<br />
+      $this-&gt;template-&gt;add_css('#logo {display: block}', 'embed', 'print');</code>
+      
+   <p><strong>Echo <var>$_styles</var> in your template (preferably in the &lt;head&gt; section) to 
+      utilize CSS added via this method.</strong></p>
+      
+   <p class="important"><strong>Note:</strong> The add_css() and add_js() methods do not verify that
+      the requested assets exist on the server's filesystem. Remember to pass file paths <strong>relative
+      to the path defined for <var>$config['base_path']</var></strong>. Both methods will return FALSE if an
+      invalid <kbd>$type</kbd> argument is supplied.</p>
+   
+   <p><em>More utilities, like setting META tags, language declarations, and other goodies typically 
+      found in an HTML document's HEAD will be considered for future releases. You can, of course,
+      define regions to house these types of things in the meantime.</em></p>
+   
+   </div>
+	<!-- END CONTENT -->
+	
+	<div id="footer">
+   
+		<p>Previous Topic:&nbsp;&nbsp;<a href="./start.html">Getting Started</a>
+		&nbsp;&nbsp;&nbsp;&middot;&nbsp;&nbsp;
+		<a href="#">Top of Page</a>&nbsp;&nbsp;&nbsp;&middot;&nbsp;&nbsp;
+		<a href="./index.html">User Guide Home</a>&nbsp;&nbsp;&nbsp;&middot;&nbsp;&nbsp;
+		Next Topic:&nbsp;&nbsp;<a href="./download.html">Downloads</a>
+		</p>
+		<p><a href="http://williamsconcepts.com">WillamsConcepts.com</a> &nbsp;&middot;&nbsp; Copyright &#169; 2008 &nbsp;&middot;&nbsp; Colin Williams</p>
+		
+	</div>
+   
+   <script type="text/javascript">
+      var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+      document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+   </script>
+   <script type="text/javascript">
+      var pageTracker = _gat._getTracker("UA-1894650-2");
+      pageTracker._trackPageview();
+   </script>
+
+</body>
+</html>

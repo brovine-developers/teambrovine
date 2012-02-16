@@ -1,0 +1,109 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Getting Started - Template - A CodeIgniter Library</title>
+	<style type="text/css" media="all">@import url('./userguide.css');</style>
+</head>
+
+<body>
+
+	<div id="header">
+		<span class="lib-name">Template Library for CodeIgniter, the PHP Framework</span>
+		<div id="search">
+			<form action="http://www.google.com/search" method="get">
+				<input type="hidden" value="williamsconcepts.com/codeigniter/libraries/template/" id="as_sitesearch" name="as_sitesearch"/>
+				<label for="q">Search User Guide</label>
+				<input type="text" value="" maxlength="255" size="31" id="q" name="q" style="width: 200px;" class="input"/> 
+				<input type="submit" value="Go" name="sa" class="submit"/>
+			</form>
+		</div>
+		<ul id="navigation">
+			<li><a href="./index.html">Introduction</a></li>
+			<li class="active"><a href="./start.html">Getting Started</a></li>
+			<li><a href="./reference.html">User Guide</a></li>
+			<li><a href="./download.html">Download Template Library</a></li>
+         <li><a href="./discussion.html">Discussion</a></li>
+		</ul>
+	</div>
+	
+	<!-- START CONTENT -->
+	<div id="content">
+	
+		<h1>Getting Started with Template</h1>
+		
+		<p>Looking for documentation covering how to use Template? Head over to 
+			<a href="./reference.html">the User Guide</a>.</p>
+		
+		<h2>Download and Install</h2>
+		
+		<ol>
+			<li><a href="./download.html"><strong>Download</strong> the Template Library</a></li>
+			<li>The download contains three files:
+				<ol>
+					<li><var>/libraries/Template.php</var><br />
+						Move to your application <strong>or</strong> system
+						<dfn>/libraries/</dfn> folder.
+					</li>
+					<li><var>/config/template.php</var><br />
+						Move to your application <dfn>/config/</dfn> folder. We’ll 
+						review this file later.
+					</li>
+					<li><var>/views/template.php </var><br />
+						Move to your application <dfn>/views/</dfn> folder. (Feel 
+						free to rename this file if a file with the same name already exists in 
+						your <dfn>views/</dfn> folder.) We’ll also review this file later.
+					</li>
+				</ol>
+			</li>
+         <li><em>Note: If you are sure you won't clash filenames, just extract the ZIP file to your
+            application folder.</em></li>
+			<li>You're now ready to start using Template. <a href="./reference.html">Learn how</a>.</li>
+		</ol>
+		
+		<h2>'Template' is a very generic library name. Why was it chosen?</h2>
+		<p>Template was designed to read well when encountered throughout your
+			application's code. While, yes, I could have come up with a unique, cutesy,
+			silly name for Template, I feel such a move wouldn't be very beneficial for
+			those who use it. Nor would it follow the clear naming standards used by core
+         CodeIgniter classes (the whole "ignition/fire" metaphor pretty much only goes
+         as far as the framework's name).</p>
+		<p>On that note, feel free to hack and
+			<a href="http://codeigniter.com/user_guide/general/creating_libraries.html">rename</a> 
+			Template to whatever best suits your application or preferences.</p>
+		
+      <h2>Is using Template <em>better</em> than using Views?</h2>
+      
+      <p><strong>Not exactly</strong>. Using Template is a <em>better way</em> to use Views, or at least
+         that's what it aims to be. Additionally, the use of Template does not alter the default
+         functionality of CodeIgniter Views. You could have 8 Controller methods that use Template
+         alongside 8 others that just use $this-&gt;load&gt;view(). Along with a simple interface to 
+         template parsers and methods for handling JavaScript and CSS assets, Template is a great 
+         foundation for implementing a Templating Engine in your CodeIgniter application.</p>
+      
+	</div>
+	<!-- END CONTENT -->
+	
+	<div id="footer">
+		<p>
+		Previous Topic:&nbsp;&nbsp;<a href="./index.html">Introduction</a>
+		&nbsp;&nbsp;&nbsp;&middot;&nbsp;&nbsp;
+		<a href="#">Top of Page</a>&nbsp;&nbsp;&nbsp;&middot;&nbsp;&nbsp;
+		<a href="./index.html">User Guide Home</a>&nbsp;&nbsp;&nbsp;&middot;&nbsp;&nbsp;
+		Next Topic:&nbsp;&nbsp;<a href="./reference.html">Template User Guide</a>
+		</p>
+		<p><a href="http://williamsconcepts.com">WillamsConcepts.com</a> &nbsp;&middot;&nbsp; Copyright &#169; 2008 &nbsp;&middot;&nbsp; Colin Williams</p>
+		
+	</div>
+   
+   <script type="text/javascript">
+      var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+      document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+   </script>
+   <script type="text/javascript">
+      var pageTracker = _gat._getTracker("UA-1894650-2");
+      pageTracker._trackPageview();
+   </script>
+
+</body>
+</html>
