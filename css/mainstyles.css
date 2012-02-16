@@ -14,3 +14,10 @@ body {
    text-align: center;
    color: #666;
 }
+
+div.drilldown {
+   margin: 5px;
+   height: 300px;
+   overflow: scroll;
+   overflow-x: hidden;
+}
