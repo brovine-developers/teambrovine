@@ -15,9 +15,20 @@ body {
    color: #666;
 }
 
-div.drilldown {
-   margin: 5px;
-   height: 300px;
-   overflow: scroll;
-   overflow-x: hidden;
+.selected, .selected td {
+   background-color: #b3b6ff !important;
+}
+
+.placeholder {
+   color: #aaaaaa;
+}
+
+.ruleRow {
+   border-bottom: 1px solid #eee;
+   padding-bottom: 20px;
+   margin-bottom: 20px;
+}
+
+.dataTables_filter, .dataTables_filter label {
+   width: 100%;
 }

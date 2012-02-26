@@ -13,7 +13,7 @@
                <a href="#testTablePane" data-toggle="tab">Test Table</a>
             </li>
             <li>
-               <a href="#hierarchyPane" data-toggle="tab">Experiment Hierarchy</a>
+               <a href="#hierarchyPane" data-toggle="tab" id="hierarchyPaneTab">Experiment Hierarchy</a>
             </li>
             <li>
                <a href="#geneSummaryPane" data-toggle="tab">Gene Summary</a>
