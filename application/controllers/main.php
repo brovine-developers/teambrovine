@@ -30,6 +30,8 @@ class Main extends CI_Controller {
       $this->template->write_view('content', 'testTable.php');
       $this->template->write_view('content', 'upload.php');
       $this->template->write_view('content', 'expHierarchy.php');
+      $this->template->write_view('content', 'geneSumm.php');
+      $this->template->write_view('content', 'tfSumm.php');
       $this->template->add_js('js/mainPage.js');
       $this->_renderPage();
 	}

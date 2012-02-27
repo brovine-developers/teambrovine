@@ -138,6 +138,52 @@ function updateComparisonList(curSpecies) {
    
 }
 
+function updateGeneSummary() {
+   jQuery.get("/ajax/getGeneSummary",
+      function(data) {
+         geneSummary.fnClearTable();
+         geneSummary.fnAddData(data);
+
+         /*comparisonList.$('tr').click(function(e) {
+            comparisonList.$('tr').removeClass('selected');
+            $(this).addClass('selected');
+            var rowData = comparisonList.fnGetData(this);
+
+            var comparisonTypeId = rowData.comparisontypeid;
+            geneList.fnClearTable();
+            factorList.fnClearTable();
+            sequenceList.fnClearTable();
+            updateExperimentList(comparisonTypeId);
+         });*/
+      },
+      'json'
+   );
+
+}
+
+function updateTFSummary() {
+   jQuery.get("/ajax/getTFSummary",
+      function(data) {
+         tfSummary.fnClearTable();
+         tfSummary.fnAddData(data);
+
+         /*comparisonList.$('tr').click(function(e) {
+            comparisonList.$('tr').removeClass('selected');
+            $(this).addClass('selected');
+            var rowData = comparisonList.fnGetData(this);
+
+            var comparisonTypeId = rowData.comparisontypeid;
+            geneList.fnClearTable();
+            factorList.fnClearTable();
+            sequenceList.fnClearTable();
+            updateExperimentList(comparisonTypeId);
+         });*/
+      },
+      'json'
+   );
+
+}
+
 function setupExperimentHierarchy() {
    var firstRowHeight = "100px";
    var secondRowHeight = "200px";
@@ -293,8 +339,61 @@ function setupExperimentHierarchy() {
    updateSpeciesList();
 }
 
+function setupGeneSummary() {
+   var height = "600px";   
+
+   geneSummary = $('#geneList_summ').dataTable({
+      "sDom": "<'row'<'span8'f>r>t<'row'<'span3'i>>",
+      "bPaginate": false,
+      "oLanguage": {
+         "sSearch": "Search Genes",
+         "sInfo": "Showing _TOTAL_ genes",
+         "sInfoFiltered": " of _MAX_"
+      },
+      "sScrollY": height,
+      "aoColumns": [
+         {"sTitle": "Gene Name", "mDataProp": "genename"},
+         {"sTitle": "Gene Abbrev", "mDataProp": "geneabbrev"},
+         {"sTitle": "Chr", "mDataProp": "chromosome"},
+         {"sTitle": "Start", "mDataProp": "start"},
+         {"sTitle": "End", "mDataProp": "end"},
+         {"sTitle": "Num Comps", "mDataProp": "numComps"},
+         {"sTitle": "Num Exps", "mDataProp": "numExps"},
+      ]
+
+   });
+
+   updateGeneSummary();
+}
+
+function setupTFSummary() {
+   var height = "600px";
+
+   tfSummary = $('#tfList_summ').dataTable({
+      "sDom": "<'row'<'span8'f>r>t<'row'<'span3'i>>",
+      "bPaginate": false,
+      "oLanguage": {
+         "sSearch": "Search Transcription Factors",
+         "sInfo": "Showing _TOTAL_ transcription factors",
+         "sInfoFiltered": " of _MAX_"
+      },
+      "sScrollY": height,
+      "aoColumns": [
+         {"sTitle": "Transfac", "mDataProp": "transfac"},
+         {"sTitle": "# of Studies", "mDataProp": "numStudies"},
+         {"sTitle": "# of Genes", "mDataProp": "numGenes"},
+         {"sTitle": "# of Occurrences", "mDataProp": "numOccs"},
+      ]
+
+   });
+
+   updateTFSummary();
+}
+
 $(document).ready(function() {
    setupExperimentHierarchy();
+   setupGeneSummary();
+   setupTFSummary();
       $('#testTable').dataTable({
          "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>",
          "sPaginationType": "bootstrap",

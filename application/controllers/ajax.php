@@ -87,6 +87,35 @@ EOT;
       echo json_encode($query->result());
    }
 
+   public function getGeneSummary() {
+      $this->load->database();
+      $sql = <<<EOT
+       SELECT geneabbrev, genename, chromosome, start, end,
+        count(e.comparisontypeid) as numComps, count(g.geneid) as numExps
+       FROM genes g, experiments e where g.experimentid = e.experimentid
+       GROUP BY genename
+EOT;
+
+      $query = $this->db->query($sql, array());
+      
+      echo json_encode($query->result());
+   }
+
+   public function getTFSummary() {
+      $this->load->database();
+      $sql = <<<EOT
+       SELECT f.transfac, count(DISTINCT f.study) as numStudies,
+        count(DISTINCT r.geneid) as numGenes, count(f.transfac) as numOccs
+       FROM factor_matches f, regulatory_sequences r, study_pages s
+       WHERE f.seqid = r.seqid and f.seqid = s.seqid
+       GROUP BY f.transfac
+EOT;
+
+      $query = $this->db->query($sql, array());
+
+      echo json_encode($query->result());
+   }
+
    public function getFactorList() {
       $this->load->database();
       $geneid = $this->input->get('geneid');
