@@ -22,7 +22,7 @@ function updateGeneSummary() {
 }
 
 function setupGeneSummary() {
-   var height = "600px";   
+   var height = "200px";   
 
    geneSummary = $('#geneList_summ').dataTable({
       "sDom": "<'row'<'span12'f>r>t<'row'<'span12'i>>",
