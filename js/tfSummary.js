@@ -22,7 +22,7 @@ function updateTFSummary() {
 }
 
 function setupTFSummary() {
-   var height = "600px";
+   var height = "200px";
 
    tfSummary = $('#tfList_summ').dataTable({
       "sDom": "<'row'<'span12'f>r>t<'row'<'span12'i>>",

@@ -104,12 +104,42 @@ EOT;
 
    public function getTFSummary() {
       $this->load->database();
+      // This query is slow when written the obvious way:
+      /*
       $sql = <<<EOT
        SELECT f.transfac,
         COUNT(DISTINCT f.study) as numStudies,
-        COUNT(DISTINCT r.geneid) as numGenes
+        COUNT(DISTINCT r.geneid) as numGenes,
+        COUNT(*) as numOccs
        FROM factor_matches f INNER JOIN regulatory_sequences r USING (seqid)
        GROUP BY f.transfac
+EOT;
+       */
+
+      /* This one is wayyyy faster. During my testing, it was around .3 seconds.
+       * It could be faster, probably. We could do 3 separate queries and merge
+       * the results in PHP. The numOccs query and numStudies query are about .01
+       * to .02 seconds each. The numGenes is a little longer at .1 to .2.
+       * For simplicity's sake, I'm doing the work in the db, though.
+       */
+      $sql = <<<EOT
+       SELECT *
+       FROM 
+          (SELECT transfac, count(*) as numOccs
+          FROM factor_matches
+          GROUP BY transfac) a
+        INNER JOIN 
+          (SELECT transfac, count(*) as numGenes
+          FROM 
+             (SELECT DISTINCT transfac, geneid
+             FROM factor_matches INNER JOIN regulatory_sequences r USING (seqid)) f1
+          GROUP BY transfac) b USING (transfac)
+        INNER JOIN
+          (SELECT transfac, count(*) as numStudies
+          FROM 
+             (SELECT DISTINCT transfac, study
+             FROM factor_matches) f1
+          GROUP BY transfac) c USING (transfac)
 EOT;
 
       $query = $this->db->query($sql);
