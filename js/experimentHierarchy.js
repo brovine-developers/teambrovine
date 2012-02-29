@@ -21,6 +21,13 @@ function updateSpeciesList() {
    );
 }
 
+function updateSequenceInfo(seqid) {
+   $('#sequenceInfo').load("ajax/getSequenceInfo",
+   {
+      'seqid': seqid
+   });
+}
+
 function updateSequenceList(geneid, transfac, study) {
    jQuery.get("ajax/getSequenceList",
    {
@@ -32,6 +39,14 @@ function updateSequenceList(geneid, transfac, study) {
       sequenceList.fnClearTable();
       sequenceList.fnAddData(data);
       fixTableWidth(sequenceList);
+
+      sequenceList.$('tr').click(function() {
+         sequenceList.$('tr').removeClass('selected');
+         $(this).addClass('selected');
+         var rowData = sequenceList.fnGetData(this);
+
+         updateSequenceInfo(rowData.seqid);
+      });
    },
    'json'
    );
@@ -132,8 +147,8 @@ function updateComparisonList(curSpecies) {
 
 function setupExperimentHierarchy() {
    var firstRowHeight = "100px";
-   var secondRowHeight = "200px";
-   var thirdRowHeight = "200px";
+   var secondRowHeight = "100px";
+   var thirdRowHeight = "100px";
    speciesList = $('#speciesList').dataTable({
       "sDom": "<'row'<'span2'f>r>t<'row'<'span2'i>>",
       "sPaginationType": "bootstrap",

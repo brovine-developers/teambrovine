@@ -254,13 +254,6 @@ EOT;
       $promoter = $this->fetchPromoter($sequenceInfo['geneid']);
       $this->calculateSequencesFromPromoter($sequences, $promoter);
 
-      /*
-      foreach ($sequences as &$sequence) {
-         $sequences['transfacs'] = array_unique(explode('/', $sequences['transfacs']));
-         $sequences['studies'] = array_unique(explode('/', $sequences['studies']));
-      }
-       */
-         
       return $sequences;
    }
    
@@ -272,12 +265,19 @@ EOT;
     */
    public function getSequenceInfo() {
       $this->load->database();
-      $seqid = $this->input->get('seqid');
+      $seqid = $this->input->post('seqid');
       $sql = <<<EOT
        SELECT regulatory_sequences.*,
-       GROUP_CONCAT(DISTINCT transfac ORDER BY transfac SEPARATOR '/') as transfacs,
-       GROUP_CONCAT(DISTINCT study ORDER BY study SEPARATOR '/') as studies
+        genes.geneabbrev,
+        experiments.label,
+        comparison_types.species,
+        comparison_types.celltype,
+       GROUP_CONCAT(transfac SEPARATOR '/') as transfacs,
+       GROUP_CONCAT(study SEPARATOR '/') as studies
        FROM regulatory_sequences INNER JOIN factor_matches USING(seqid)
+        INNER JOIN genes USING (geneid)
+        INNER JOIN experiments USING (experimentid)
+        INNER JOIN comparison_types USING (comparisontypeid)
        WHERE seqid = ?
 EOT;
       $query = $this->db->query($sql, array($seqid));
@@ -289,9 +289,14 @@ EOT;
       $sequenceInfo['transfacs'] = array_unique(explode('/', $sequenceInfo['transfacs']));
       $sequenceInfo['studies'] = array_unique(explode('/', $sequenceInfo['studies']));
 
+      natcasesort($sequenceInfo['transfacs']);
+      natcasesort($sequenceInfo['studies']);
+
       $sequenceInfo['similar'] = $this->getSimilarSequenceInfo($sequenceInfo);
 
-      echo json_encode($sequenceInfo);
+      $this->load->view('sequenceInfo', array(
+         'sequenceInfo' => $sequenceInfo
+      ));
    }
    
 }
