@@ -34,13 +34,13 @@ function setupGeneSummary() {
       },
       "sScrollY": height,
       "aoColumns": [
-         {"sTitle": "Gene Name", "mDataProp": "genename"},
+         {"sTitle": "Gene", "mDataProp": "genename"},
          {"sTitle": "Gene Abbrev", "mDataProp": "geneabbrev"},
          {"sTitle": "Chr", "mDataProp": "chromosome"},
          {"sTitle": "Start", "mDataProp": "start"},
          {"sTitle": "End", "mDataProp": "end"},
-         {"sTitle": "Num Comps", "mDataProp": "numComps"},
-         {"sTitle": "Num Exps", "mDataProp": "numExps"},
+         {"sTitle": "Comps", "mDataProp": "numComps"},
+         {"sTitle": "Exps", "mDataProp": "numExps"},
       ]
 
    });

@@ -35,9 +35,9 @@ function setupTFSummary() {
       "sScrollY": height,
       "aoColumns": [
          {"sTitle": "Transfac", "mDataProp": "transfac"},
-         {"sTitle": "# of Studies", "mDataProp": "numStudies"},
-         {"sTitle": "# of Genes", "mDataProp": "numGenes"},
-         {"sTitle": "# of Occurrences", "mDataProp": "numOccs"},
+         {"sTitle": "Studies", "mDataProp": "numStudies"},
+         {"sTitle": "Genes", "mDataProp": "numGenes"},
+         {"sTitle": "Occurrences", "mDataProp": "numOccs"},
       ]
 
    });
