@@ -1,6 +1,6 @@
 
 function updateSpeciesList() {
-   jQuery.get("/ajax/getSpeciesList",
+   jQuery.get("ajax/getSpeciesList",
    function(data) {
       speciesList.fnClearTable();
       speciesList.fnAddData(data);
@@ -23,7 +23,7 @@ function updateSpeciesList() {
 }
 
 function updateSequenceList(geneid, transfac, study) {
-   jQuery.get("/ajax/getSequenceList",
+   jQuery.get("ajax/getSequenceList",
    {
       'geneid': geneid,
       'transfac': transfac,
@@ -39,7 +39,7 @@ function updateSequenceList(geneid, transfac, study) {
 }
 
 function updateFactorList(geneid) {
-   jQuery.get("/ajax/getFactorList",
+   jQuery.get("ajax/getFactorList",
    { 'geneid': geneid },
    function(data) {
       factorList.fnClearTable();
@@ -62,7 +62,7 @@ function updateFactorList(geneid) {
 }
 
 function updateGeneList(experimentid) {
-   jQuery.get("/ajax/getGeneList",
+   jQuery.get("ajax/getGeneList",
    { 'experimentid': experimentid },
    function(data) {
       geneList.fnClearTable();
@@ -93,7 +93,7 @@ function fixTableWidth(table) {
 
 function updateExperimentList(comparisontypeid) {
    experimentList.fnClearTable();
-   jQuery.get("/ajax/getExperimentList",
+   jQuery.get("ajax/getExperimentList",
    {
       'comparisontypeid': comparisontypeid
    },
@@ -113,7 +113,7 @@ function updateExperimentList(comparisontypeid) {
 }
 
 function updateComparisonList(curSpecies) {
-   jQuery.get("/ajax/getComparisonList", 
+   jQuery.get("ajax/getComparisonList", 
       {
          'species': curSpecies
       },
@@ -139,7 +139,7 @@ function updateComparisonList(curSpecies) {
 }
 
 function updateGeneSummary() {
-   jQuery.get("/ajax/getGeneSummary",
+   jQuery.get("ajax/getGeneSummary",
       function(data) {
          geneSummary.fnClearTable();
          geneSummary.fnAddData(data);
@@ -163,7 +163,7 @@ function updateGeneSummary() {
 }
 
 function updateTFSummary() {
-   jQuery.get("/ajax/getTFSummary",
+   jQuery.get("ajax/getTFSummary",
       function(data) {
          tfSummary.fnClearTable();
          tfSummary.fnAddData(data);
@@ -386,7 +386,7 @@ $(document).ready(function() {
       "sDom": "<'row'<'span4'l><'span8'f>r>t<'row'<'span4'i><'span4'p>>",
       "sPaginationType": "bootstrap",
       'bPaginate': false,
-      "sAjaxSource": ("/import/status?random=" + Math.random())
+      "sAjaxSource": ("import/status?random=" + Math.random())
    });
    
    $('.dataTables_filter label').each(function() {
@@ -484,7 +484,7 @@ $(document).ready(function() {
    });
 
    $("#clearAllDataButton").click(function() {
-      $.ajax("/import/clearAllData?random=" + Math.random(), {
+      $.ajax("import/clearAllData?random=" + Math.random(), {
          success: function(data, textStatus) {
             $('#clearAllDataResult').text(data);
             uploadTable.fnClearTable();
