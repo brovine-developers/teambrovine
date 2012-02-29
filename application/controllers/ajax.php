@@ -91,8 +91,9 @@ EOT;
       $this->load->database();
       $sql = <<<EOT
        SELECT geneabbrev, genename, chromosome, start, end,
-        count(e.comparisontypeid) as numComps, count(g.geneid) as numExps
-       FROM genes g, experiments e where g.experimentid = e.experimentid
+        COUNT(DISTINCT e.comparisontypeid) as numComps,
+        COUNT(g.geneid) as numExps
+       FROM genes g INNER JOIN experiments e USING (experimentid)
        GROUP BY genename
 EOT;
 
@@ -134,7 +135,44 @@ EOT;
 
       echo json_encode($result);
    }
-   
+
+   /**
+    * This fetches the promoter sequence for a given gene. We use this
+    * when we present regulatory sequence information, since we don't store
+    * the actual string in the db. Doing it this way prevents data inconsistencies,
+    * but it's slower than storing it.
+    *
+    */
+   private function fetchPromoter($geneid) {
+      $sql = <<<EOT
+       SELECT sequence
+       FROM promoter_sequences 
+       WHERE geneid = ?
+EOT;
+      $query = $this->db->query($sql, array($geneid));
+      return $query->row()->sequence;
+   }
+
+   private function calculateSingleSequenceFromPromoter(&$row, $promoter) {
+      $row['sequence'] = substr($promoter, $row['beginning'], $row['length']);
+   }
+
+   /**
+    * This takes the info in regulatory_sequences (begin, length) and 
+    * gets the data out of sequenceData. We might want to store this instead of
+    * calculating it, but it does save space to not duplicate it. Maybe.
+    * If we have to store the promoter anyway, it does. I doubt that we'll
+    * ever hit a point where this is the slow part, especially because we will
+    * likely never do any serious analysis on the sequence while it's in the DB
+    * and it should take very little time to calculate.
+    */
+   private function calculateSequencesFromPromoter(&$sequenceData, $promoter) {
+      // We don't store the individual sequences in the db, so we calculate them here.
+      foreach ($sequenceData as &$row) {
+         $this->calculateSingleSequenceFromPromoter($row, $promoter);
+      }
+   }
+
    public function getSequenceList() {
       $this->load->database();
       $geneid = $this->input->get('geneid');
@@ -147,22 +185,84 @@ EOT;
 EOT;
       $query = $this->db->query($sql, array($geneid, $transfac, $study));
 
-      $result = $query->result_array();
+      $sequences = $query->result_array();
 
-      $sql = <<<EOT
-       SELECT sequence
-       FROM promoter_sequences 
-       WHERE geneid = ?
-EOT;
-      $query = $this->db->query($sql, array($geneid));
-      $sequence = $query->row()->sequence;
-
-      // We don't store the individual sequences in the db, so we calculate them here.
-      foreach ($result as &$row) {
-         $row['sequence'] = substr($sequence, $row['beginning'], $row['length']);
-      }
-
-      echo json_encode($result);
+      $promoter = $this->fetchPromoter($geneid);
+      $this->calculateSequencesFromPromoter($sequences, $promoter);
+      echo json_encode($sequences);
    }
+
+   /**
+    * Given sequence info, give info of similar sequences.
+    */
+   private function getSimilarSequenceInfo($sequenceInfo) {
+      $sql = <<<EOT
+       SELECT regulatory_sequences.*
+         -- ,       GROUP_CONCAT(DISTINCT transfac ORDER BY transfac SEPARATOR '/') as transfacs,
+       -- GROUP_CONCAT(DISTINCT study ORDER BY study SEPARATOR '/') as studies
+       FROM regulatory_sequences
+      -- INNER JOIN factor_matches USING(seqid)
+       WHERE geneid = ?
+       AND seqid != ?
+       AND beginning = ?
+       AND sense = ?
+       AND length IN (?, ?)
+       -- GROUP BY seqid
+EOT;
+
+      $params = array(
+         $sequenceInfo['geneid'],
+         $sequenceInfo['seqid'],
+         $sequenceInfo['beginning'],
+         $sequenceInfo['sense'],
+         $sequenceInfo['length'] - 1,
+         $sequenceInfo['length'] + 1
+      );
+
+      $query = $this->db->query($sql, $params);
+      $sequences = $query->result_array();
+      $promoter = $this->fetchPromoter($sequenceInfo['geneid']);
+      $this->calculateSequencesFromPromoter($sequences, $promoter);
+
+      /*
+      foreach ($sequences as &$sequence) {
+         $sequences['transfacs'] = array_unique(explode('/', $sequences['transfacs']));
+         $sequences['studies'] = array_unique(explode('/', $sequences['studies']));
+      }
+       */
+         
+      return $sequences;
+   }
+   
+   /**
+    * Given a seqid, return the data about a specific regulatory_sequence
+    * and its associated factors.
+    * This is used for UC-8.
+    * We're going to go ahead and search for similar regulatory elements here.
+    */
+   public function getSequenceInfo() {
+      $this->load->database();
+      $seqid = $this->input->get('seqid');
+      $sql = <<<EOT
+       SELECT regulatory_sequences.*,
+       GROUP_CONCAT(DISTINCT transfac ORDER BY transfac SEPARATOR '/') as transfacs,
+       GROUP_CONCAT(DISTINCT study ORDER BY study SEPARATOR '/') as studies
+       FROM regulatory_sequences INNER JOIN factor_matches USING(seqid)
+       WHERE seqid = ?
+EOT;
+      $query = $this->db->query($sql, array($seqid));
+      $sequenceInfo = $query->row_array();
+
+      $promoter = $this->fetchPromoter($sequenceInfo['geneid']);
+      $this->calculateSingleSequenceFromPromoter($sequenceInfo, $promoter);
+
+      $sequenceInfo['transfacs'] = array_unique(explode('/', $sequenceInfo['transfacs']));
+      $sequenceInfo['studies'] = array_unique(explode('/', $sequenceInfo['studies']));
+
+      $sequenceInfo['similar'] = $this->getSimilarSequenceInfo($sequenceInfo);
+
+      echo json_encode($sequenceInfo);
+   }
+   
 }
 

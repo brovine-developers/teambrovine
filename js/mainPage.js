@@ -143,6 +143,7 @@ function updateGeneSummary() {
       function(data) {
          geneSummary.fnClearTable();
          geneSummary.fnAddData(data);
+         fixTableWidth(geneSummary);
 
          /*comparisonList.$('tr').click(function(e) {
             comparisonList.$('tr').removeClass('selected');
@@ -298,21 +299,6 @@ function setupExperimentHierarchy() {
    
    });
 
-   $('.dataTables_filter label').each(function() {
-      var text = $(this).text();
-      $(this).find('input').attr('placeholder', text);
-
-      // Taken from
-      // http://stackoverflow.com/questions/5680201/jquery-remove-unwrapped-text-but-preserve-the-elements
-      var parent = $(this)[0];  // Get reference to DOM
-
-      for( var i = 0; i < parent.childNodes.length; i++ ) {
-         var current_child = parent.childNodes[i];
-         if( current_child.nodeType == 3 )
-         parent.removeChild( current_child );
-      }
-   });
-   
    $('#hierarchyPaneTab').on('shown', function (e) {
       fixTableWidth(speciesList);
       fixTableWidth(comparisonList);
@@ -321,19 +307,12 @@ function setupExperimentHierarchy() {
       fixTableWidth(factorList);
       fixTableWidth(sequenceList);
    });
-   $('[placeholder]').focus(function() {
-      var input = $(this);
-      if (input.val() == input.attr('placeholder')) {
-      input.val('');
-      input.removeClass('placeholder');
-      }
-   }).blur(function() {
-      var input = $(this);
-      if (input.val() == '' || input.val() == input.attr('placeholder')) {
-      input.addClass('placeholder');
-      input.val(input.attr('placeholder'));
-      }
-   }).blur();
+
+   $('#geneSummaryPaneTab').on('shown', function (e) {
+      fixTableWidth(geneSummary);
+   });
+
+
 
    // Get the list of species from the server.
    updateSpeciesList();
@@ -343,7 +322,7 @@ function setupGeneSummary() {
    var height = "600px";   
 
    geneSummary = $('#geneList_summ').dataTable({
-      "sDom": "<'row'<'span8'f>r>t<'row'<'span3'i>>",
+      "sDom": "<'row'<'span12'f>r>t<'row'<'span12'i>>",
       "bPaginate": false,
       "oLanguage": {
          "sSearch": "Search Genes",
@@ -394,91 +373,122 @@ $(document).ready(function() {
    setupExperimentHierarchy();
    setupGeneSummary();
    setupTFSummary();
-      $('#testTable').dataTable({
-         "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>",
-         "sPaginationType": "bootstrap",
-         "oLanguage": {
-            "sLengthMenu": "_MENU_ records per page"
-         }
-      });
-
-      var uploadTable = $('#uploadTable').dataTable({
-         "sDom": "<'row'<'span4'l><'span8'f>r>t<'row'<'span4'i><'span4'p>>",
-         "sPaginationType": "bootstrap",
-         'bPaginate': false,
-         "sAjaxSource": ("/import/status?random=" + Math.random())
-      });
-
-      var uploadComplete = function(event, ID, fileObj, response, data) {
-         var responseInfo = jQuery.parseJSON(response);
-
-         // Iterate through the uploadTable data, look for the groupname.
-         // Set the proper field as true.
-         var tableData = uploadTable.fnGetData();
-         var itemFound = false;
-         var rowIndex = -1;
-
-         if (responseInfo.success) {
-            for (var i = 0; i < tableData.length; ++i) {
-               if (tableData[i][0] == responseInfo.fileInfo.groupName) {
-                  itemFound = true;
-                  // Update the existing row.
-                  var allSuccess = true;
-                  for (var j = 1; j <= 3; ++j) {
-                     if (responseInfo.whichFilesExist[j]) {
-                        uploadTable.fnUpdate('Success', i, j);
-                     } else {
-                        allSuccess = false;
-                     }
-                  }
-                  if (allSuccess) {
-                     uploadTable.fnUpdate('Complete!', i, 4);
-                  } else {
-                     uploadTable.fnUpdate(responseInfo.message, i, 4);
-                  }
-
-                  break;
-               }
-            }
-         }
-
-         if (!itemFound) {
-            // Insert the new row.
-            responseInfo.whichFilesExist.push(responseInfo.message);
-            for (var i = 1; i <= 3; ++i) {
-               if (responseInfo.whichFilesExist[i]) {
-                  responseInfo.whichFilesExist[i] = 'Success';
-               } else {
-                  responseInfo.whichFilesExist[i] = 'Missing';
-               }
-            }
-            uploadTable.fnAddData(responseInfo.whichFilesExist);
-         }
-
-         return true;
+   
+   $('#testTable').dataTable({
+      "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>",
+      "sPaginationType": "bootstrap",
+      "oLanguage": {
+         "sLengthMenu": "_MENU_ records per page"
       }
-      
+   });
 
-      $('#file_upload').uploadify({
-         'uploader': '/images/uploadify.swf',
-         'script': '/import',
-         'cancelImg': '/images/cancel.png',
-         'expressInstall': '/images/expressInstall.swf',
-         'auto': true,
-         'removeCompleted': true,
-         'multi': true,
-         // 'fileExt': '* promoter TESS Hits 1.csv;* promoter TESS Job Parameters.csv;* promoter TESS Sequences.csv',
-         'fileExt': '*.csv',
-         'fileDesc': 'CSV TESS Results',
-         onComplete: uploadComplete
-      });
+   var uploadTable = $('#uploadTable').dataTable({
+      "sDom": "<'row'<'span4'l><'span8'f>r>t<'row'<'span4'i><'span4'p>>",
+      "sPaginationType": "bootstrap",
+      'bPaginate': false,
+      "sAjaxSource": ("/import/status?random=" + Math.random())
+   });
+   
+   $('.dataTables_filter label').each(function() {
+      var text = $(this).text();
+      $(this).find('input').attr('placeholder', text);
 
-      $("#clearAllDataButton").click(function() {
-         $.ajax("/import/clearAllData?random=" + Math.random(), {
-            success: function(data, textStatus) {
-               $('#clearAllDataResult').text(data);
-               uploadTable.fnClearTable();
+      // Taken from
+      // http://stackoverflow.com/questions/5680201/jquery-remove-unwrapped-text-but-preserve-the-elements
+      var parent = $(this)[0];  // Get reference to DOM
+
+      for( var i = 0; i < parent.childNodes.length; i++ ) {
+         var current_child = parent.childNodes[i];
+         if( current_child.nodeType == 3 )
+         parent.removeChild( current_child );
+      }
+   });
+   
+
+   $('[placeholder]').focus(function() {
+      var input = $(this);
+      if (input.val() == input.attr('placeholder')) {
+      input.val('');
+      input.removeClass('placeholder');
+      }
+   }).blur(function() {
+      var input = $(this);
+      if (input.val() == '' || input.val() == input.attr('placeholder')) {
+      input.addClass('placeholder');
+      input.val(input.attr('placeholder'));
+      }
+   }).blur();
+
+   var uploadComplete = function(event, ID, fileObj, response, data) {
+      var responseInfo = jQuery.parseJSON(response);
+
+      // Iterate through the uploadTable data, look for the groupname.
+      // Set the proper field as true.
+      var tableData = uploadTable.fnGetData();
+      var itemFound = false;
+      var rowIndex = -1;
+
+      if (responseInfo.success) {
+         for (var i = 0; i < tableData.length; ++i) {
+            if (tableData[i][0] == responseInfo.fileInfo.groupName) {
+               itemFound = true;
+               // Update the existing row.
+               var allSuccess = true;
+               for (var j = 1; j <= 3; ++j) {
+                  if (responseInfo.whichFilesExist[j]) {
+                     uploadTable.fnUpdate('Success', i, j);
+                  } else {
+                     allSuccess = false;
+                  }
+               }
+               if (allSuccess) {
+                  uploadTable.fnUpdate('Complete!', i, 4);
+               } else {
+                  uploadTable.fnUpdate(responseInfo.message, i, 4);
+               }
+
+               break;
             }
-         });
+         }
+      }
+
+      if (!itemFound) {
+         // Insert the new row.
+         responseInfo.whichFilesExist.push(responseInfo.message);
+         for (var i = 1; i <= 3; ++i) {
+            if (responseInfo.whichFilesExist[i]) {
+               responseInfo.whichFilesExist[i] = 'Success';
+            } else {
+               responseInfo.whichFilesExist[i] = 'Missing';
+            }
+         }
+         uploadTable.fnAddData(responseInfo.whichFilesExist);
+      }
+
+      return true;
+   }
+   
+
+   $('#file_upload').uploadify({
+      'uploader': '/images/uploadify.swf',
+      'script': '/import',
+      'cancelImg': '/images/cancel.png',
+      'expressInstall': '/images/expressInstall.swf',
+      'auto': true,
+      'removeCompleted': true,
+      'multi': true,
+      // 'fileExt': '* promoter TESS Hits 1.csv;* promoter TESS Job Parameters.csv;* promoter TESS Sequences.csv',
+      'fileExt': '*.csv',
+      'fileDesc': 'CSV TESS Results',
+      onComplete: uploadComplete
+   });
+
+   $("#clearAllDataButton").click(function() {
+      $.ajax("/import/clearAllData?random=" + Math.random(), {
+         success: function(data, textStatus) {
+            $('#clearAllDataResult').text(data);
+            uploadTable.fnClearTable();
+         }
       });
+   });
 });

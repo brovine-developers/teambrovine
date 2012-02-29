@@ -16,7 +16,7 @@
                <a href="#hierarchyPane" data-toggle="tab" id="hierarchyPaneTab">Experiment Hierarchy</a>
             </li>
             <li>
-               <a href="#geneSummaryPane" data-toggle="tab">Gene Summary</a>
+               <a href="#geneSummaryPane" data-toggle="tab" id="geneSummaryPaneTab">Gene Summary</a>
             </li>
             <li>
                <a href="#tfSummaryPane" data-toggle="tab">TF Summary</a>
