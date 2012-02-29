@@ -17,8 +17,7 @@ class Main extends CI_Controller {
 	 * map to /index.php/welcome/<method_name>
 	 * @see http://codeigniter.com/user_guide/general/urls.html
 	 */
-	public function index()
-	{
+	public function index()	{
       // Default way.
 		//$this->load->view('welcome_message');
       
@@ -27,14 +26,38 @@ class Main extends CI_Controller {
       // Just keep adding views. Make sure each view is in a tab-pane div
       // with the proper link in the header.
       $this->template->write_view('content', 'home.php');
-      $this->template->write_view('content', 'testTable.php');
-      $this->template->write_view('content', 'upload.php');
-      $this->template->write_view('content', 'expHierarchy.php');
-      $this->template->write_view('content', 'geneSumm.php');
-      $this->template->write_view('content', 'tfSumm.php');
       $this->template->add_js('js/mainPage.js');
-      $this->_renderPage();
+      $this->_renderPage('Home');
 	}
+
+   public function Upload() {
+      $this->_initPage();
+      $this->template->write_view('content', 'upload.php');
+      $this->template->add_js('js/upload.js');
+      $this->_renderPage('Upload');
+
+   }
+
+   public function ExperimentHierarchy() {
+      $this->_initPage();
+      $this->template->write_view('content', 'expHierarchy.php');
+      $this->template->add_js('js/experimentHierarchy.js');
+      $this->_renderPage('Experiment Hierarchy');
+   }
+
+   public function GeneSummary() {
+      $this->_initPage();
+      $this->template->write_view('content', 'geneSumm.php');
+      $this->template->add_js('js/geneSummary.js');
+      $this->_renderPage('Gene Summary');
+   }
+   
+   public function TranscriptionFactorSummary() {
+      $this->_initPage();
+      $this->template->write_view('content', 'tfSumm.php');
+      $this->template->add_js('js/tfSummary.js');
+      $this->_renderPage('Transcription Factor Summary');
+   }
 
    /**
     * _initPage is a function I wrote to simplify initializing a page.
@@ -52,6 +75,7 @@ class Main extends CI_Controller {
       $this->template->add_js('js/DT_bootstrap.js');
       $this->template->add_js('js/swfobject.js');
       $this->template->add_js('js/jquery.uploadify.v2.1.4.min.js');
+      $this->template->add_js('js/common.js');
    }
 
    /**
@@ -59,10 +83,19 @@ class Main extends CI_Controller {
     * See its use in index().
     * @author Sterling Hirsh
     */
-   private function _renderPage() {
+   private function _renderPage($activeTab) {
+      $tabs = array(
+         './' => 'Home',
+         'Upload' => 'Upload',
+         'ExperimentHierarchy' => 'Experiment Hierarchy',
+         'GeneSummary' => 'Gene Summary',
+         'TranscriptionFactorSummary' => 'Transcription Factor Summary'
+      );
       $data = array(
          'siteName' => 'Team Brovine!',
-         'curtime' => time()
+         'curtime' => time(),
+         'tabs' => $tabs,
+         'activeTab' => $activeTab
       );
       $this->template->write_view('header', 'header.php', $data);
       $this->template->write_view('footer', 'footer.php', $data);

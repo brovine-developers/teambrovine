@@ -1,4 +1,3 @@
-<div class="tab-pane" id="hierarchyPane">
    <div class="row">
       <div class="span12">
          <h1>Experiment Hierarchy</h1>
@@ -64,4 +63,3 @@
          </table>
       </div>
    </div>
-</div>

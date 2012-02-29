@@ -1,4 +1,3 @@
-<div class="tab-pane" id="uploadPane">
    <div class="row">
       <div class="span4">
             <form>
@@ -30,4 +29,3 @@
          <div id="clearAllDataResult"></div>
       </div>
    </div>
-</div>

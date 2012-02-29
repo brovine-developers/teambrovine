@@ -41,6 +41,11 @@
 $route['default_controller'] = "main";
 $route['404_override'] = '';
 
+$route['Upload'] = '/main/Upload';
+$route['ExperimentHierarchy'] = '/main/ExperimentHierarchy';
+$route['GeneSummary'] = '/main/GeneSummary';
+$route['TranscriptionFactorSummary'] = '/main/TranscriptionFactorSummary';
+
 
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */

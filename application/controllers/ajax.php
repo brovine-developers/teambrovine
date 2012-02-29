@@ -105,14 +105,14 @@ EOT;
    public function getTFSummary() {
       $this->load->database();
       $sql = <<<EOT
-       SELECT f.transfac, count(DISTINCT f.study) as numStudies,
-        count(DISTINCT r.geneid) as numGenes, count(f.transfac) as numOccs
-       FROM factor_matches f, regulatory_sequences r, study_pages s
-       WHERE f.seqid = r.seqid and f.seqid = s.seqid
+       SELECT f.transfac,
+        COUNT(DISTINCT f.study) as numStudies,
+        COUNT(DISTINCT r.geneid) as numGenes
+       FROM factor_matches f INNER JOIN regulatory_sequences r USING (seqid)
        GROUP BY f.transfac
 EOT;
 
-      $query = $this->db->query($sql, array());
+      $query = $this->db->query($sql);
 
       echo json_encode($query->result());
    }
