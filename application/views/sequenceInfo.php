@@ -26,7 +26,7 @@
                </tr>
                <tr>
                   <th>Species</th>
-                  <td><?=$sequenceInfo['species']?></td>
+                  <td><?=ucfirst($sequenceInfo['species'])?></td>
                </tr>
                <tr>
                   <th>Comparison</th>

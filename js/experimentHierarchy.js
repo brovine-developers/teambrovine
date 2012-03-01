@@ -14,7 +14,9 @@ function updateSpeciesList() {
          geneList.fnClearTable();
          factorList.fnClearTable();
          sequenceList.fnClearTable();
+         $('#sequenceInfo').empty();
          updateComparisonList(curSpecies);
+         fixAllTableWidths();
       });
    },
    'json'
@@ -37,6 +39,7 @@ function updateSequenceList(geneid, transfac, study) {
    },
    function(data) {
       sequenceList.fnClearTable();
+      $('#sequenceInfo').empty();
       sequenceList.fnAddData(data);
       fixTableWidth(sequenceList);
 
@@ -58,6 +61,7 @@ function updateFactorList(geneid) {
    function(data) {
       factorList.fnClearTable();
       sequenceList.fnClearTable();
+      $('#sequenceInfo').empty();
       factorList.fnAddData(data);
       fixTableWidth(factorList);
       factorList.$('tr').click(function(e) {
@@ -82,6 +86,7 @@ function updateGeneList(experimentid) {
       geneList.fnClearTable();
       sequenceList.fnClearTable();
       factorList.fnClearTable();
+      $('#sequenceInfo').empty();
 
       geneList.fnAddData(data);
       fixTableWidth(geneList);
@@ -99,12 +104,13 @@ function updateGeneList(experimentid) {
 }
 
 function updateExperimentList(comparisontypeid) {
-   experimentList.fnClearTable();
    jQuery.get("ajax/getExperimentList",
    {
       'comparisontypeid': comparisontypeid
    },
    function(data) {
+      experimentList.fnClearTable();
+      $('#sequenceInfo').empty();
       experimentList.fnAddData(data);
       fixTableWidth(experimentList);
       experimentList.$('tr').click(function(e) {
@@ -263,7 +269,21 @@ function setupExperimentHierarchy() {
    updateSpeciesList();
 }
 
+function fixAllTableWidths() {
+   fixTableWidth(speciesList);
+   fixTableWidth(experimentList);
+   fixTableWidth(geneList);
+   fixTableWidth(factorList);
+   fixTableWidth(sequenceList);
+}  
+
 $(document).ready(function() {
    setupExperimentHierarchy();
    setupPlaceholders();
+   fixAllTableWidths();
+});
+
+// Work around for chrome. Sometimes, it doesn't properly fix tables.
+$(window).load(function() {
+   fixAllTableWidths();
 });
