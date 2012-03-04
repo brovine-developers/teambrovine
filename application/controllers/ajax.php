@@ -186,10 +186,30 @@ EOT;
 EOT;
       $query = $this->db->query($sql, array($geneid));
 
-      $result = $query->result();
+      $result = $query->result_array();
       foreach ($result as &$row) {
-         $row->study = str_replace('/', ' /<br>', $row->study);
+         $row['studyPretty'] = str_replace('/', ' /<br>', $row['study']);
+         $row['allRow'] = 0;
       }
+
+      // Get All Count
+      $sql = <<<EOT
+       SELECT COUNT(seqid) as numTimes
+       FROM regulatory_sequences INNER JOIN factor_matches USING(seqid)
+       WHERE geneid = ?
+EOT;
+      $query = $this->db->query($sql, array($geneid));
+      $countInfo = $query->row();
+
+      // Add "All" Row.
+      $result[] = array(
+         'study' => '-',
+         'studyPretty' => '-',
+         'transfac' => 'All',
+         'numTimes' => $countInfo->numTimes,
+         'allRow' => 1
+      );
+
 
       echo json_encode($result);
    }
@@ -236,12 +256,22 @@ EOT;
       $geneid = $this->input->get('geneid');
       $transfac = $this->input->get('transfac');
       $study = $this->input->get('study');
+
+      $transfacFilter = '';
+      $params = array($geneid);
+
+      if ($transfac != 'All' && $study != '-') {
+         $transfacFilter = 'AND transfac = ? AND study = ?';
+         $params[] = $transfac;
+         $params[] = $study;
+      }
+
       $sql = <<<EOT
        SELECT *
        FROM regulatory_sequences INNER JOIN factor_matches USING(seqid)
-       WHERE geneid = ? AND transfac = ? and study = ?
+       WHERE geneid = ? $transfacFilter
 EOT;
-      $query = $this->db->query($sql, array($geneid, $transfac, $study));
+      $query = $this->db->query($sql, $params);
 
       $sequences = $query->result_array();
 

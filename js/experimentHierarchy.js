@@ -153,8 +153,8 @@ function updateComparisonList(curSpecies) {
 
 function setupExperimentHierarchy() {
    var firstRowHeight = "100px";
-   var secondRowHeight = "100px";
-   var thirdRowHeight = "100px";
+   var secondRowHeight = "150px";
+   var thirdRowHeight = "150px";
    speciesList = $('#speciesList').dataTable({
       "sDom": "<'row'<'span2'f>r>t<'row'<'span2'i>>",
       "sPaginationType": "bootstrap",
@@ -196,8 +196,10 @@ function setupExperimentHierarchy() {
       },
       "aoColumns": [
          {"sTitle": "Experiment", "mDataProp": "label"},
-         {"sTitle": "Regulation", "mDataProp": "regulation"}
-
+         {"sTitle": "Genes", "mDataProp": "genecount_all"},
+         {"sTitle": "Up", "mDataProp": "genecount_up"},
+         {"sTitle": "Down", "mDataProp": "genecount_down"},
+         {"sTitle": "Experimentid", "mDataProp": "experimentid", "bVisible": false}
       ]
    });
 
@@ -231,9 +233,13 @@ function setupExperimentHierarchy() {
       },
       "aoColumns": [
          {"sTitle": "Factor", "mDataProp": "transfac"},
-         {"sTitle": "Study", "mDataProp": "study"},
-         {"sTitle": "#", "mDataProp": "numTimes"}
-      ]
+         {"sTitle": "Study", "mDataProp": "studyPretty"},
+         {"sTitle": "#", "mDataProp": "numTimes"},
+         {"sTitle": "AllRow", "mDataProp": "allRow", "bVisible": false},
+         {"sTitle": "StudyOrig", "mDataProp": "study", "bVisible": false}
+      ],
+      "aaSortingFixed": [[3,'desc']]
+      
    
    });
    
