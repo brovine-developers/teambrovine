@@ -14,7 +14,7 @@
 | path to your installation.
 |
 */
-$config['base_url']	= 'http://brovine.csc.calpoly.edu/~tcirwin/';
+$config['base_url']	= '';
 
 /*
 |--------------------------------------------------------------------------
