@@ -92,12 +92,40 @@ EOT;
       $sql = <<<EOT
        SELECT geneabbrev, genename, chromosome, start, end,
         COUNT(DISTINCT e.comparisontypeid) as numComps,
-        COUNT(g.geneid) as numExps
+        COUNT(g.geneid) as numExps, geneid
        FROM genes g INNER JOIN experiments e USING (experimentid)
        GROUP BY genename
 EOT;
 
       $query = $this->db->query($sql, array());
+      
+      echo json_encode($query->result());
+   }
+
+   public function getLongGene() {
+      $this->load->database();
+      $geneid = $this->input->get('geneid');
+      $sql = <<<EOT
+       SELECT geneabbrev, genename, chromosome, start, end, ABS(start - end) as length, sequence
+       FROM genes INNER JOIN promoter_sequences USING (geneid)
+       WHERE genename = ? 
+EOT;
+
+      $query = $this->db->query($sql, array($geneid));
+      
+      echo json_encode($query->result());
+   }
+
+   public function getExpsPerGene() {
+      $this->load->database();
+      $geneid = $this->input->get('geneid');
+      $sql = <<<EOT
+       sELECT     label, regulation   FROM genes INNER JOIN
+                    experiments
+USING (         experimentid            ) Where genename = ?
+EOT;
+
+      $query = $this->db->query($sql, array($geneid));
       
       echo json_encode($query->result());
    }
