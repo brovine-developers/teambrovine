@@ -254,19 +254,35 @@ function setupExperimentHierarchy() {
          {"sTitle": "Begin", "mDataProp": "beginning"},
          {"sTitle": "Length", "mDataProp": "length"},
          {"sTitle": "Sense", "mDataProp": "sense"},
-         {"sTitle": "La", "mDataProp": "la"},
-         {"sTitle": "La/", "mDataProp": "la_slash"},
-         {"sTitle": "Lq", "mDataProp": "lq"},
-         {"sTitle": "Ld", "mDataProp": "ld"},
-         {"sTitle": "Lpv", "mDataProp": "lpv"},
-         {"sTitle": "Sc", "mDataProp": "sc"},
-         {"sTitle": "Sm", "mDataProp": "sm"},
-         {"sTitle": "Spv", "mDataProp": "spv"},
-         {"sTitle": "Ppv", "mDataProp": "ppv"},
+         {"sTitle": "La", "mDataProp": "la", "sType": "numeric"},
+         {"sTitle": "La/", "mDataProp": "la_slash", "sType": "numeric"},
+         {"sTitle": "Lq", "mDataProp": "lq", "sType": "numeric"},
+         {"sTitle": "Ld", "mDataProp": "ld", "sType": "numeric"},
+         {"sTitle": "Lpv", "mDataProp": "lpv", "sType": "numeric"},
+         {"sTitle": "Sc", "mDataProp": "sc", "sType": "numeric"},
+         {"sTitle": "Sm", "mDataProp": "sm", "sType": "numeric"},
+         {"sTitle": "Spv", "mDataProp": "spv", "sType": "numeric"},
+         {"sTitle": "Ppv", "mDataProp": "ppv", "sType": "numeric"},
          {"sTitle": "Sequence", "mDataProp": "sequence"},
          {"sTitle": "Sequenceid", "mDataProp": "seqid", "bVisible": false}
       ]
    
+   });
+
+   var filterGeneList = function(oSettings, aData, iDataIndex) {
+      if (oSettings.sTableId != "geneList") {
+         return true;
+      }
+
+      btnVal = $("#geneFilterOptions input[type='radio']:checked").val();
+      // aData[4] is regulation.
+      return (btnVal == 'all' || btnVal == aData[4]);
+   };
+
+   $.fn.dataTableExt.afnFiltering.push(filterGeneList);
+
+   $('#geneFilterOptions input').change(function() {
+      geneList.fnDraw();
    });
 
    // Get the list of species from the server.
