@@ -43,7 +43,6 @@ function updateExpsPerGene(geneId) {
        $("#gene-start").html(data[0].start);
        $("#gene-end").html(data[0].end);
        $("#gene-length").html(data[0].length);
-       $("#gene-seq").html(data[0].sequence);
     },
     'json'
    );
@@ -84,7 +83,7 @@ function setupGeneSummary() {
       "sScrollY": height,
       "aoColumns": [ 
          {"sTitle": "Experiment", "mDataProp": "label"},
-         {"sTitle": "Genes", "mDataProp": "regulation"},
+         {"sTitle": "Regulation", "mDataProp": "regulation"},
       ]
 
    });

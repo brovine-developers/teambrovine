@@ -106,7 +106,7 @@ EOT;
       $this->load->database();
       $geneid = $this->input->get('geneid');
       $sql = <<<EOT
-       SELECT geneabbrev, genename, chromosome, start, end, ABS(start - end) as length, sequence
+       SELECT geneabbrev, genename, chromosome, start, end, ABS(start - end)+1 as length, sequence
        FROM genes INNER JOIN promoter_sequences USING (geneid)
        WHERE genename = ? 
 EOT;

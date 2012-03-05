@@ -1,10 +1,12 @@
 <h1>Gene Summary</h1>
+
 <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="geneList_summ">
    <thead>
    </thead>
    <tbody>
    </tbody>
 </table>
+<p>&nbsp;</p>
 
 <div id="gene-display" style="display: none;">
    <h3 id="gene-name">Gene Name</h3>
@@ -35,14 +37,10 @@
             <th>Length</th>
             <td id="gene-length"></td>
          </tr>
-
-         <tr>
-            <th>Promoter Seq.</th>
-            <td id="gene-seq"></td>
-         </tr>
       </tbody>
    </table>
 </div>
+<p>&nbsp;</p>
 
 <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="experimentGene">
    <thead>
