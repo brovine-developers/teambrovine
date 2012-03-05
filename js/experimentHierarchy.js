@@ -1,3 +1,5 @@
+var curGeneid;
+
 function updateSpeciesList() {
    jQuery.get("ajax/getSpeciesList",
    function(data) {
@@ -55,9 +57,9 @@ function updateSequenceList(geneid, transfac, study) {
    );
 }
 
-function updateFactorList(geneid) {
+function updateFactorList() {
    jQuery.get("ajax/getFactorList",
-   { 'geneid': geneid },
+   { 'geneid': curGeneid },
    function(data) {
       factorList.fnClearTable();
       sequenceList.fnClearTable();
@@ -70,8 +72,7 @@ function updateFactorList(geneid) {
          var rowData = factorList.fnGetData(this);
          var transfac = rowData.transfac;
          var study = rowData.study;
-         var geneid = geneList.fnGetData(geneList.$('tr.selected')[0]).geneid;
-         updateSequenceList(geneid, transfac, study);
+         updateSequenceList(curGeneid, transfac, study);
       });
 
    },
@@ -94,8 +95,8 @@ function updateGeneList(experimentid) {
          geneList.$('tr').removeClass('selected');
          $(this).addClass('selected');
          var rowData = geneList.fnGetData(this);
-         var geneid = rowData.geneid;
-         updateFactorList(geneid);
+         curGeneid = rowData.geneid;
+         updateFactorList();
       });
 
    },
@@ -269,21 +270,115 @@ function setupExperimentHierarchy() {
    
    });
 
+   // Setup Gene filter
+   var geneFilterVal = $("#geneFilterOptions input[type='radio']:checked").val();
+
    var filterGeneList = function(oSettings, aData, iDataIndex) {
       if (oSettings.sTableId != "geneList") {
          return true;
       }
 
-      btnVal = $("#geneFilterOptions input[type='radio']:checked").val();
       // aData[4] is regulation.
-      return (btnVal == 'all' || btnVal == aData[4]);
+      return (geneFilterVal == 'all' || geneFilterVal == aData[4]);
    };
 
    $.fn.dataTableExt.afnFiltering.push(filterGeneList);
 
+   // Add radio button listener to redraw table.
    $('#geneFilterOptions input').change(function() {
+      // Find button val outside the loop for speed purposes.
+      geneFilterVal = $("#geneFilterOptions input[type='radio']:checked").val();
       geneList.fnDraw();
    });
+
+   // Setup Regulatory Sequence filter
+   var minLaVal;
+   var minLaSlashVal;
+   var minLqVal;
+   var maxLdVal;
+   var minBegVal;
+   var maxBegVal;
+   var senseFilterVal;
+
+   var updateSequenceFilter = function() {
+      minLaVal = $('#minla').val();
+      minLaSlashVal = $('#minlaslash').val();
+      minLqVal = $('#minlq').val();
+      maxLdVal = $('#maxld').val();
+      minBegVal = $('#minbeg').val();
+      maxBegVal = $('#maxbeg').val();
+
+      if (minLaVal == '') {
+         minLaVal = -99999;
+      } else {
+         minLaVal = minLaVal * 1.0;
+      }
+
+      if (minLaSlashVal == '') {
+         minLaSlashVal = -99999;
+      } else {
+         minLaSlashVal = minLaSlashVal * 1.0;
+      }
+
+      if (minLqVal == '') {
+         minLqVal = -99999;
+      } else {
+         minLqVal = minLqVal * 1.0;
+      }
+      
+      if (maxLdVal == '') {
+         maxLdVal = 99999;
+      } else {
+         maxLdVal = maxLdVal * 1.0;
+      }
+      
+      if (minBegVal == '') {
+         minBegVal = -99999;
+      } else {
+         minBegVal = minBegVal * 1.0;
+      }
+      
+      if (maxBegVal == '') {
+         maxBegVal = 99999;
+      } else {
+         maxBegVal = maxBegVal * 1.0;
+      }
+
+      senseFilterVal = $("#senseFilters input[type='radio']:checked").val();
+   };
+
+   updateSequenceFilter();
+   
+   var filterSequenceList = function(oSettings, aData, iDataIndex) {
+      if (oSettings.sTableId != "sequenceList") {
+         return true;
+      }
+
+      return (
+         // Check Begin
+         aData[0] >= minBegVal && 
+         aData[0] <= maxBegVal && 
+         // Check Sense
+         (aData[2] == senseFilterVal || senseFilterVal == 'all') &&
+         // Check L-Values
+         aData[3] >= minLaVal &&
+         aData[4] >= minLaSlashVal &&
+         aData[5] >= minLqVal &&
+         aData[6] <= maxLdVal
+      );
+   };
+
+   $.fn.dataTableExt.afnFiltering.push(filterSequenceList);
+
+   var triggerSequenceListRedraw = function() {
+      updateSequenceFilter();
+      sequenceList.fnDraw();
+
+   };
+
+   // Add radio button listener to redraw table.
+   $('#senseFilters input').change(triggerSequenceListRedraw);
+   $("#sequenceFilterOptions input[type='text']").keyup(triggerSequenceListRedraw);
 
    // Get the list of species from the server.
    updateSpeciesList();

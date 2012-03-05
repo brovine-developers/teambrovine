@@ -72,7 +72,7 @@
    <div class="span12">
       <div class="well">
          <h3>Regulatory Sequence Filter Options</h3>
-         <div class="row">
+         <div class="row" id="sequenceFilterOptions">
             <div class="span1">
                <label>Min La<br>
                   <input type="text" class="span1" id="minla">
@@ -107,7 +107,7 @@
                <div class="row">
                   <div class="span1">Sense</div>
                </div>
-               <div class="row senseFilters">
+               <div class="row" id="senseFilters">
                   <div class="span1">
                   <label class="radio">
                      <input type="radio" name="senseFilter" value="all" checked>
@@ -116,13 +116,13 @@
                   </div>
                   <div class="span1">
                   <label class="radio">
-                     <input type="radio" name="senseFilter" value="n">
+                     <input type="radio" name="senseFilter" value="N">
                      N
                   </label>
                   </div>
                   <div class="span1">
                   <label class="radio">
-                     <input type="radio" name="senseFilter" value="r">
+                     <input type="radio" name="senseFilter" value="R">
                      R
                   </label>
                   </div>
