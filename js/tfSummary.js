@@ -5,17 +5,28 @@ function updateTFSummary() {
          tfSummary.fnAddData(data);
          fixTableWidth(tfSummary);
 
-         /*comparisonList.$('tr').click(function(e) {
-            comparisonList.$('tr').removeClass('selected');
+         tfSummary.$('tr').click(function(e) {
+            tfSummary.$('tr').removeClass('selected');
             $(this).addClass('selected');
-            var rowData = comparisonList.fnGetData(this);
+            var rowData = tfSummary.fnGetData(this);
 
-            var comparisonTypeId = rowData.comparisontypeid;
-            geneList.fnClearTable();
-            factorList.fnClearTable();
-            sequenceList.fnClearTable();
-            updateExperimentList(comparisonTypeId);
-         });*/
+            var tf = rowData.transfac;
+            updateTFOccurrences(tf);
+         });
+      },
+      'json'
+   );
+}
+
+function updateTFOccurrences(tf) {
+   jQuery.get("ajax/getTFOccur",
+      {
+         "tf": tf
+      },
+      function(data) {
+         tfOccur.fnClearTable();
+         tfOccur.fnAddData(data);
+         fixTableWidth(tfOccur);
       },
       'json'
    );
@@ -38,6 +49,28 @@ function setupTFSummary() {
          {"sTitle": "Studies", "mDataProp": "numStudies"},
          {"sTitle": "Genes", "mDataProp": "numGenes"},
          {"sTitle": "Occurrences", "mDataProp": "numOccs"},
+      ]
+
+   });
+
+   tfOccur = $('#tf_occur').dataTable({
+      "sDom": "<'row'<'span12'f>r>t<'row'<'span12'i>>",
+      "bPaginate": false,
+      "oLanguage": {
+         "sSearch": "Search Transfac Occurrences",
+         "sInfo": "Showing _TOTAL_ occurrences",
+         "sInfoFiltered": " of _MAX_"
+      },
+      "sScrollY": height,
+      "aoColumns": [
+         {"sTitle": "Comparison", "mDataProp": "celltype"},
+         {"sTitle": "Experiment", "mDataProp": "label"},
+         {"sTitle": "Gene Name", "mDataProp": "genename"},
+         {"sTitle": "Model", "mDataProp": "study"},
+         {"sTitle": "Species", "mDataProp": "species"},
+         {"sTitle": "Beginning", "mDataProp": "beginning"},
+         {"sTitle": "Sense", "mDataProp": "sense"},
+         {"sTitle": "Length", "mDataProp": "length"},
       ]
 
    });

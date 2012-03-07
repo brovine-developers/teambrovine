@@ -132,24 +132,7 @@ EOT;
 
    public function getTFSummary() {
       $this->load->database();
-      // This query is slow when written the obvious way:
-      /*
-      $sql = <<<EOT
-       SELECT f.transfac,
-        COUNT(DISTINCT f.study) as numStudies,
-        COUNT(DISTINCT r.geneid) as numGenes,
-        COUNT(*) as numOccs
-       FROM factor_matches f INNER JOIN regulatory_sequences r USING (seqid)
-       GROUP BY f.transfac
-EOT;
-       */
-
-      /* This one is wayyyy faster. During my testing, it was around .3 seconds.
-       * It could be faster, probably. We could do 3 separate queries and merge
-       * the results in PHP. The numOccs query and numStudies query are about .01
-       * to .02 seconds each. The numGenes is a little longer at .1 to .2.
-       * For simplicity's sake, I'm doing the work in the db, though.
-       */
+      
       $sql = <<<EOT
        SELECT *
        FROM 
@@ -171,6 +154,25 @@ EOT;
 EOT;
 
       $query = $this->db->query($sql);
+
+      echo json_encode($query->result());
+   }
+
+   public function getTFOccur() {
+      $this->load->database();
+      
+      $tfName = $this->input->get('tf');
+      $sql = <<<EOT
+       SELECT celltype, species, label, genename, study, beginning, length, sense
+       FROM factor_matches
+          inner join regulatory_sequences using (seqid)
+          inner join genes using (geneid)
+          inner join experiments using (experimentid)
+          inner join comparison_types using (comparisontypeid)
+       where transfac = ?
+EOT;
+
+      $query = $this->db->query($sql, array($tfName));
 
       echo json_encode($query->result());
    }
