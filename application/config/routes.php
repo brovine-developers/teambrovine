@@ -45,7 +45,7 @@ $route['Upload'] = '/main/Upload';
 $route['ExperimentHierarchy'] = '/main/ExperimentHierarchy';
 $route['GeneSummary'] = '/main/GeneSummary';
 $route['TranscriptionFactorSummary'] = '/main/TranscriptionFactorSummary';
-
+$route['GeneSearch'] = '/main/GeneSearch';
 
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */

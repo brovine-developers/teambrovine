@@ -59,6 +59,14 @@ class Main extends CI_Controller {
       $this->_renderPage('Transcription Factor Summary');
    }
 
+   /*Ryan*/
+   public function GeneSearch() {
+	$this->_initPage();
+	$this->template->write_view('content', 'geneSearch.php');
+	$this->template->add_js('js/geneSearch.js');
+	$this->_renderPage('Gene Search');
+   }
+   
    /**
     * _initPage is a function I wrote to simplify initializing a page.
     * See its use in index().
@@ -89,7 +97,9 @@ class Main extends CI_Controller {
          'Upload' => 'Upload',
          'ExperimentHierarchy' => 'Experiment Hierarchy',
          'GeneSummary' => 'Gene Summary',
-         'TranscriptionFactorSummary' => 'Transcription Factor Summary'
+         'TranscriptionFactorSummary' => 'Transcription Factor Summary',
+	 /*Ryan*/
+	 'GeneSearch' => 'Gene Search'
       );
       $data = array(
          'siteName' => 'Team Brovine!',
