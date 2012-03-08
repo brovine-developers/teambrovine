@@ -10,7 +10,7 @@
 
 <div class="row ruleRow">
    <div class="span2 selector"> 
-      <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="speciesList">
+      <table class="table table-striped table-bordered" id="speciesList">
          <thead>
          </thead>
          <tbody>
@@ -18,16 +18,15 @@
       </table>
    </div>
    <div class="span4 selector">
-      <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="comparisonList">
+      <table class="table table-striped table-bordered" id="comparisonList">
          <thead>
-            <th>Comparisons</th>
          </thead>
          <tbody>
          </tbody>
       </table>
    </div>
    <div class="span6 selector">
-      <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="experimentList">
+      <table class="table table-striped table-bordered" id="experimentList">
          <thead>
          </thead>
          <tbody>
@@ -52,7 +51,7 @@
 </div>
 <div class="row ruleRow">
    <div class="span8">
-      <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="geneList">
+      <table class="table table-striped table-bordered" id="geneList">
          <thead>
          </thead>
          <tbody>
@@ -60,7 +59,7 @@
       </table>
    </div>
    <div class="span4">
-      <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="factorList">
+      <table class="table table-striped table-bordered" id="factorList">
          <thead>
          </thead>
          <tbody>
@@ -135,7 +134,7 @@
 </div>
 <div class="row ruleRow">
    <div class="span12">
-      <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="sequenceList">
+      <table class="table table-striped table-bordered" id="sequenceList">
          <thead>
          </thead>
          <tbody>
