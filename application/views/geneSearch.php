@@ -1,6 +1,17 @@
 <h1>Gene Search</h1>
 
 <div class="row ruleRow">
+   <div class="span4">
+      <table class="table table-striped table-bordered" id="factorList">
+         <thead>
+         </thead>
+         <tbody>
+         </tbody>
+      </table>
+   </div>
+</div>
+
+<div class="row ruleRow">
    <div class="span2 selector">
       <table class="table table-striped table-bordered" id="speciesList">
          <thead>

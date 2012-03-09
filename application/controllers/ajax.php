@@ -216,6 +216,44 @@ EOT;
       echo json_encode($result);
    }
 
+   //RyanTestFunction
+   public function getDistinctFactorList() {
+      $this->load->database();
+      $sql = <<<EOT
+       SELECT DISTINCT study, transfac, COUNT(seqid) as numTimes
+       FROM regulatory_sequences INNER JOIN factor_matches USING(seqid)
+       GROUP BY study, transfac
+EOT;
+      $query = $this->db->query($sql);
+
+      $result = $query->result_array();
+      foreach ($result as &$row) {
+         $row['studyPretty'] = str_replace('/', ' /<br>', $row['study']);
+         $row['allRow'] = 0;
+      }
+
+      // Get All Count
+      $sql = <<<EOT
+       SELECT COUNT(seqid) as numTimes
+       FROM regulatory_sequences INNER JOIN factor_matches USING(seqid)
+EOT;
+      $query = $this->db->query($sql);
+      $countInfo = $query->row();
+
+      // Add "All" Row.
+      $result[] = array(
+         'study' => '-',
+         'studyPretty' => '-',
+         'transfac' => 'All',
+         'numTimes' => $countInfo->numTimes,
+         'allRow' => 1
+      );
+
+
+      echo json_encode($result);
+   }
+
+
    /**
     * This fetches the promoter sequence for a given gene. We use this
     * when we present regulatory sequence information, since we don't store
