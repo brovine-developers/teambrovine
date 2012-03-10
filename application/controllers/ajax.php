@@ -305,33 +305,29 @@ EOT;
         }
         else{
            $sql .= "(factor_matches.transFac = '$transFacs[$i]' AND
-                    factor_matches.study = '$studies[$i]')";
-            if($i != count($transFacs) - 1){
-              $sql .= " OR ";
-            }
-            else{
-              $sql .= ") AND ";
-              
-              if($experiment){
-                $sql .= "genes.experimentid = experiments.experimentid AND
-                         experiments.label = '$experiment'";
-              }
-              elseif($comparisontypeid){
-                $sql .= "genes.experimentid = experiments.experimentid AND
-                         experiments.comparisontypeid = $comparisontypeid";
-              }
-              elseif($species){
-                $sql .= "genes.experimentid = experiments.experimentid AND
-                         experiments.comparisontypeid = comparison_types.comparisontypeid AND
-                         comparison_types.species = '$species'";
-              }
-              else{
-                 $sql = str_replace(") AND ", ");", $sql);
-              }
-	    }
-         }
+                    factor_matches.study = '$studies[$i]') OR ";
+        }
       }
-
+      $sql .= ")) AND ";
+      $sql = str_replace(") OR )) AND ", ")) AND ", $sql);
+              
+      if($experiment){
+          $sql .= "genes.experimentid = experiments.experimentid AND
+                   experiments.label = '$experiment'";
+      }
+      elseif($comparisontypeid){
+          $sql .= "genes.experimentid = experiments.experimentid AND
+                   experiments.comparisontypeid = $comparisontypeid";
+      }
+      elseif($species){
+          $sql .= "genes.experimentid = experiments.experimentid AND
+                   experiments.comparisontypeid = comparison_types.comparisontypeid AND
+                   comparison_types.species = '$species'";
+      }
+      else{
+           $sql = str_replace(")) AND ", "));", $sql);
+      }
+      
       $query = $this->db->query($sql, array($minLa, $minLaSlash, $minLq, $maxLd));
 
       $result = $query->result();

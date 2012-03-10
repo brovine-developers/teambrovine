@@ -58,8 +58,8 @@ function updateSpeciesList() {
          species = rowData.species;
          experimentList.fnClearTable();
          updateComparisonList(species);
-         comparisontypeid = null;
-         experiment = null;
+         comparisontypeid = undefined;
+         experiment = undefined;
          updateGeneFilter();
          fixAllTableWidths();
       });
@@ -105,7 +105,7 @@ function updateComparisonList(curSpecies) {
             var rowData = comparisonList.fnGetData(this);
             comparisontypeid = rowData.comparisontypeid;
             updateExperimentList(comparisontypeid);
-            experiment = null;
+            experiment = undefined;
             updateGeneFilter();
          });
       },
