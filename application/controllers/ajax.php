@@ -288,6 +288,8 @@ public function getGeneFoundListFromDB() {
       $comparisontypeid = $this->input->get('comparisontypeid');
       $experiment = $this->input->get('experiment');
       
+      $isAll = false;
+
       $sql = <<<EOT
       SELECT DISTINCT genes.genename, genes.regulation
       FROM genes, regulatory_sequences, factor_matches, experiments, comparison_types
@@ -301,6 +303,7 @@ EOT;
       for($i = 0; $i < count($transFacs); $i++){
         if($transFacs[$i] == 'All' && $studies[$i] == '-'){
            $sql = str_replace(" AND (", "", $sql);
+           $isAll = true;
            break;
         }
         else{
@@ -308,9 +311,13 @@ EOT;
                     factor_matches.study = '$studies[$i]') OR ";
         }
       }
-      $sql .= ")) AND ";
-      $sql = str_replace(") OR )) AND ", ")) AND ", $sql);
-              
+      if($isAll){
+         $sql .= " AND ";
+      }
+      else{
+         $sql .= ")) AND ";
+         $sql = str_replace(") OR )) AND ", ")) AND ", $sql);
+      }        
       if($experiment){
           $sql .= "genes.experimentid = experiments.experimentid AND
                    experiments.label = '$experiment'";
@@ -325,7 +332,12 @@ EOT;
                    comparison_types.species = '$species'";
       }
       else{
-           $sql = str_replace(")) AND ", "));", $sql);
+           if($isAll){
+             $sql = str_replace(" AND ", ";", $sql);
+           }
+           else{
+             $sql = str_replace(")) AND ", "));", $sql);
+           }
       }
       
       $query = $this->db->query($sql, array($minLa, $minLaSlash, $minLq, $maxLd));
