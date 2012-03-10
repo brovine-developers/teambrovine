@@ -1,4 +1,46 @@
-var curGeneid;
+var transFacs = new Array();
+var studies = new Array();
+
+// Setup Gene Filter
+var minLaVal;
+var minLaSlashVal;
+var minLqVal;
+var maxLdVal;
+
+function updateGeneFilter(){ 
+   minLaVal = $('#minla').val();
+   minLaSlashVal = $('#minlaslash').val();
+   minLqVal = $('#minlq').val();
+   maxLdVal = $('#maxld').val();
+
+   if (minLaVal == '') {
+      minLaVal = -99999;
+   } else {
+      minLaVal = minLaVal * 1.0;
+   }
+
+   if (minLaSlashVal == '') {
+      minLaSlashVal = -99999;
+   } else {
+      minLaSlashVal = minLaSlashVal * 1.0;
+   }
+ 
+   if (minLqVal == '') {
+      minLqVal = -99999;
+   } else {
+      minLqVal = minLqVal * 1.0;
+   }
+
+   if (maxLdVal == '') {
+      maxLdVal = 99999;
+   } else {
+      maxLdVal = maxLdVal * 1.0;
+   }
+
+   updateGeneFoundList(transFacs, studies, minLaVal, minLaSlashVal, minLqVal, maxLdVal);
+}
+
+
 
 function updateSpeciesList() {
    jQuery.get("ajax/getSpeciesList",
@@ -68,17 +110,28 @@ function updateFactorList() {
    jQuery.get("ajax/getDistinctFactorList",
    function(data) {
       factorList.fnClearTable();
-     // sequenceList.fnClearTable();
-      $('#sequenceInfo').empty();
       factorList.fnAddData(data);
       fixTableWidth(factorList);
       factorList.$('tr').click(function(e) {
-         factorList.$('tr').removeClass('selected');
-         $(this).addClass('selected');
-         var rowData = factorList.fnGetData(this);
-         var transfac = rowData.transfac;
-         var study = rowData.study;
-         //updateSequenceList(curGeneid, transfac, study);
+         if(e.metaKey|| e.ctrlKey){
+	    $(this).addClass('selected');
+            var rowData = factorList.fnGetData(this);
+            transFacs.push(rowData.transfac);
+            studies.push(rowData.study);
+	 }
+         else{
+            factorList.$('tr').removeClass('selected');
+            $(this).addClass('selected');
+          
+            transFacs.length = 0;
+            studies.length = 0;
+          
+            var rowData = factorList.fnGetData(this);
+            transFacs.push(rowData.transfac);
+            studies.push(rowData.study);
+         }
+         updateGeneFilter();
+         updateComparisonFromGeneList("");
       });
 
    },
@@ -86,11 +139,64 @@ function updateFactorList() {
    );
 }
 
+function updateComparisonFromGeneList(genename) {
+   jQuery.get("ajax/getComparisonFromGeneList",
+      {
+         'genename' : genename
+      },
+      function(data) {
+         comparisonFromGeneList.fnClearTable();
+         comparisonFromGeneList.fnAddData(data);
+         fixTableWidth(comparisonFromGeneList);
+      },
+      'json'
+   );
+}
+
+function updateGeneFoundList(transFacs, studies, minLaVal, minLaSlashVal, minLqVal, maxLdVal) {
+   jQuery.get("ajax/getGeneFoundListFromDB",
+      {
+         'transFacs' : transFacs,
+         'studies' : studies,
+         'minLa' : minLaVal,
+         'minLaSlash' : minLaSlashVal,
+         'minLq' : minLqVal,
+         'maxLd' : maxLdVal
+      },
+      function(data) {
+         geneFoundList.fnClearTable();
+         geneFoundList.fnAddData(data);
+         fixTableWidth(geneFoundList);
+         geneFoundList.$('tr').click(function(e) {
+            geneFoundList.$('tr').removeClass('selected');
+            $(this).addClass('selected');
+            var rowData = geneFoundList.fnGetData(this);
+            var genename = rowData.genename;
+            updateComparisonFromGeneList(genename);
+         });
+      },
+      'json'
+   );
+}
+
 function setupExperimentHierarchy() {
    var firstRowHeight = "100px";
    var secondRowHeight = "150px";
    var thirdRowHeight = "150px";
-  
+
+   comparisonFromGeneList = $('#comparisonFromGeneList').dataTable({
+      "sDom": "<'row'<'span6'f>r>t<'row'<'span6'i>>",
+      "bPaginate": false,
+      "sScrollY": secondRowHeight,
+      "aoColumns": [
+         {"sTitle": "Comparison", "mDataProp": "comparison"},
+         {"sTitle": "Study", "mDataProp": "label"}/*
+         {"sTitle": "ComparisonTypeId", "mDataProp": "comparisontypeid", "bVisible": false},
+         {"sTitle": "Study", "mDataProp": "studyPretty"},
+         {"sTitle": "StudyOrig", "mDataProp": "study", "bVisible": false}*/
+      ]
+   });
+
    factorList = $('#factorList').dataTable({
       "sDom": "<'row'<'span4'f>r>t<'row'<'span4'i>>",
       "bPaginate": false,
@@ -156,6 +262,22 @@ function setupExperimentHierarchy() {
          {"sTitle": "Experimentid", "mDataProp": "experimentid", "bVisible": false}
       ]
    });
+
+   geneFoundList = $('#geneFoundList').dataTable( {
+      "sDom": "<'row'<'span4'f>r>t<'row'<'span4'i>>",
+      "sPaginationType": "bootstrap",
+      "bPaginate": false,
+      "bInfo": false,
+      "sScrollY": thirdRowHeight,
+      "oLanguage": {
+         "sSearch": "Search Genes"
+      },
+      "aoColumns": [
+         {"sTitle": "GeneName", "mDataProp": "genename"},
+         {"sTitle": "Regulation", "mDataProp": "regulation"}
+      ]
+   });
+
    updateFactorList();
    updateSpeciesList();
 }

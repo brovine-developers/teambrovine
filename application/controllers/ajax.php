@@ -253,6 +253,78 @@ EOT;
       echo json_encode($result);
    }
 
+public function getComparisonFromGeneList() {
+    $this->load->database();
+    $genename = $this->input->get('genename');
+    $sql = <<<EOT
+    SELECT comparison_types.species, comparison_types.celltype, experiments.label
+    FROM comparison_types, experiments, genes
+    WHERE genes.experimentid = experiments.experimentid AND
+          experiments.comparisontypeid = comparison_types.comparisontypeid AND
+          genes.genename = ?;
+EOT;
+    $query = $this->db->query($sql, $genename);
+    $result = $query->result();
+    $out = array();
+    foreach ($result as $row) {
+       $out[] = array(
+                 'comparison' => ucfirst($row->species) . ": {$row->celltype}",
+                 'label' => $row->label
+       );
+     }
+     echo json_encode($out);
+  }
+
+
+///RyanTest
+ public function getGeneFoundListFromDB() {
+      $this->load->database();
+      $minLa = $this->input->get('minLa');
+      $minLaSlash = $this->input->get('minLaSlash');
+      $minLq = $this->input->get('minLq');
+      $maxLd = $this->input->get('maxLd');
+      $transFacs = $this->input->get('transFacs');
+      $studies = $this->input->get('studies');
+     
+      $sql = <<<EOT
+      SELECT DISTINCT genes.genename, genes.regulation
+      FROM genes, regulatory_sequences, factor_matches
+      WHERE genes.geneid = regulatory_sequences.geneid AND
+            factor_matches.seqid = regulatory_sequences.seqid AND
+            factor_matches.la >= ? AND
+            factor_matches.la_slash >= ? AND
+            factor_matches.lq >= ? AND
+            factor_matches.ld <= ? AND (
+EOT;
+      for($i = 0; $i < count($transFacs); $i++){
+        if($transFacs[$i] == 'All' && $studies[$i] == '-'){
+           $sql = str_replace(" AND (", "", $sql);
+           break;
+        }
+        else{
+           $sql .= "(factor_matches.transFac = '$transFacs[$i]' AND
+                    factor_matches.study = '$studies[$i]')";
+            if($i != count($transFacs) - 1){
+              $sql .= " OR ";
+            }
+            else{
+              $sql .= ");";
+	    }
+         }
+      }
+
+      $query = $this->db->query($sql, array($minLa, $minLaSlash, $minLq, $maxLd));
+
+      $result = $query->result();
+      $out = array();
+      foreach ($result as $row) {
+        $out[] = array(
+                 'genename' => $row->genename,
+                 'regulation' => $row->regulation
+        );
+      }
+      echo json_encode($out);
+   }
 
    /**
     * This fetches the promoter sequence for a given gene. We use this
