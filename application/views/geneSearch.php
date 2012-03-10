@@ -16,7 +16,7 @@
    <div class="span5">
       <div class="well">
          <h3>Filter Options</h3>
-         <div class="row" id="sequenceFilterOptions">
+         <div class="row" id="geneFilterOptions">
             <div class="span1">
                <label>Min La<br>
                   <input type="text" class="span1" id="minla">

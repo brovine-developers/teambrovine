@@ -275,9 +275,7 @@ EOT;
      echo json_encode($out);
   }
 
-
-///RyanTest
- public function getGeneFoundListFromDB() {
+public function getGeneFoundListFromDB() {
       $this->load->database();
       $minLa = $this->input->get('minLa');
       $minLaSlash = $this->input->get('minLaSlash');
@@ -285,10 +283,14 @@ EOT;
       $maxLd = $this->input->get('maxLd');
       $transFacs = $this->input->get('transFacs');
       $studies = $this->input->get('studies');
-     
+      
+      $species = $this->input->get('species');
+      $comparisontypeid = $this->input->get('comparisontypeid');
+      $experiment = $this->input->get('experiment');
+      
       $sql = <<<EOT
       SELECT DISTINCT genes.genename, genes.regulation
-      FROM genes, regulatory_sequences, factor_matches
+      FROM genes, regulatory_sequences, factor_matches, experiments, comparison_types
       WHERE genes.geneid = regulatory_sequences.geneid AND
             factor_matches.seqid = regulatory_sequences.seqid AND
             factor_matches.la >= ? AND
@@ -308,7 +310,24 @@ EOT;
               $sql .= " OR ";
             }
             else{
-              $sql .= ");";
+              $sql .= ") AND ";
+              
+              if($experiment){
+                $sql .= "genes.experimentid = experiments.experimentid AND
+                         experiments.label = '$experiment'";
+              }
+              elseif($comparisontypeid){
+                $sql .= "genes.experimentid = experiments.experimentid AND
+                         experiments.comparisontypeid = $comparisontypeid";
+              }
+              elseif($species){
+                $sql .= "genes.experimentid = experiments.experimentid AND
+                         experiments.comparisontypeid = comparison_types.comparisontypeid AND
+                         comparison_types.species = '$species'";
+              }
+              else{
+                 $sql = str_replace(") AND ", ");", $sql);
+              }
 	    }
          }
       }

@@ -1,5 +1,8 @@
 var transFacs = new Array();
 var studies = new Array();
+var species;
+var comparisontypeid;
+var experiment;
 
 // Setup Gene Filter
 var minLaVal;
@@ -37,7 +40,7 @@ function updateGeneFilter(){
       maxLdVal = maxLdVal * 1.0;
    }
 
-   updateGeneFoundList(transFacs, studies, minLaVal, minLaSlashVal, minLqVal, maxLdVal);
+   updateGeneFoundList(transFacs, studies, minLaVal, minLaSlashVal, minLqVal, maxLdVal, species, comparisontypeid, experiment);
 }
 
 
@@ -52,10 +55,12 @@ function updateSpeciesList() {
          speciesList.$('tr').removeClass('selected');
          $(this).addClass('selected');
          var rowData = speciesList.fnGetData(this);
-
-         var curSpecies = rowData.species;
+         species = rowData.species;
          experimentList.fnClearTable();
-         updateComparisonList(curSpecies);
+         updateComparisonList(species);
+         comparisontypeid = null;
+         experiment = null;
+         updateGeneFilter();
          fixAllTableWidths();
       });
    },
@@ -76,8 +81,9 @@ function updateExperimentList(comparisontypeid) {
          experimentList.$('tr').removeClass('selected');
          $(this).addClass('selected');
          var rowData = experimentList.fnGetData(this);
-         var experimentid = rowData.experimentid;
-         //do something with this data
+         experiment = rowData.label;
+         updateGeneFilter();
+         fixAllTableWidths();
       });
    },
    'json'
@@ -97,8 +103,10 @@ function updateComparisonList(curSpecies) {
             comparisonList.$('tr').removeClass('selected');
             $(this).addClass('selected');
             var rowData = comparisonList.fnGetData(this);
-            var comparisonTypeId = rowData.comparisontypeid;
-            updateExperimentList(comparisonTypeId);
+            comparisontypeid = rowData.comparisontypeid;
+            updateExperimentList(comparisontypeid);
+            experiment = null;
+            updateGeneFilter();
          });
       },
       'json'
@@ -153,7 +161,7 @@ function updateComparisonFromGeneList(genename) {
    );
 }
 
-function updateGeneFoundList(transFacs, studies, minLaVal, minLaSlashVal, minLqVal, maxLdVal) {
+function updateGeneFoundList(transFacs, studies, minLaVal, minLaSlashVal, minLqVal, maxLdVal, species, comparisontypeid, experiment) {
    jQuery.get("ajax/getGeneFoundListFromDB",
       {
          'transFacs' : transFacs,
@@ -161,7 +169,10 @@ function updateGeneFoundList(transFacs, studies, minLaVal, minLaSlashVal, minLqV
          'minLa' : minLaVal,
          'minLaSlash' : minLaSlashVal,
          'minLq' : minLqVal,
-         'maxLd' : maxLdVal
+         'maxLd' : maxLdVal,
+         'species' : species,
+         'comparisontypeid' : comparisontypeid,
+         'experiment' : experiment
       },
       function(data) {
          geneFoundList.fnClearTable();
