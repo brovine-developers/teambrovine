@@ -22,7 +22,7 @@
                </tr>
                <tr>
                   <th>Gene</th>
-                  <td><?=$sequenceInfo['geneabbrev']?></td>
+                  <td><?=$sequenceInfo['genename']?> (<?=$sequenceInfo['geneabbrev']?>)</td>
                </tr>
                <tr>
                   <th>Species</th>
@@ -41,32 +41,32 @@
       </div>
 
       <div class="span6">
-         <div class="row">
-            <div class="span3">
-               <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered">
-                  <thead>
-                     <th>Factors</th>
-                  </thead>
-                  <tbody>
-                     <? foreach ($sequenceInfo['transfacs'] as $factor) : ?>
-                        <tr><td><?=$factor?></td></tr>
-                     <? endforeach; ?>
-                  </tbody>
-               </table>
-            </div>
-            <div class="span3">
-               <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered">
-                  <thead>
-                     <th>Studies</th>
-                  </thead>
-                  <tbody>
-                     <? foreach ($sequenceInfo['studies'] as $study) : ?>
-                        <tr><td><?=$study?></td></tr>
-                     <? endforeach; ?>
-                  </tbody>
-               </table>
-            </div>
-         </div>
+         <table class="table table-striped table-bordered">
+            <thead>
+               <tr>
+                  <th>Factor</th>
+                  <th>Study</th>
+                  <th>La</th>
+                  <th>La/</th>
+                  <th>Lq</th>
+                  <th>Ld</th>
+                  <th>Lpv</th>
+               </tr>
+            </thead>
+            <tbody>
+               <? foreach ($factorMatchInfo as $info) : ?>
+                  <tr>
+                     <td><?=$info['transfac']?></td>
+                     <td><?=$info['study']?></td>
+                     <td><?=$info['la']?></td>
+                     <td><?=$info['la_slash']?></td>
+                     <td><?=$info['lq']?></td>
+                     <td><?=$info['ld']?></td>
+                     <td><?=$info['lpv']?></td>
+                  </tr>
+               <? endforeach; ?>
+            </tbody>
+         </table>
 
          <h3>Similar Sequences</h3>
          <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered">
