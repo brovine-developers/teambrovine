@@ -23,13 +23,22 @@ EOT;
    public function getComparisonList() {
       $this->load->database();
       $curSpecies = $this->input->get('species');
+      
       $sql = <<<EOT
       SELECT *
       FROM comparison_types
-      WHERE species = ?
-      ORDER BY species, celltype
+      WHERE 
 EOT;
-      $query = $this->db->query($sql, array($curSpecies));
+
+      for ($i = 0; $i < count($curSpecies); $i++) {
+         if ($i != 0)
+            $sql .= " OR ";
+         $sql .= "species = ?";
+      }
+
+      $sql .= " ORDER BY species, celltype";
+      
+      $query = $this->db->query($sql, $curSpecies);
       $result = $query->result();
       $out = array();
       foreach ($result as $row) {
@@ -61,10 +70,18 @@ EOT;
          AND genes.regulation = 'down'
       ) as genecount_down
       FROM experiments
-      WHERE comparisontypeid = ?
-      ORDER BY label
+      WHERE 
 EOT;
-      $query = $this->db->query($sql, array($comparisonTypeId));
+
+      for ($i = 0; $i < count($comparisonTypeId); $i++) {
+         if ($i != 0)
+            $sql .= " OR ";
+         $sql .= "comparisontypeid = ?";
+      }
+      
+      $sql .= "ORDER BY label";
+      
+      $query = $this->db->query($sql, $comparisonTypeId);
       $result = $query->result();
 
       echo json_encode($query->result());
@@ -157,13 +174,57 @@ EOT;
 
       echo json_encode($query->result());
    }
+   
+   public function getTFDrillSummary() {
+      $this->load->database();
+      $experimentid = $this->input->get('experimentid');
+      $la = $this->input->get('la');
+      $la_s = $this->input->get('la_s');
+      $lq = $this->input->get('lq');
+      $ld = $this->input->get('ld');
+      
+      $sql = <<<EOT
+       SELECT transfac, numOccs, numGenes, numStudies
+       FROM 
+          (SELECT transfac, seqid, count(*) as numOccs
+          FROM factor_matches
+          WHERE la > ? AND la_slash > ? AND lq > ? AND ld <= ?
+          GROUP BY transfac) a
+        INNER JOIN 
+          (SELECT transfac, count(*) as numGenes
+          FROM 
+             (SELECT DISTINCT transfac, geneid
+             FROM factor_matches INNER JOIN regulatory_sequences r USING (seqid)) f1
+          GROUP BY transfac) b USING (transfac)
+        INNER JOIN
+          (SELECT transfac, count(*) as numStudies
+          FROM 
+             (SELECT DISTINCT transfac, study
+             FROM factor_matches
+               WHERE la > ? AND la_slash > ? AND lq > ? AND ld <= ?) f1
+          GROUP BY transfac) c USING (transfac)
+        INNER JOIN regulatory_sequences using (seqid)
+        INNER JOIN genes using (geneid)
+       WHERE 
+EOT;
+
+      for ($i = 0; $i < count($experimentid); $i++) {
+         if ($i != 0)
+            $sql .= " OR ";
+         $sql .= "experimentid = ?";
+      }
+
+      $query = $this->db->query($sql, array_merge(array($la, $la_s, $lq, $ld, $la, $la_s, $lq, $ld), $experimentid));
+
+      echo json_encode($query->result());
+   }
 
    public function getTFOccur() {
       $this->load->database();
       
       $tfName = $this->input->get('tf');
       $sql = <<<EOT
-       SELECT celltype, species, label, genename, study, beginning, length, sense
+       SELECT celltype, species, label, genename, geneabbrev, study, beginning, length, sense
        FROM factor_matches
           inner join regulatory_sequences using (seqid)
           inner join genes using (geneid)
@@ -173,8 +234,24 @@ EOT;
 EOT;
 
       $query = $this->db->query($sql, array($tfName));
-
-      echo json_encode($query->result());
+      $result = $query->result();
+      $out = array();
+      foreach ($result as $row) {
+         $out[] = array(
+            'celltype' => $row->celltype,
+            'speciesPretty' => ucfirst($row->species),
+            'species' => $row->species,
+            'label' => $row->label,
+            'genename' => $row->genename,
+            'geneabbrev' => $row->geneabbrev,
+            'study' => $row->study,
+            'beginning' => $row->beginning,
+            'length' => $row->length,
+            'sense' => $row->sense
+         );
+      }
+      
+      echo json_encode($out);
    }
 
    public function getFactorList() {

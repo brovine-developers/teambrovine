@@ -46,6 +46,7 @@ $route['ExperimentHierarchy'] = '/main/ExperimentHierarchy';
 $route['GeneSummary'] = '/main/GeneSummary';
 $route['TranscriptionFactorSummary'] = '/main/TranscriptionFactorSummary';
 $route['GeneSearch'] = '/main/GeneSearch';
+$route['TFPop'] = '/main/TfPop';
 
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */

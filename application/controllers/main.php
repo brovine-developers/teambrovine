@@ -67,6 +67,13 @@ class Main extends CI_Controller {
 	$this->_renderPage('Gene Search');
    }
    
+   public function TfPop() {
+      $this->_initPage();
+      $this->template->write_view('content', 'tfPop.php');
+      $this->template->add_js('js/tfPop.js');
+      $this->_renderPage('TF Popularity');
+   }
+   
    /**
     * _initPage is a function I wrote to simplify initializing a page.
     * See its use in index().
@@ -99,7 +106,8 @@ class Main extends CI_Controller {
          'GeneSummary' => 'Gene Summary',
          'TranscriptionFactorSummary' => 'Transcription Factor Summary',
 	 /*Ryan*/
-	 'GeneSearch' => 'Gene Search'
+	 'GeneSearch' => 'Gene Search',
+         'TFPop' => 'TF Popularity'
       );
       $data = array(
          'siteName' => 'Team Brovine!',
