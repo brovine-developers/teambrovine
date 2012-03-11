@@ -433,7 +433,7 @@ EOT;
        AND seqid != ?
        AND beginning = ?
        AND sense = ?
-       AND length IN (?, ?)
+       AND length IN (?, ?, ?)
        -- GROUP BY seqid
 EOT;
 
@@ -443,6 +443,7 @@ EOT;
          $sequenceInfo['beginning'],
          $sequenceInfo['sense'],
          $sequenceInfo['length'] - 1,
+         $sequenceInfo['length'],
          $sequenceInfo['length'] + 1
       );
 
@@ -466,6 +467,7 @@ EOT;
       $sql = <<<EOT
        SELECT regulatory_sequences.*,
         genes.geneabbrev,
+        genes.genename,
         experiments.label,
         comparison_types.species,
         comparison_types.celltype,
@@ -480,6 +482,16 @@ EOT;
       $query = $this->db->query($sql, array($seqid));
       $sequenceInfo = $query->row_array();
 
+      $sql = <<<EOT
+       SELECT * 
+       FROM factor_matches
+       WHERE seqid = ?
+EOT;
+   
+      $query = $this->db->query($sql, array($seqid));
+      $factorMatchInfo = $query->result_array();
+      
+
       $promoter = $this->fetchPromoter($sequenceInfo['geneid']);
       $this->calculateSingleSequenceFromPromoter($sequenceInfo, $promoter);
 
@@ -492,7 +504,8 @@ EOT;
       $sequenceInfo['similar'] = $this->getSimilarSequenceInfo($sequenceInfo);
 
       $this->load->view('sequenceInfo', array(
-         'sequenceInfo' => $sequenceInfo
+         'sequenceInfo' => $sequenceInfo,
+         'factorMatchInfo' => $factorMatchInfo
       ));
    }
    

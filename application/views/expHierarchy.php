@@ -71,6 +71,9 @@
    <div class="span12">
       <div class="well">
          <h3>Regulatory Sequence Filter Options</h3>
+<? /* TODO: Add input type="number" if you feel like setting up
+the event listeners for it. Need to get click, keypress, 
+and scroll. */ ?>
          <div class="row" id="sequenceFilterOptions">
             <div class="span1">
                <label>Min La<br>
