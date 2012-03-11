@@ -217,6 +217,7 @@ function updateGeneFoundList(transFacs, studies, minLaVal, minLaSlashVal, minLqV
          geneFoundList.fnClearTable();
          geneFoundList.fnAddData(data);
          fixTableWidth(geneFoundList);
+         updateComparisonFromGeneList("");
          geneFoundList.$('tr').click(function(e) {
             geneFoundList.$('tr').removeClass('selected');
             $(this).addClass('selected');
