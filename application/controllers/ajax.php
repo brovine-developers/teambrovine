@@ -219,12 +219,54 @@ EOT;
    //RyanTestFunction
    public function getDistinctFactorList() {
       $this->load->database();
+
+      $minLa = $this->input->get('minLa');
+      $minLaSlash = $this->input->get('minLaSlash');
+      $minLq = $this->input->get('minLq');
+      $maxLd = $this->input->get('maxLd');
+
+      $species = $this->input->get('species');
+      $comparisontypeid = $this->input->get('comparisontypeid');
+      $experiment = $this->input->get('experiment');
+
       $sql = <<<EOT
        SELECT DISTINCT study, transfac, COUNT(seqid) as numTimes
-       FROM regulatory_sequences INNER JOIN factor_matches USING(seqid)
-       GROUP BY study, transfac
+       FROM regulatory_sequences INNER JOIN factor_matches USING(seqid) INNER JOIN genes USING(geneid) 
 EOT;
-      $query = $this->db->query($sql);
+ 
+      if($experiment){
+          $sql .= " INNER JOIN experiments USING(experimentid)
+                   WHERE label = '$experiment' AND
+                   factor_matches.la >= ? AND
+                   factor_matches.la_slash >= ? AND
+                   factor_matches.lq >= ? AND
+                   factor_matches.ld <= ?";
+      }
+      elseif($comparisontypeid){
+          $sql .= " INNER JOIN experiments USING(experimentid) INNER JOIN comparison_types USING(comparisontypeid)
+                   WHERE factor_matches.la >= ? AND
+                   factor_matches.la_slash >= ? AND
+                   factor_matches.lq >= ? AND
+                   factor_matches.ld <= ?";
+      }
+      elseif($species){
+          $sql .= " INNER JOIN experiments USING(experimentid) INNER JOIN comparison_types USING(comparisontypeid)
+                   WHERE species = '$species' AND
+                   factor_matches.la >= ? AND
+                   factor_matches.la_slash >= ? AND
+                   factor_matches.lq >= ? AND
+                   factor_matches.ld <= ?";
+      }
+      else{
+         $sql .= " WHERE factor_matches.la >= ? AND
+                   factor_matches.la_slash >= ? AND
+                   factor_matches.lq >= ? AND
+                   factor_matches.ld <= ?";
+      }
+      
+      $sql .= " GROUP BY study, transfac";
+
+      $query = $this->db->query($sql, array($minLa, $minLaSlash, $minLq, $maxLd));
 
       $result = $query->result_array();
       foreach ($result as &$row) {
@@ -235,9 +277,41 @@ EOT;
       // Get All Count
       $sql = <<<EOT
        SELECT COUNT(seqid) as numTimes
-       FROM regulatory_sequences INNER JOIN factor_matches USING(seqid)
+       FROM regulatory_sequences INNER JOIN factor_matches USING(seqid) INNER JOIN genes USING(geneid)
 EOT;
-      $query = $this->db->query($sql);
+
+      if($experiment){
+          $sql .= " INNER JOIN experiments USING(experimentid)
+                   WHERE label = '$experiment' AND
+                   factor_matches.la >= ? AND
+                   factor_matches.la_slash >= ? AND
+                   factor_matches.lq >= ? AND
+                   factor_matches.ld <= ?";
+      }
+      elseif($comparisontypeid){
+          $sql .= " INNER JOIN experiments USING(experimentid) INNER JOIN comparison_types USING(comparisontypeid)
+                   WHERE factor_matches.la >= ? AND
+                   factor_matches.la_slash >= ? AND
+                   factor_matches.lq >= ? AND
+                   factor_matches.ld <= ?";
+      }
+      elseif($species){
+          $sql .= " INNER JOIN experiments USING(experimentid) INNER JOIN comparison_types USING(comparisontypeid)
+                   WHERE species = '$species' AND
+                   factor_matches.la >= ? AND
+                   factor_matches.la_slash >= ? AND
+                   factor_matches.lq >= ? AND
+                   factor_matches.ld <= ?";
+      }
+      else{
+         $sql .= " WHERE factor_matches.la >= ? AND
+                   factor_matches.la_slash >= ? AND
+                   factor_matches.lq >= ? AND
+                   factor_matches.ld <= ?";
+      }
+
+
+      $query = $this->db->query($sql, array($minLa, $minLaSlash, $minLq, $maxLd));
       $countInfo = $query->row();
 
       // Add "All" Row.
@@ -277,16 +351,8 @@ EOT;
 
 public function getGeneFoundListFromDB() {
       $this->load->database();
-      $minLa = $this->input->get('minLa');
-      $minLaSlash = $this->input->get('minLaSlash');
-      $minLq = $this->input->get('minLq');
-      $maxLd = $this->input->get('maxLd');
       $transFacs = $this->input->get('transFacs');
       $studies = $this->input->get('studies');
-      
-      $species = $this->input->get('species');
-      $comparisontypeid = $this->input->get('comparisontypeid');
-      $experiment = $this->input->get('experiment');
       
       $isAll = false;
 
@@ -294,16 +360,17 @@ public function getGeneFoundListFromDB() {
       SELECT DISTINCT genes.genename, genes.regulation
       FROM genes, regulatory_sequences, factor_matches, experiments, comparison_types
       WHERE genes.geneid = regulatory_sequences.geneid AND
-            factor_matches.seqid = regulatory_sequences.seqid AND
-            factor_matches.la >= ? AND
-            factor_matches.la_slash >= ? AND
-            factor_matches.lq >= ? AND
-            factor_matches.ld <= ? AND (
+            factor_matches.seqid = regulatory_sequences.seqid AND (
 EOT;
       for($i = 0; $i < count($transFacs); $i++){
-        if($transFacs[$i] == 'All' && $studies[$i] == '-'){
+         if($transFacs[$i] == 'All'){
+            $isAll = true;
+         }
+      }
+      
+      for($i = 0; $i < count($transFacs); $i++){
+        if($isAll){
            $sql = str_replace(" AND (", "", $sql);
-           $isAll = true;
            break;
         }
         else{
@@ -311,36 +378,13 @@ EOT;
                     factor_matches.study = '$studies[$i]') OR ";
         }
       }
-      if($isAll){
-         $sql .= " AND ";
+     
+      if(!$isAll){
+         $sql = substr($sql, 0, -4);
+         $sql .= ")";
       }
-      else{
-         $sql .= ")) AND ";
-         $sql = str_replace(") OR )) AND ", ")) AND ", $sql);
-      }        
-      if($experiment){
-          $sql .= "genes.experimentid = experiments.experimentid AND
-                   experiments.label = '$experiment'";
-      }
-      elseif($comparisontypeid){
-          $sql .= "genes.experimentid = experiments.experimentid AND
-                   experiments.comparisontypeid = $comparisontypeid";
-      }
-      elseif($species){
-          $sql .= "genes.experimentid = experiments.experimentid AND
-                   experiments.comparisontypeid = comparison_types.comparisontypeid AND
-                   comparison_types.species = '$species'";
-      }
-      else{
-           if($isAll){
-             $sql = str_replace(" AND ", ";", $sql);
-           }
-           else{
-             $sql = str_replace(")) AND ", "));", $sql);
-           }
-      }
-      
-      $query = $this->db->query($sql, array($minLa, $minLaSlash, $minLq, $maxLd));
+ 
+      $query = $this->db->query($sql);
 
       $result = $query->result();
       $out = array();

@@ -13,6 +13,11 @@ var maxLdVal;
 var filterTimer;
 var filter_timer_on = 0;
 
+function clearFactorSelections(){
+   transFacs = [];
+   studies = [];
+}
+
 function filterInputTimer(){
    updateGeneFilter();
    filter_timer_on = 0;
@@ -23,7 +28,7 @@ function setupGeneFilter(){
      if(filter_timer_on == 1){
         clearTimeout(filterTimer);
      }
-     t = setTimeout("filterInputTimer()", 750);
+     filterTimer = setTimeout("filterInputTimer()", 750);
      filter_timer_on = 1;
    });
 
@@ -31,7 +36,7 @@ function setupGeneFilter(){
      if(filter_timer_on == 1){
         clearTimeout(filterTimer);
      }
-     t = setTimeout("filterInputTimer()",750);
+     filterTimer = setTimeout("filterInputTimer()",750);
      filter_timer_on = 1;
    });
 
@@ -39,7 +44,7 @@ function setupGeneFilter(){
      if(filter_timer_on == 1){
         clearTimeout(filterTimer);
      }
-     t = setTimeout("filterInputTimer()", 750);
+     filterTimer = setTimeout("filterInputTimer()", 750);
      filter_timer_on = 1;
    });
 
@@ -47,7 +52,7 @@ function setupGeneFilter(){
      if(filter_timer_on == 1){
         clearTimeout(filterTimer);
      }
-     t = setTimeout("filterInputTimer()", 750);
+     filterTimer = setTimeout("filterInputTimer()", 750);
      filter_timer_on = 1;
    });
 }
@@ -81,7 +86,9 @@ function updateGeneFilter(){
    } else {
       maxLdVal = maxLdVal * 1.0;
    }
-   updateGeneFoundList(transFacs, studies, minLaVal, minLaSlashVal, minLqVal, maxLdVal, species, comparisontypeid, experiment);
+   clearFactorSelections();
+   updateFactorList(minLaVal, minLaSlashVal, minLqVal, maxLdVal, species, comparisontypeid, experiment);
+   //updateGeneFoundList(transFacs, studies);
 }
 
 function updateSpeciesList() {
@@ -153,18 +160,37 @@ function updateComparisonList(curSpecies) {
 
 }
 
-function updateFactorList() {
+function updateFactorList(minLaVal, minLaSlashVal, minLqVal, maxLdVal, species, comparisontypeid, experiment) {
    jQuery.get("ajax/getDistinctFactorList",
+   {
+       'species' : species,
+       'comparisontypeid' : comparisontypeid,
+       'experiment' : experiment,
+       'minLa' : minLaVal,
+       'minLaSlash' : minLaSlashVal,
+       'minLq' : minLqVal,
+       'maxLd' : maxLdVal
+   },
    function(data) {
+
       factorList.fnClearTable();
       factorList.fnAddData(data);
+      
       fixTableWidth(factorList);
       factorList.$('tr').click(function(e) {
          if(e.metaKey|| e.ctrlKey){
-	    $(this).addClass('selected');
-            var rowData = factorList.fnGetData(this);
-            transFacs.push(rowData.transfac);
-            studies.push(rowData.study);
+            if($(this).hasClass('selected')){
+               var rowData = factorList.fnGetData(this);
+               $(this).removeClass('selected');
+               transFacs.splice(transFacs.indexOf(rowData.transfac, 1));
+               studies.splice(studies.indexOf(rowData.study, 1));
+            }
+            else{
+	       $(this).addClass('selected');
+               var rowData = factorList.fnGetData(this);
+               transFacs.push(rowData.transfac);
+               studies.push(rowData.study);
+            }
 	 }
          else{
             factorList.$('tr').removeClass('selected');
@@ -177,10 +203,10 @@ function updateFactorList() {
             transFacs.push(rowData.transfac);
             studies.push(rowData.study);
          }
-         updateGeneFilter();
+         updateGeneFoundList(transFacs, studies);
          updateComparisonFromGeneList("");
       });
-
+     updateGeneFoundList(transFacs, studies);
    },
    'json'
    );
@@ -200,18 +226,11 @@ function updateComparisonFromGeneList(genename) {
    );
 }
 
-function updateGeneFoundList(transFacs, studies, minLaVal, minLaSlashVal, minLqVal, maxLdVal, species, comparisontypeid, experiment) {
+function updateGeneFoundList(transFacs, studies) {
    jQuery.get("ajax/getGeneFoundListFromDB",
       {
          'transFacs' : transFacs,
-         'studies' : studies,
-         'minLa' : minLaVal,
-         'minLaSlash' : minLaSlashVal,
-         'minLq' : minLqVal,
-         'maxLd' : maxLdVal,
-         'species' : species,
-         'comparisontypeid' : comparisontypeid,
-         'experiment' : experiment
+         'studies' : studies
       },
       function(data) {
          geneFoundList.fnClearTable();
@@ -316,10 +335,8 @@ function setupExperimentHierarchy() {
 
    geneFoundList = $('#geneFoundList').dataTable( {
       "sDom": "<'row'<'span4'f>r>t<'row'<'span4'i>>",
-      "sPaginationType": "bootstrap",
       "bPaginate": false,
-      "bInfo": false,
-      "sScrollY": thirdRowHeight,
+      "sScrollY": secondRowHeight,
       "oLanguage": {
          "sSearch": "Search Genes"
       },
