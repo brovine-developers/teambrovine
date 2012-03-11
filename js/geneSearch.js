@@ -10,6 +10,48 @@ var minLaSlashVal;
 var minLqVal;
 var maxLdVal;
 
+var filterTimer;
+var filter_timer_on = 0;
+
+function filterInputTimer(){
+   updateGeneFilter();
+   filter_timer_on = 0;
+}
+
+function setupGeneFilter(){
+   $('#minla').keydown(function() {
+     if(filter_timer_on == 1){
+        clearTimeout(filterTimer);
+     }
+     t = setTimeout("filterInputTimer()", 750);
+     filter_timer_on = 1;
+   });
+
+   $('#minlaslash').keydown(function() {
+     if(filter_timer_on == 1){
+        clearTimeout(filterTimer);
+     }
+     t = setTimeout("filterInputTimer()",750);
+     filter_timer_on = 1;
+   });
+
+   $('#minlq').keydown(function() {
+     if(filter_timer_on == 1){
+        clearTimeout(filterTimer);
+     }
+     t = setTimeout("filterInputTimer()", 750);
+     filter_timer_on = 1;
+   });
+
+   $('#maxld').keydown(function() {
+     if(filter_timer_on == 1){
+        clearTimeout(filterTimer);
+     }
+     t = setTimeout("filterInputTimer()", 750);
+     filter_timer_on = 1;
+   });
+}
+
 function updateGeneFilter(){ 
    minLaVal = $('#minla').val();
    minLaSlashVal = $('#minlaslash').val();
@@ -39,11 +81,8 @@ function updateGeneFilter(){
    } else {
       maxLdVal = maxLdVal * 1.0;
    }
-
    updateGeneFoundList(transFacs, studies, minLaVal, minLaSlashVal, minLqVal, maxLdVal, species, comparisontypeid, experiment);
 }
-
-
 
 function updateSpeciesList() {
    jQuery.get("ajax/getSpeciesList",
@@ -288,7 +327,7 @@ function setupExperimentHierarchy() {
          {"sTitle": "Regulation", "mDataProp": "regulation"}
       ]
    });
-
+   setupGeneFilter();
    updateFactorList();
    updateSpeciesList();
 }
