@@ -91,7 +91,7 @@ EOT;
       $this->load->database();
       $experimentid = $this->input->get('experimentid');
       $sql = <<<EOT
-       SELECT geneid, geneabbrev, chromosome, start, end, regulation,
+       SELECT geneid, genename, geneabbrev, chromosome, start, end, regulation,
         (SELECT COUNT(DISTINCT transfac)
          FROM regulatory_sequences INNER JOIN factor_matches USING(seqid)
          WHERE regulatory_sequences.geneid = genes.geneid

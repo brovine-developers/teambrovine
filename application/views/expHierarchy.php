@@ -34,6 +34,27 @@
       </table>
    </div>
 </div>
+<? // No editing or deleting Species / Comparisons.
+/*
+<div class="row ruleRow">
+   <div class="span2">
+      With selected species:<br>
+      <a class="btn btn-warning disabled" id="editSpecies"><i class="icon-pencil icon-white"></i> Edit</a>
+      <a class="btn btn-danger disabled" id="hideSpecies"><i class="icon-minus-sign icon-white"></i> Hide</a>
+   </div>
+   <div class="span4">
+      With selected comparison:<br>
+      <a class="btn btn-warning disabled" id="editComparison"><i class="icon-pencil icon-white"></i> Edit</a>
+      <a class="btn btn-danger disabled" id="hideComparison"><i class="icon-minus-sign icon-white"></i> Hide</a>
+   </div>
+   <div class="span6">
+      With selected experiment:<br>
+      <a class="btn btn-warning disabled" id="editExperiment"><i class="icon-pencil icon-white"></i> Edit</a>
+      <a class="btn btn-danger disabled" id="hideExperiment"><i class="icon-minus-sign icon-white"></i> Hide</a>
+   </div>
+</div>
+ */
+?>
 <div class="row">
    <div class="span8">
          <div class="row" id="geneFilterOptions">
@@ -49,7 +70,7 @@
          </div>
    </div>
 </div>
-<div class="row ruleRow">
+<div class="row">
    <div class="span8">
       <table class="table table-striped table-bordered" id="geneList">
          <thead>
@@ -65,6 +86,16 @@
          <tbody>
          </tbody>
       </table>
+   </div>
+</div>
+<div class="row ruleRow">
+   <div class="span8">
+      <a class="btn btn-warning disabled" id="editGene"><i class="icon-pencil icon-white"></i> Edit Gene</a>
+      <a class="btn btn-danger disabled" id="hideGene"><i class="icon-minus-sign icon-white"></i> Hide Gene</a>
+   </div>
+   <div class="span4">
+      <a class="btn btn-warning disabled" id="editFactor"><i class="icon-pencil icon-white"></i> Edit Factor</a>
+      <a class="btn btn-danger disabled" id="hideFactor"><i class="icon-minus-sign icon-white"></i> Hide Factor</a>
    </div>
 </div>
 <div class="row">
@@ -135,7 +166,7 @@ and scroll. */ ?>
       
    </div>
 </div>
-<div class="row ruleRow">
+<div class="row">
    <div class="span12">
       <table class="table table-striped table-bordered" id="sequenceList">
          <thead>
@@ -145,5 +176,70 @@ and scroll. */ ?>
       </table>
    </div>
 </div>
+<div class="row ruleRow">
+   <div class="span12">
+      <a class="btn btn-warning disabled" id="editSequence"><i class="icon-pencil icon-white"></i> Edit Sequence</a>
+      <a class="btn btn-danger disabled" id="hideSequence"><i class="icon-minus-sign icon-white"></i> Hide Sequence</a>
+   </div>
+</div>
 <div class="row" id="sequenceInfo">
+</div>
+
+<!-- Here be modals. -->
+<div class="modal hide fade" id="editGeneModal">
+   <form class="form-horizontal">
+      <fieldset>
+         <legend>Edit Gene</legend>
+         <div class="control-group">
+            <label for="genenameInput" class="control-label">Name</label>
+            <div class="controls">
+               <input id="genenameInput">
+            </div>
+         </div>
+         <div class="control-group">
+            <label for="geneabbrevInput" class="control-label">Abbreviation</label>
+            <div class="controls">
+               <input id="geneabbrevInput">
+            </div>
+         </div>
+         <div class="control-group">
+            <label for="genechromosomeInput" class="control-label">Chromosome</label>
+            <div class="controls">
+               <input id="genechromosomeInput">
+            </div>
+         </div>
+         <div class="control-group">
+            <label for="genestartInput" class="control-label">Start</label>
+            <div class="controls">
+               <input id="genestartInput">
+            </div>
+         </div>
+         <div class="control-group">
+            <label for="geneendInput" class="control-label">End</label>
+            <div class="controls">
+               <input id="geneendInput">
+            </div>
+         </div>
+         <div class="control-group">
+            <label class="control-label">Regulation</label>
+            <div class="controls">
+               <label class="radio">
+                  <input type="radio" id="generegulationInputDown" name="editGeneRegulation" value="down">
+                  Down
+               </label>
+               <label class="radio">
+                  <input type="radio" id="generegulationInputUp" name="editGeneRegulation" value="up">
+                  Up
+               </label>
+            </div>
+         </div>
+         <input type="hidden" id="geneidInput" value="0">
+         <div class="control-group">
+            <div class="controls">
+               <a id="editGeneSave" class="btn btn-primary">Save</a>
+               <a class="btn" data-dismiss="modal">Cancel</a>
+            </div>
+         </div>
+      </fieldset>
+   </form>
 </div>

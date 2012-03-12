@@ -1,8 +1,72 @@
 var curGeneid;
+var geneModal;
+var factorModal;
+var sequenceModal;
+
+function setupEditAndDelete() {
+   geneModal = $('#editGeneModal').modal({
+      'show': false
+   });
+
+   $('#editGene').click(function() {
+      if (!$(this).hasClass('disabled')) {
+         var geneData = geneList.fnGetData(geneList.$('.selected')[0]);
+         $('#genenameInput').val(geneData.genename);
+         $('#geneabbrevInput').val(geneData.geneabbrev);
+         $('#genechromosomeInput').val(geneData.chromosome);
+         $('#genestartInput').val(geneData.start);
+         $('#geneendInput').val(geneData.end);
+         $('#geneidInput').val(geneData.geneid);
+
+         var selectedInput = '#generegulationInputUp';
+         if (geneData.regulation == 'down') {
+            selectedInput = '#generegulationInputDown';
+         }
+
+         $(selectedInput).prop('checked', true);
+         geneModal.modal('show');
+      }
+   });
+
+   $('#editGeneSave').click(function() {
+      // Save gene info here.
+
+      var geneRegulation = 'up';
+      if ($('#generegulationInputDown').prop('checked')) {
+         geneRegulation = 'down';
+      }
+
+      var row = geneList.$('.selected')[0];
+      var oldGeneData = geneList.fnGetData(row);
+      // Make a new geneData object for the row. 
+      var newGeneData = {
+         geneid: $('#geneidInput').val(),
+         genename: $('#genenameInput').val(),
+         geneabbrev: $('#geneabbrevInput').val(),
+         chromosome: $('#genechromosomeInput').val(),
+         start: $('#genestartInput').val(),
+         end: $('#geneendInput').val(),
+         regulation: geneRegulation,
+         numFactors: oldGeneData.numFactors
+      };
+
+      geneList.fnUpdate(newGeneData, row);
+      geneModal.modal('hide');
+
+      // TODO: Save
+   });
+}
 
 function updateSpeciesList() {
    jQuery.get("ajax/getSpeciesList",
    function(data) {
+      $('#editGene').addClass('disabled');
+      $('#hideGene').addClass('disabled');
+      $('#editFactor').addClass('disabled');
+      $('#hideFactor').addClass('disabled');
+      $('#editSequence').addClass('disabled');
+      $('#hideSequence').addClass('disabled');
+
       speciesList.fnClearTable();
       speciesList.fnAddData(data);
       
@@ -40,6 +104,9 @@ function updateSequenceList(geneid, transfac, study) {
       'study': study
    },
    function(data) {
+      $('#editSequence').addClass('disabled');
+      $('#hideSequence').addClass('disabled');
+
       sequenceList.fnClearTable();
       $('#sequenceInfo').empty();
       sequenceList.fnAddData(data);
@@ -48,6 +115,8 @@ function updateSequenceList(geneid, transfac, study) {
       sequenceList.$('tr').click(function() {
          sequenceList.$('tr').removeClass('selected');
          $(this).addClass('selected');
+         $('#editSequence').removeClass('disabled');
+         $('#hideSequence').removeClass('disabled');
          var rowData = sequenceList.fnGetData(this);
 
          updateSequenceInfo(rowData.seqid);
@@ -64,6 +133,11 @@ function updateFactorList() {
       factorList.fnClearTable();
       sequenceList.fnClearTable();
       $('#sequenceInfo').empty();
+      $('#editFactor').addClass('disabled');
+      $('#hideFactor').addClass('disabled');
+      $('#editSequence').addClass('disabled');
+      $('#hideSequence').addClass('disabled');
+
       factorList.fnAddData(data);
       fixTableWidth(factorList);
       factorList.$('tr').click(function(e) {
@@ -73,6 +147,13 @@ function updateFactorList() {
          var transfac = rowData.transfac;
          var study = rowData.study;
          updateSequenceList(curGeneid, transfac, study);
+         if (!rowData.allRow) {
+            $('#editFactor').removeClass('disabled');
+            $('#hideFactor').removeClass('disabled');
+         } else {
+            $('#editFactor').addClass('disabled');
+            $('#hideFactor').addClass('disabled');
+         }
       });
 
    },
@@ -88,6 +169,12 @@ function updateGeneList(experimentid) {
       sequenceList.fnClearTable();
       factorList.fnClearTable();
       $('#sequenceInfo').empty();
+      $('#editGene').addClass('disabled');
+      $('#hideGene').addClass('disabled');
+      $('#editFactor').addClass('disabled');
+      $('#hideFactor').addClass('disabled');
+      $('#editSequence').addClass('disabled');
+      $('#hideSequence').addClass('disabled');
 
       geneList.fnAddData(data);
       fixTableWidth(geneList);
@@ -97,6 +184,8 @@ function updateGeneList(experimentid) {
          var rowData = geneList.fnGetData(this);
          curGeneid = rowData.geneid;
          updateFactorList();
+         $('#editGene').removeClass('disabled');
+         $('#hideGene').removeClass('disabled');
       });
 
    },
@@ -110,6 +199,13 @@ function updateExperimentList(comparisontypeid) {
       'comparisontypeid': comparisontypeid
    },
    function(data) {
+      $('#editGene').addClass('disabled');
+      $('#hideGene').addClass('disabled');
+      $('#editFactor').addClass('disabled');
+      $('#hideFactor').addClass('disabled');
+      $('#editSequence').addClass('disabled');
+      $('#hideSequence').addClass('disabled');
+
       experimentList.fnClearTable();
       $('#sequenceInfo').empty();
       experimentList.fnAddData(data);
@@ -132,6 +228,13 @@ function updateComparisonList(curSpecies) {
          'species': curSpecies
       },
       function(data) {
+         $('#editGene').addClass('disabled');
+         $('#hideGene').addClass('disabled');
+         $('#editFactor').addClass('disabled');
+         $('#hideFactor').addClass('disabled');
+         $('#editSequence').addClass('disabled');
+         $('#hideSequence').addClass('disabled');
+
          comparisonList.fnClearTable();
          comparisonList.fnAddData(data);
          
@@ -220,7 +323,8 @@ function setupExperimentHierarchy() {
          {"sTitle": "End", "mDataProp": "end"},
          {"sTitle": "Reg", "mDataProp": "regulation"},
          {"sTitle": "Factors", "mDataProp": "numFactors"},
-         {"sTitle": "Geneid", "mDataProp": "geneid", "bVisible": false}
+         {"sTitle": "Geneid", "mDataProp": "geneid", "bVisible": false},
+         {"sTitle": "GeneName", "mDataProp": "genename", "bVisible": false}
       ]
    
    });
@@ -268,6 +372,18 @@ function setupExperimentHierarchy() {
          {"sTitle": "Sequenceid", "mDataProp": "seqid", "bVisible": false}
       ]
    
+   });
+
+   // Setup tooltips on gene rows.
+   $('#geneList').tooltip({
+      selector: 'td:first-child',
+      title: function() {
+         var row = ($(this).parent()[0]);
+         console.log(row);
+         var rowData = geneList.fnGetData(row);
+         console.log(rowData);
+         return rowData.genename;
+      }
    });
 
    // Setup Gene filter
@@ -379,6 +495,9 @@ function setupExperimentHierarchy() {
    // Add radio button listener to redraw table.
    $('#senseFilters input').change(triggerSequenceListRedraw);
    $("#sequenceFilterOptions input[type='text']").keyup(triggerSequenceListRedraw);
+
+   // Setup edit / delete listeners and modals.
+   setupEditAndDelete();
 
    // Get the list of species from the server.
    updateSpeciesList();
