@@ -3,6 +3,27 @@ var geneModal;
 var factorModal;
 var sequenceModal;
 
+function getTimestamp() {
+   // http://www.perturb.org/display/786_Javascript_Unixtime.html
+   var foo = new Date; // Generic JS date object
+   var unixtime_ms = foo.getTime(); // Returns milliseconds since the epoch
+   var unixtime = parseInt(unixtime_ms / 1000);
+}
+
+function getPrettyTime() {
+   var now = new Date;
+   var date = new Date();
+   var yyyy = date.getFullYear();
+   var mm = date.getMonth() + 1;
+   var dd = date.getDate();
+   var hh = date.getHours();
+   var min = date.getMinutes();
+   var ss = date.getSeconds();
+
+   var mysqlDateTime = yyyy + '-' + mm + '-' + dd + ' ' + hh + ':' + min + ':' + ss;
+   return mysqlDateTime;
+}
+
 function setupEditAndDelete() {
    geneModal = $('#editGeneModal').modal({
       'show': false
@@ -17,6 +38,7 @@ function setupEditAndDelete() {
          $('#genestartInput').val(geneData.start);
          $('#geneendInput').val(geneData.end);
          $('#geneidInput').val(geneData.geneid);
+         $('#geneLastEdited').html(geneData.date_edited_pretty);
 
          var selectedInput = '#generegulationInputUp';
          if (geneData.regulation == 'down') {
@@ -47,13 +69,19 @@ function setupEditAndDelete() {
          start: $('#genestartInput').val(),
          end: $('#geneendInput').val(),
          regulation: geneRegulation,
+         date_edited: getTimestamp(),
+         date_edited_pretty: getPrettyTime(),
          numFactors: oldGeneData.numFactors
       };
 
       geneList.fnUpdate(newGeneData, row);
       geneModal.modal('hide');
 
-      // TODO: Save
+      jQuery.post('ajax/updateGene', newGeneData, function() {
+         // Do nothing on success, I guess.
+         // Maybe we should put up a spinner but who's got the time.
+         // This looks faster, too.
+      });
    });
 }
 
@@ -378,12 +406,41 @@ function setupExperimentHierarchy() {
    $('#geneList').tooltip({
       selector: 'td:first-child',
       title: function() {
+         if ($(this).hasClass('dataTables_empty')) {
+            return "Select an experiment first.";
+         }
          var row = ($(this).parent()[0]);
-         console.log(row);
          var rowData = geneList.fnGetData(row);
-         console.log(rowData);
          return rowData.genename;
       }
+   });
+
+   $('#geneList_wrapper tr th:contains(Chr)').tooltip({
+      title: "Chromosome"
+   });
+   
+   $('#geneList_wrapper tr th:contains(Reg)').tooltip({
+      title: "Regulation"
+   });
+   
+   $('#geneList_wrapper tr th:contains(Gene)').tooltip({
+      title: "Hover for full name"
+   });
+   
+   $('#experimentList_wrapper tr th:contains(Up)').tooltip({
+      title: "Genes regulated up"
+   });
+   
+   $('#experimentList_wrapper tr th:contains(Down)').tooltip({
+      title: "Genes regulated down"
+   });
+   
+   $('#experimentList_wrapper tr th:contains(Genes)').tooltip({
+      title: "Total number of genes"
+   });
+   
+   $("#factorList_wrapper tr th:contains('#')").tooltip({
+      title: "Number of matching regulatory elements"
    });
 
    // Setup Gene filter

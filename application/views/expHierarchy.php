@@ -233,6 +233,13 @@ and scroll. */ ?>
                </label>
             </div>
          </div>
+         <div class="control-group">
+            <label class="control-label">Last Edited</label>
+            <div class="controls">
+               <label style="padding-top: 5px" id="geneLastEdited"></label>
+            </div>
+         </div>
+
          <input type="hidden" id="geneidInput" value="0">
          <div class="control-group">
             <div class="controls">

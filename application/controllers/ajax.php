@@ -91,7 +91,9 @@ EOT;
       $this->load->database();
       $experimentid = $this->input->get('experimentid');
       $sql = <<<EOT
-       SELECT geneid, genename, geneabbrev, chromosome, start, end, regulation,
+       SELECT geneid, date_edited, FROM_UNIXTIME(date_edited) as date_edited_pretty,
+        genename, geneabbrev, chromosome, 
+        start, end, regulation,
         (SELECT COUNT(DISTINCT transfac)
          FROM regulatory_sequences INNER JOIN factor_matches USING(seqid)
          WHERE regulatory_sequences.geneid = genes.geneid
@@ -100,8 +102,15 @@ EOT;
        WHERE experimentid = ?
 EOT;
       $query = $this->db->query($sql, array($experimentid));
+      $results = $query->result();
 
-      echo json_encode($query->result());
+      foreach ($results as $result) {
+         if ($result->date_edited == 0) {
+            $result->date_edited_pretty = 'Never';
+         }
+      }
+
+      echo json_encode($results);
    }
 
    public function getGeneSummary() {
@@ -628,6 +637,36 @@ EOT;
          'sequenceInfo' => $sequenceInfo,
          'factorMatchInfo' => $factorMatchInfo
       ));
+   }
+
+   public function updateGene() {
+      // These are in the order of the params.
+      $fields = array('genename', 'geneabbrev', 'chromosome', 
+         'start', 'end', 'regulation');
+
+      $geneData = array();
+      foreach ($fields as $field) {
+         $geneData[] = $this->input->post($field);
+      }
+
+      $geneData[] = time();
+      $geneData[] = $this->input->post('geneid');
+
+      $sql = <<<EOT
+       UPDATE genes SET
+        genename = ?,
+        geneabbrev= ?,
+        chromosome = ?,
+        start = ?,
+        end = ?,
+        regulation = ?,
+        date_edited = ?
+       WHERE
+        geneid = ?
+EOT;
+
+      $this->load->database();
+      $query = $this->db->query($sql, $geneData);
    }
    
 }
