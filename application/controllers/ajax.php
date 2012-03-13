@@ -188,6 +188,15 @@ EOT;
       echo json_encode($query->result());
    }
 
+   public function getPromoter() {
+      $this->load->database();
+      $geneid = $this->input->get_post('geneid');
+
+      $promoter = $this->fetchPromoter($geneid);
+
+      echo json_encode(array('promoter' => $promoter));
+   }
+
    public function getExpsPerGene() {
       $this->load->database();
       $geneid = $this->input->get('geneid');
@@ -798,7 +807,9 @@ EOT;
       }
 
       $geneData[] = time();
-      $geneData[] = $this->input->post('geneid');
+      $geneData[] = $geneid = $this->input->post('geneid');
+
+      $promoter = $this->input->post('promoter');
 
       $sql = <<<EOT
        UPDATE genes SET
@@ -815,6 +826,15 @@ EOT;
 
       $this->load->database();
       $query = $this->db->query($sql, $geneData);
+
+      $sql = <<<EOT
+       UPDATE promoter_sequences SET
+        sequence = ?
+       WHERE
+        geneid = ?
+EOT;
+
+      $this->db->query($sql, array($promoter, $geneid));
       
       // Update experiment list at the end.
       $this->getExperimentList();

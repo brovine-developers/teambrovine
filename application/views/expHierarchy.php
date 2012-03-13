@@ -286,6 +286,12 @@ and scroll. */ ?>
             </div>
          </div>
          <div class="control-group">
+            <label for="genepromoterInput" class="control-label">Promoter Sequence</label>
+            <div class="controls">
+               <textarea id="genepromoterInput" class="disabled"></textarea>
+            </div>
+         </div>
+         <div class="control-group">
             <label class="control-label">Regulation</label>
             <div class="controls">
                <label class="radio">

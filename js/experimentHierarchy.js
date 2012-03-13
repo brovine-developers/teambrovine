@@ -112,6 +112,16 @@ function setupDelete() {
    });
 }
 
+function getPromoter(geneid) {
+   jQuery.get("ajax/getPromoter", {
+      geneid: geneid
+   },
+   function(data) {
+      $('#genepromoterInput').removeClass('disabled').html(data.promoter);
+   }, 'json');
+
+}
+
 function setupEdit() {
    // Gene Modal //////////////////////////////////////////////////////////////
 
@@ -129,6 +139,9 @@ function setupEdit() {
          $('#geneendInput').val(geneData.end);
          $('#geneidInput').val(geneData.geneid);
          $('#geneLastEdited').html(geneData.date_edited_pretty);
+         $('#genepromoterInput').addClass('disabled');
+
+         getPromoter(geneData.geneid);
 
          var selectedInput = '#generegulationInputUp';
          if (geneData.regulation == 'down') {
@@ -170,6 +183,7 @@ function setupEdit() {
       var compData = comparisonList.fnGetData(comparisonRow);
       var serverData = $.extend({}, newGeneData, {
          comparisontypeid: compData.comparisontypeid,
+         promoter: $('#genepromoterInput').val(),
          showHidden: showHidden
       });
 
