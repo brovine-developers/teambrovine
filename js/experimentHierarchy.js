@@ -194,7 +194,6 @@ function setupEditAndDelete() {
 
       var newExperimentData = $.extend(
        {}, oldExperimentData, {
-         experimentid: $('#experimentidInput').val(),
          label: $('#experimentLabelInput').val(),
          date_edited: getTimestamp(),
          date_edited_pretty: getPrettyTime(),
@@ -204,6 +203,53 @@ function setupEditAndDelete() {
       experimentModal.modal('hide');
 
       jQuery.post('ajax/updateExperiment', newExperimentData);
+   });
+   
+   // Sequence Modal ////////////////////////////////////////////////////////
+   
+   sequenceModal = $('#editSequenceModal').modal({
+      'show': false
+   });
+
+   $('#editSequence').click(function() {
+      if (!$(this).hasClass('disabled')) {
+         var sequenceData = sequenceList.fnGetData(sequenceList.$('.selected')[0]);
+         $('#sequenceBeginningInput').val(sequenceData.beginning);
+         $('#sequenceLengthInput').val(sequenceData.length);
+         $('#sequenceSenseInput').val(sequenceData.sense);
+         $('#seqidInput').val(sequenceData.seqid);
+         $('#sequenceLastEdited').html(sequenceData.date_edited_pretty);
+
+         sequenceModal.modal('show');
+      }
+   });
+
+   $('#editSequenceSave').click(function() {
+      // Save sequence info here.
+
+      var row = sequenceList.$('.selected')[0];
+      var oldSequenceData = sequenceList.fnGetData(row);
+      // Make a new sequenceData object for the row. 
+
+
+      var newSequenceData = $.extend(
+       {}, oldSequenceData, {
+         beginning: $('#sequenceBeginningInput').val(),
+         length: $('#sequenceLengthInput').val(),
+         sense: $('#sequenceSenseInput').val(),
+         date_edited: getTimestamp(),
+         date_edited_pretty: getPrettyTime(),
+      });
+
+      sequenceList.fnUpdate(newSequenceData, row);
+      sequenceModal.modal('hide');
+
+      jQuery.post('ajax/updateSequence', newSequenceData, function(sequenceInfoData) {
+         updateSequenceInfoData(sequenceInfoData);
+         newSequenceData.sequence = sequenceInfoData.sequenceInfo.sequence;
+         sequenceList.fnUpdate(newSequenceData, row);
+
+      }, 'json');
    });
 }
 
@@ -245,32 +291,36 @@ function updateSpeciesList() {
    );
 }
 
+function updateSequenceInfoData(data) {
+   $("#sequenceStart").html(data.sequenceInfo.beginning);
+   $("#sequenceLength").html(data.sequenceInfo.length);
+   $("#sequenceSense").html(data.sequenceInfo.sense);
+   $("#sequenceSequence").html(data.sequenceInfo.sequence);
+   $("#sequenceGene").html(data.sequenceInfo.genename + " (" + 
+    data.sequenceInfo.geneabbrev + ")");
+   $("#sequenceSpecies").html(data.sequenceInfo.species);
+   $("#sequenceComparison").html(data.sequenceInfo.celltype);
+   $("#sequenceExperiment").html(data.sequenceInfo.label);
+
+   similarList.fnClearTable();
+   similarList.fnAddData(data.sequenceInfo.similar);
+
+   matchList.fnClearTable();
+   matchList.fnAddData(data.factorMatchInfo);
+
+   $("#sequenceInfo").removeClass("hidden");
+   fixTableWidth(similarList);
+   fixTableWidth(matchList);
+
+}
+
 function updateSequenceInfo(seqid) {
    jQuery.get("ajax/getSequenceInfo",
    {
       'seqid': seqid
    },
    function(data) {
-      $("#sequenceStart").html(data.sequenceInfo.beginning);
-      $("#sequenceLength").html(data.sequenceInfo.length);
-      $("#sequenceSense").html(data.sequenceInfo.sense);
-      $("#sequenceSequence").html(data.sequenceInfo.sequence);
-      $("#sequenceGene").html(data.sequenceInfo.genename + " (" + 
-       data.sequenceInfo.geneabbrev + ")");
-      $("#sequenceSpecies").html(data.sequenceInfo.species);
-      $("#sequenceComparison").html(data.sequenceInfo.celltype);
-      $("#sequenceExperiment").html(data.sequenceInfo.label);
-
-      similarList.fnClearTable();
-      similarList.fnAddData(data.sequenceInfo.similar);
-
-      matchList.fnClearTable();
-      matchList.fnAddData(data.factorMatchInfo);
-
-      $("#sequenceInfo").removeClass("hidden");
-      fixTableWidth(similarList);
-      fixTableWidth(matchList);
-
+      updateSequenceInfoData(data);
    }, 'json');
 }
 

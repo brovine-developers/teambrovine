@@ -148,7 +148,6 @@ and scroll. */ ?>
             </div>
          </div>
       </div>
-      
    </div>
 </div>
 <div class="row">
@@ -355,6 +354,46 @@ and scroll. */ ?>
          <div class="control-group">
             <div class="controls">
                <a id="editExperimentSave" class="btn btn-primary">Save</a>
+               <a class="btn" data-dismiss="modal">Cancel</a>
+            </div>
+         </div>
+      </fieldset>
+   </form>
+</div>
+
+<div class="modal hide fade" id="editSequenceModal">
+   <form class="form-horizontal">
+      <fieldset>
+         <legend>Edit Sequence</legend>
+         <div class="control-group">
+            <label for="sequenceBeginningInput" class="control-label">Begin</label>
+            <div class="controls">
+               <input id="sequenceBeginningInput">
+            </div>
+         </div>
+         <div class="control-group">
+            <label for="sequenceLengthInput" class="control-label">Length</label>
+            <div class="controls">
+               <input id="sequenceLengthInput">
+            </div>
+         </div>
+         <div class="control-group">
+            <label for="sequenceSenseInput" class="control-label">Sense</label>
+            <div class="controls">
+               <input id="sequenceSenseInput">
+            </div>
+         </div>
+         <div class="control-group">
+            <label class="control-label">Last Edited</label>
+            <div class="controls">
+               <label style="padding-top: 5px" id="sequenceLastEdited"></label>
+            </div>
+         </div>
+
+         <input type="hidden" id="seqidInput" value="0">
+         <div class="control-group">
+            <div class="controls">
+               <a id="editSequenceSave" class="btn btn-primary">Save</a>
                <a class="btn" data-dismiss="modal">Cancel</a>
             </div>
          </div>

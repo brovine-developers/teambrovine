@@ -554,7 +554,8 @@ EOT;
       }
 
       $sql = <<<EOT
-       SELECT *
+      SELECT *, regulatory_sequences.date_edited,
+        FROM_UNIXTIME(regulatory_sequences.date_edited) as date_edited_pretty
        FROM regulatory_sequences INNER JOIN factor_matches USING(seqid)
        WHERE geneid = ? $transfacFilter
 EOT;
@@ -564,6 +565,9 @@ EOT;
 
       foreach ($sequences as &$row) {
          $row['studyPretty'] = str_replace('/', ' /<br>', $row['study']);
+         if ($row['date_edited'] == 0) {
+            $row['date_edited_pretty'] = 'Never';
+         }
       }
 
       $promoter = $this->fetchPromoter($geneid);
@@ -616,6 +620,9 @@ EOT;
    public function getSequenceInfo() {
       $this->load->database();
       $seqid = $this->input->get('seqid');
+      if (!$seqid) {
+         $seqid = $this->input->post('seqid');
+      }
       $sql = <<<EOT
        SELECT regulatory_sequences.*,
         genes.geneabbrev,
@@ -779,6 +786,30 @@ EOT;
 EOT;
       $query = $this->db->query($sql, array($label, time(), $expid));
       $this->db->trans_complete();
+   }
+   
+   public function updateSequence() {
+      $this->load->database();
+      $this->db->trans_start();
+
+      $beginning = $this->input->post('beginning');
+      $length = $this->input->post('length');
+      $sense = $this->input->post('sense');
+      $seqid = $this->input->post('seqid');
+
+      $sql = <<<EOT
+       UPDATE regulatory_sequences SET
+        length = ?,
+        sense = ?,
+        beginning = ?,
+        date_edited = ?
+       WHERE
+        seqid = ?
+EOT;
+      $query = $this->db->query($sql, 
+       array($length, $sense, $beginning, time(), $seqid));
+      $this->db->trans_complete();
+      $this->getSequenceInfo();
    }
 }
 
