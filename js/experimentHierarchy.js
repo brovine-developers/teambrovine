@@ -158,6 +158,45 @@ function setupEditAndDelete() {
          selectTableRow(speciesList, matchData);
       }, 'json');
    });
+   
+   // Experiment Modal ////////////////////////////////////////////////////////
+   
+   experimentModal = $('#editExperimentModal').modal({
+      'show': false
+   });
+
+   $('#editExperiment').click(function() {
+      if (!$(this).hasClass('disabled')) {
+         var experimentData = experimentList.fnGetData(experimentList.$('.selected')[0]);
+         $('#experimentLabelInput').val(experimentData.label);
+         $('#experimentidInput').val(experimentData.experimentid);
+         $('#experimentLastEdited').html(experimentData.date_edited_pretty);
+
+         experimentModal.modal('show');
+      }
+   });
+
+   $('#editExperimentSave').click(function() {
+      // Save experiment info here.
+
+      var row = experimentList.$('.selected')[0];
+      var oldExperimentData = experimentList.fnGetData(row);
+      // Make a new experimentData object for the row. 
+
+
+      var newExperimentData = $.extend(
+       {}, oldExperimentData, {
+         experimentid: $('#experimentidInput').val(),
+         label: $('#experimentLabelInput').val(),
+         date_edited: getTimestamp(),
+         date_edited_pretty: getPrettyTime(),
+      });
+
+      experimentList.fnUpdate(newExperimentData, row);
+      experimentModal.modal('hide');
+
+      jQuery.post('ajax/updateExperiment', newExperimentData);
+   });
 }
 
 function updateSpeciesListData(data) {
@@ -311,6 +350,9 @@ function updateExperimentList(comparisontypeid) {
       experimentList.$('tr').click(function(e) {
          experimentList.$('tr').removeClass('selected');
          $(this).addClass('selected');
+         $('#editExperiment').removeClass('disabled');
+         $('#hideExperiment').removeClass('disabled');
+
          var rowData = experimentList.fnGetData(this);
          var experimentid = rowData.experimentid;
          updateGeneList(experimentid);

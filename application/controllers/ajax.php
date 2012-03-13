@@ -53,7 +53,8 @@ EOT;
       $this->load->database();
       $comparisonTypeId = $this->input->get('comparisontypeid');
       $sql = <<<EOT
-      SELECT experimentid, label, 
+      SELECT experimentid, label, hidden, date_edited,
+       FROM_UNIXTIME(date_edited) as date_edited_pretty,
        (SELECT COUNT(*)
          FROM genes
          WHERE genes.experimentid = experiments.experimentid
@@ -83,7 +84,13 @@ EOT;
       $query = $this->db->query($sql, $comparisonTypeId);
       $result = $query->result();
 
-      echo json_encode($query->result());
+      foreach ($result as $row) {
+         if ($row->date_edited == 0) {
+            $row->date_edited_pretty = 'Never';
+         }
+      }
+
+      echo json_encode($result);
    }
 
    public function getGeneList() {
@@ -671,8 +678,6 @@ EOT;
    public function updateComparison() {
       $this->load->database();
       $this->db->trans_start();
-      // These are in the order of the params.
-      $fields = array('celltype', 'species');
 
       $celltype = $this->input->post('celltype');
       $species = $this->input->post('species');
@@ -730,6 +735,24 @@ EOT;
       }
 
       $this->getSpeciesList();
+      $this->db->trans_complete();
+   }
+
+   public function updateExperiment() {
+      $this->load->database();
+      $this->db->trans_start();
+
+      $label = $this->input->post('label');
+      $expid = $this->input->post('experimentid');
+
+      $sql = <<<EOT
+       UPDATE experiments SET
+        label = ?,
+        date_edited = ?
+       WHERE
+        experimentid = ?
+EOT;
+      $query = $this->db->query($sql, array($label, time(), $expid));
       $this->db->trans_complete();
    }
 }

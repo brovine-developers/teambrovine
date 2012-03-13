@@ -269,3 +269,31 @@ and scroll. */ ?>
       </fieldset>
    </form>
 </div>
+
+<div class="modal hide fade" id="editExperimentModal">
+   <form class="form-horizontal">
+      <fieldset>
+         <legend>Edit Experiment</legend>
+         <div class="control-group">
+            <label for="experimentLabelInput" class="control-label">Experiment</label>
+            <div class="controls">
+               <input id="experimentLabelInput">
+            </div>
+         </div>
+         <div class="control-group">
+            <label class="control-label">Last Edited</label>
+            <div class="controls">
+               <label style="padding-top: 5px" id="experimentLastEdited"></label>
+            </div>
+         </div>
+
+         <input type="hidden" id="experimentidInput" value="0">
+         <div class="control-group">
+            <div class="controls">
+               <a id="editExperimentSave" class="btn btn-primary">Save</a>
+               <a class="btn" data-dismiss="modal">Cancel</a>
+            </div>
+         </div>
+      </fieldset>
+   </form>
+</div>
