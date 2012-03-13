@@ -469,7 +469,7 @@ EOT;
                    factor_matches.ld <= ?";
       }
 
-      $sql .= "$joiner factor_matches.hidden <= $showHidden AND
+      $sql .= " $joiner factor_matches.hidden <= $showHidden AND
          regulatory_sequences.hidden <= $showHidden AND
          genes.hidden <= $showHidden
          GROUP BY study, transfac";
@@ -518,7 +518,7 @@ EOT;
                    factor_matches.ld <= ?";
       }
       
-      $sql .= "$joiner factor_matches.hidden <= $showHidden AND
+      $sql .= " $joiner factor_matches.hidden <= $showHidden AND
          regulatory_sequences.hidden <= $showHidden AND
          genes.hidden <= $showHidden";
 
