@@ -258,6 +258,9 @@ function setupExperimentHierarchy() {
       "sDom": "<'row'<'span6'f>r>t<'row'<'span6'i>>",
       "bPaginate": false,
       "sScrollY": secondRowHeight,
+      "oLanguage": {
+         "sSearch": "Search Comparisons"
+      },
       "aoColumns": [
          {"sTitle": "Comparison", "mDataProp": "comparison"},
          {"sTitle": "Study", "mDataProp": "label"}/*
