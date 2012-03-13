@@ -4,6 +4,8 @@ var sequenceModal;
 var matchModal;
 var comparisonModal;
 var experimentModal;
+var showHidden;
+var objShowHidden;
 
 function getTimestamp() {
    // http://www.perturb.org/display/786_Javascript_Unixtime.html
@@ -24,6 +26,16 @@ function getPrettyTime() {
 
    var mysqlDateTime = yyyy + '-' + mm + '-' + dd + ' ' + hh + ':' + min + ':' + ss;
    return mysqlDateTime;
+}
+
+function updateHideButtonText(node, rowHidden) {
+   var span = $('span', node);
+   var text = span.html();
+   if (rowHidden == 1) {
+      span.html(text.replace("Hide", "Show"));
+   } else {
+      span.html(text.replace("Show", "Hide"));
+   }
 }
 
 /**
@@ -55,8 +67,52 @@ function getSelectedRowData(table) {
    return table.fnGetData(getSelectedRow(table));
 }
 
-function setupEditAndDelete() {
+function colorDeletedAndEdited(nRow, aData) {
+   if (aData.hidden == "1") {
+      $(nRow).addClass('hiddenRow');
+   } else if (aData.date_edited > 0) {
+      $(nRow).addClass('editedRow');
+   }
+}
 
+function setupDelete() {
+   var tablesByHideId = {
+      hideComparison: comparisonList,
+      hideExperiment: experimentList,
+      hideGene: geneList,
+      hideSequence: sequenceList,
+      hideMatch: matchList
+   };
+
+   var primaryKeysByHideId = {
+      hideComparison: 'comparisontypeid',
+      hideExperiment: 'experimentid',
+      hideGene: 'geneid',
+      hideSequence: 'seqid',
+      hideMatch: 'matchid'
+   }
+
+   $('.hideButton').click(function() {
+      if (!$(this).hasClass('disabled')) {
+         // Send an ajax request to hide the element and refresh the page.
+         var id = $(this).attr('id');
+         var rowData = getSelectedRowData(tablesByHideId[id]);
+         var key = primaryKeysByHideId[id];
+         var value = rowData[key];
+         var serverData = {
+            field: key,
+            value: value,
+            isHidden: rowData.hidden
+         };
+
+         jQuery.post('ajax/toggleRow', serverData, function(responseData) {
+            location.reload(true);
+         }, 'json');
+      }
+   });
+}
+
+function setupEdit() {
    // Gene Modal //////////////////////////////////////////////////////////////
 
    geneModal = $('#editGeneModal').modal({
@@ -113,7 +169,8 @@ function setupEditAndDelete() {
       var comparisonRow = comparisonList.$('tr.selected')[0];
       var compData = comparisonList.fnGetData(comparisonRow);
       var serverData = $.extend({}, newGeneData, {
-         comparisontypeid: compData.comparisontypeid
+         comparisontypeid: compData.comparisontypeid,
+         showHidden: showHidden
       });
 
       jQuery.post('ajax/updateGene', serverData, function(experimentData) {
@@ -167,7 +224,11 @@ function setupEditAndDelete() {
       comparisonList.fnUpdate(newComparisonData, row);
       comparisonModal.modal('hide');
 
-      jQuery.post('ajax/updateComparison', newComparisonData, function(data) {
+      var serverData = $.extend({}, newComparisonData, {
+         showHidden: showHidden
+      });
+
+      jQuery.post('ajax/updateComparison', serverData, function(data) {
          // Update species list on update.
          updateSpeciesListData(data);
          matchData = {
@@ -212,7 +273,9 @@ function setupEditAndDelete() {
       experimentList.fnUpdate(newExperimentData, row);
       experimentModal.modal('hide');
 
-      jQuery.post('ajax/updateExperiment', newExperimentData);
+      var serverData = $.extend({}, newExperimentData, objShowHidden);
+
+      jQuery.post('ajax/updateExperiment', serverData);
    });
    
    // Sequence Modal ////////////////////////////////////////////////////////
@@ -254,7 +317,9 @@ function setupEditAndDelete() {
       sequenceList.fnUpdate(newSequenceData, row);
       sequenceModal.modal('hide');
 
-      jQuery.post('ajax/updateSequence', newSequenceData, function(sequenceInfoData) {
+      var serverData = $.extend({}, newSequenceData, objShowHidden);
+
+      jQuery.post('ajax/updateSequence', serverData, function(sequenceInfoData) {
          updateSequenceInfoData(sequenceInfoData);
          newSequenceData.sequence = sequenceInfoData.sequenceInfo.sequence;
          sequenceList.fnUpdate(newSequenceData, row);
@@ -316,8 +381,6 @@ function setupEditAndDelete() {
       });
 
       matchList.fnUpdate(newMatchData, row);
-      console.log(newMatchData);
-      console.log(row);
       matchModal.modal('hide');
 
       var selectedGeneid = getSelectedRowData(geneList).geneid;
@@ -329,7 +392,8 @@ function setupEditAndDelete() {
       var serverData = $.extend({}, newMatchData, {
          selectedExperimentid: selectedExperimentid,
          selectedGeneid: selectedGeneid,
-         allRowSelected: selectedFactorData.allRow
+         allRowSelected: selectedFactorData.allRow,
+         showHidden: showHidden
       });
 
       jQuery.post('ajax/updateMatch', serverData, function(data) {
@@ -376,6 +440,7 @@ function updateSpeciesListData(data) {
 
 function updateSpeciesList() {
    jQuery.get("ajax/getSpeciesList",
+   { showHidden: showHidden },
    function(data) {
       $('#editGene').addClass('disabled');
       $('#hideGene').addClass('disabled');
@@ -417,6 +482,7 @@ function updateSequenceInfoData(data) {
       var matchid = rowData.matchid;
       $('#editMatch').removeClass('disabled');
       $('#hideMatch').removeClass('disabled');
+      updateHideButtonText($('#hideMatch'), rowData.hidden);
 
       fixAllTableWidths();
    });
@@ -430,7 +496,8 @@ function updateSequenceInfoData(data) {
 function updateSequenceInfo(seqid) {
    jQuery.get("ajax/getSequenceInfo",
    {
-      'seqid': seqid
+      'seqid': seqid,
+      'showHidden': showHidden
    },
    function(data) {
       updateSequenceInfoData(data);
@@ -448,6 +515,7 @@ function updateSequenceListData(data) {
       $('#editSequence').removeClass('disabled');
       $('#hideSequence').removeClass('disabled');
       var rowData = sequenceList.fnGetData(this);
+      updateHideButtonText($('#hideSequence'), rowData.hidden);
 
       updateSequenceInfo(rowData.seqid);
    });
@@ -458,7 +526,8 @@ function updateSequenceList(geneid, transfac, study) {
    {
       'geneid': geneid,
       'transfac': transfac,
-      'study': study
+      'study': study,
+      'showHidden': showHidden
    },
    function(data) {
       $('#editSequence').addClass('disabled');
@@ -487,7 +556,10 @@ function updateFactorListData(data) {
 
 function updateFactorList() {
    jQuery.get("ajax/getFactorList",
-   { 'geneid': curGeneid },
+   { 
+      'geneid': curGeneid,
+      'showHidden': showHidden
+   },
    function(data) {
       sequenceList.fnClearTable();
       $('#sequenceInfo').addClass('hidden');
@@ -512,12 +584,16 @@ function updateGeneListData(data) {
       updateFactorList();
       $('#editGene').removeClass('disabled');
       $('#hideGene').removeClass('disabled');
+      updateHideButtonText($('#hideGene'), rowData.hidden);
    });
 }
 
 function updateGeneList(experimentid) {
    jQuery.get("ajax/getGeneList",
-   { 'experimentid': experimentid },
+   { 
+      'experimentid': experimentid,
+      'showHidden': showHidden
+   },
    function(data) {
       sequenceList.fnClearTable();
       factorList.fnClearTable();
@@ -544,6 +620,7 @@ function updateExperimentListData(data) {
       $('#hideExperiment').removeClass('disabled');
 
       var rowData = experimentList.fnGetData(this);
+      updateHideButtonText($('#hideExperiment'), rowData.hidden);
       var experimentid = rowData.experimentid;
       updateGeneList(experimentid);
    });
@@ -553,7 +630,8 @@ function updateExperimentListData(data) {
 function updateExperimentList(comparisontypeid) {
    jQuery.get("ajax/getExperimentList",
    {
-      'comparisontypeid': comparisontypeid
+      'comparisontypeid': comparisontypeid,
+      'showHidden': showHidden
    },
    function(data) {
       $('#editGene').addClass('disabled');
@@ -574,7 +652,8 @@ function updateExperimentList(comparisontypeid) {
 function updateComparisonList(curSpecies) {
    jQuery.get("ajax/getComparisonList", 
       {
-         'species': curSpecies
+         'species': curSpecies,
+         'showHidden': showHidden
       },
       function(data) {
          $('#editGene').addClass('disabled');
@@ -596,6 +675,7 @@ function updateComparisonList(curSpecies) {
             
             $('#editComparison').removeClass('disabled');
             $('#hideComparison').removeClass('disabled');
+            updateHideButtonText($('#hideComparison'), rowData.hidden);
 
             var comparisonTypeId = rowData.comparisontypeid;
             geneList.fnClearTable();
@@ -619,6 +699,7 @@ function setupExperimentHierarchy() {
       "bPaginate": false,
       "bInfo": false,
       "sScrollY": firstRowHeight,
+      "fnRowCallback": colorDeletedAndEdited,
       "oLanguage": {
          "sSearch": "Search Species"
       },
@@ -634,6 +715,7 @@ function setupExperimentHierarchy() {
       "bPaginate": false,
       "bInfo": false,
       "sScrollY": firstRowHeight,
+      "fnRowCallback": colorDeletedAndEdited,
       "oLanguage": {
          "sSearch": "Search Comparisons"
       },
@@ -649,6 +731,7 @@ function setupExperimentHierarchy() {
       "bPaginate": false,
       "bInfo": false,
       "sScrollY": firstRowHeight,
+      "fnRowCallback": colorDeletedAndEdited,
       "oLanguage": {
          "sSearch": "Search Experiments"
       },
@@ -670,6 +753,7 @@ function setupExperimentHierarchy() {
          "sInfoFiltered": " of _MAX_"
       },
       "sScrollY": secondRowHeight,
+      "fnRowCallback": colorDeletedAndEdited,
       "aoColumns": [
          {"sTitle": "Gene", "mDataProp": "geneabbrev"},
          {"sTitle": "Chr", "mDataProp": "chromosome"},
@@ -687,6 +771,7 @@ function setupExperimentHierarchy() {
       "sDom": "<'row'<'span4'f>r>t<'row'<'span4'i>>",
       "bPaginate": false,
       "sScrollY": secondRowHeight,
+      "fnRowCallback": colorDeletedAndEdited,
       "oLanguage": {
          "sSearch": "Search Transcription Factors"
       },
@@ -706,6 +791,7 @@ function setupExperimentHierarchy() {
       "sDom": "<'row'<'span12'f>r>t<'row'<'span12'i>>",
       "bPaginate": false,
       "sScrollY": thirdRowHeight,
+      "fnRowCallback": colorDeletedAndEdited,
       "oLanguage": {
          "sSearch": "Search Regulatory Sequences"
       },
@@ -739,6 +825,7 @@ function setupExperimentHierarchy() {
          "sSearch": "Search Similar Sequences"
       },
       "sScrollY": "200px",
+      "fnRowCallback": colorDeletedAndEdited,
       "aoColumns": [
          {"sTitle": "Begin", "mDataProp": "beginning"},
          {"sTitle": "Length", "mDataProp": "length"},
@@ -751,6 +838,7 @@ function setupExperimentHierarchy() {
       "sDom": "<'row'<'span12'f>r>t<'row'<'span12'i>>",
       "bPaginate": false,
       "sScrollY": thirdRowHeight,
+      "fnRowCallback": colorDeletedAndEdited,
       "oLanguage": {
          "sSearch": "Search Matching Factors"
       },
@@ -926,7 +1014,15 @@ function setupExperimentHierarchy() {
    $("#sequenceFilterOptions input[type='text']").keyup(triggerSequenceListRedraw);
 
    // Setup edit / delete listeners and modals.
-   setupEditAndDelete();
+   setupEdit();
+   setupDelete();
+
+   showHidden = $("#showHidden").prop('checked') ? 1 : 0;
+   objShowHidden = { showHidden: showHidden };
+
+   $("#showHidden").change(function() {
+      $('#showHiddenForm').submit();
+   });
 
    // Get the list of species from the server.
    updateSpeciesList();

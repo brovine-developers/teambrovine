@@ -2,10 +2,17 @@
    <div class="span12">
       <h1>Experiment Hierarchy</h1>
       <p>
-         Begin by selecting a species. 
+         Begin by selecting a species. Yellow rows have been edited, and red rows have been hidden.
+      </p>
+      <p>
+         <form action="ExperimentHierarchy" method="get" id="showHiddenForm">
+            <label class="checkbox">
+               <input type="checkbox" id="showHidden" name="showHidden" value="1" <?=$showHidden?>>
+               Show Hidden Entries 
+            </label>
+         </form>
       </p>
    </div>
-
 </div>
 
 <div class="row">
@@ -37,11 +44,11 @@
 <div class="row ruleRow">
    <div class="span4 offset2">
       <a class="btn btn-warning disabled" id="editComparison"><i class="icon-pencil icon-white"></i> Edit Comparison</a>
-      <a class="btn btn-danger disabled" id="hideComparison"><i class="icon-minus-sign icon-white"></i> Hide Comparison</a>
+      <a class="btn btn-danger disabled hideButton" id="hideComparison"><i class="icon-minus-sign icon-white"></i><span> Hide Comparison</span></a>
    </div>
    <div class="span6">
       <a class="btn btn-warning disabled" id="editExperiment"><i class="icon-pencil icon-white"></i> Edit Experiment</a>
-      <a class="btn btn-danger disabled" id="hideExperiment"><i class="icon-minus-sign icon-white"></i> Hide Experiment</a>
+      <a class="btn btn-danger disabled hideButton" id="hideExperiment"><i class="icon-minus-sign icon-white"></i><span> Hide Experiment</span></a>
    </div>
 </div>
 <div class="row">
@@ -80,7 +87,7 @@
 <div class="row ruleRow">
    <div class="span8">
       <a class="btn btn-warning disabled" id="editGene"><i class="icon-pencil icon-white"></i> Edit Gene</a>
-      <a class="btn btn-danger disabled" id="hideGene"><i class="icon-minus-sign icon-white"></i> Hide Gene</a>
+      <a class="btn btn-danger disabled hideButton" id="hideGene"><i class="icon-minus-sign icon-white"></i><span> Hide Gene</span></a>
    </div>
 </div>
 <div class="row">
@@ -163,7 +170,7 @@ and scroll. */ ?>
 <div class="row ruleRow">
    <div class="span12">
       <a class="btn btn-warning disabled" id="editSequence"><i class="icon-pencil icon-white"></i> Edit Sequence</a>
-      <a class="btn btn-danger disabled" id="hideSequence"><i class="icon-minus-sign icon-white"></i> Hide Sequence</a>
+      <a class="btn btn-danger disabled hideButton" id="hideSequence"><i class="icon-minus-sign icon-white"></i><span> Hide Sequence</span></a>
    </div>
 </div>
 <div class="row hidden" id="sequenceInfo">
@@ -233,7 +240,7 @@ and scroll. */ ?>
       <div class="row">
          <div class="span12">
             <a class="btn btn-warning disabled" id="editMatch"><i class="icon-pencil icon-white"></i> Edit Factor</a>
-            <a class="btn btn-danger disabled" id="hideMatch"><i class="icon-minus-sign icon-white"></i> Hide Factor</a>
+            <a class="btn btn-danger disabled hideButton" id="hideMatch"><i class="icon-minus-sign icon-white"></i><span> Hide Factor</span></a>
          </div>
       </div>
    </div>

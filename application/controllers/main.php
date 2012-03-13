@@ -40,7 +40,13 @@ class Main extends CI_Controller {
 
    public function ExperimentHierarchy() {
       $this->_initPage();
-      $this->template->write_view('content', 'expHierarchy.php');
+      $showHidden = $this->input->get('showHidden');
+
+      $showHidden = $showHidden ? 'checked' : '';
+
+      $this->template->write_view('content', 'expHierarchy.php', array(
+         'showHidden' => $showHidden   
+      ));
       $this->template->add_js('js/experimentHierarchy.js');
       $this->_renderPage('Experiment Hierarchy');
    }

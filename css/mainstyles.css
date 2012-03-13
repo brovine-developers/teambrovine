@@ -19,6 +19,13 @@ body {
    background-color: #b3b6ff !important;
 }
 
+.hiddenRow.selected, .hiddenRow.selected td {
+   background-color: #ffb6ff !important;
+}
+.editedRow.selected, .editedRow.selected td {
+   background-color: #93dddd !important;
+}
+
 .placeholder {
    color: #aaaaaa;
 }
@@ -35,4 +42,12 @@ body {
 
 .hidden {
    display: none;
+}
+
+.hiddenRow, .hiddenRow td {
+   background-color: #ffb6b3 !important;
+}
+
+.editedRow, .editedRow td {
+   background-color: #ffffb3 !important;
 }

@@ -1,20 +1,29 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 class Ajax extends CI_Controller {
+   // Returns 1 when we should show hidden, 0 otherwise.
+   public function showHidden() {
+      return $this->input->get_post('showHidden') ? 1 : 0;
+   }
+
    public function getSpeciesList() {
       $this->load->database();
       $sql =<<<EOT
-      SELECT DISTINCT species 
+      SELECT species, MIN(hidden) as hidden, MAX(date_edited) as date_edited
       FROM comparison_types
+      WHERE hidden <= ?
+      GROUP BY species
       ORDER BY species
 EOT;
-      $query = $this->db->query($sql);
+      $query = $this->db->query($sql, array($this->showHidden()));
       $result = $query->result();
       $out = array();
       foreach ($result as $row) {
          $out[] = array(
             'speciesPretty' => htmlentities(ucfirst($row->species)),
-            'species' => htmlentities($row->species)
+            'species' => htmlentities($row->species),
+            'hidden' => $row->hidden,
+            'date_edited' => $row->date_edited
          );
       }
       echo json_encode($out);
@@ -22,12 +31,12 @@ EOT;
 
    public function getComparisonList() {
       $this->load->database();
-      $curSpecies = $this->input->get('species');
+      $curSpecies = (array) $this->input->get('species');
       
       $sql = <<<EOT
       SELECT *, FROM_UNIXTIME(date_edited) as date_edited_pretty
       FROM comparison_types
-      WHERE 
+      WHERE (
 EOT;
 
       for ($i = 0; $i < count($curSpecies); $i++) {
@@ -36,8 +45,11 @@ EOT;
          $sql .= "species = ?";
       }
 
-      $sql .= " ORDER BY species, celltype";
+      $sql .= " ) AND hidden <= ?
+        ORDER BY species, celltype";
       
+      $curSpecies[] = $this->showHidden();
+
       $query = $this->db->query($sql, $curSpecies);
       $result = $query->result();
       foreach ($result as $row) {
@@ -61,6 +73,8 @@ EOT;
       } else {
          $comparisonTypeId = array();
       }
+      
+      $showHidden = $this->showHidden();
 
       $sql = <<<EOT
       SELECT experimentid, label, hidden, date_edited,
@@ -68,19 +82,23 @@ EOT;
        (SELECT COUNT(*)
          FROM genes
          WHERE genes.experimentid = experiments.experimentid
+         AND hidden <= $showHidden
       ) as genecount_all,
        (SELECT COUNT(*)
          FROM genes
          WHERE genes.experimentid = experiments.experimentid
          AND genes.regulation = 'up'
+         AND hidden <= $showHidden
       ) as genecount_up,
        (SELECT COUNT(*)
          FROM genes
          WHERE genes.experimentid = experiments.experimentid
          AND genes.regulation = 'down'
+         AND hidden <= $showHidden
       ) as genecount_down
       FROM experiments
       WHERE 
+      hidden <= $showHidden AND (
 
 EOT;
 
@@ -90,7 +108,7 @@ EOT;
          $sql .= "comparisontypeid = ?";
       }
       
-      $sql .= " ORDER BY label";
+      $sql .= ") ORDER BY label";
       
       $query = $this->db->query($sql, $comparisonTypeId);
       $result = $query->result();
@@ -107,16 +125,20 @@ EOT;
    public function getGeneList($asArray = false, $experimentid = false) {
       $this->load->database();
       $experimentid = $experimentid ?: $this->input->get('experimentid');
+      $showHidden = $this->showHidden();
       // Count(DISTINCT) is slow, but it works well here.
       $sql = <<<EOT
        SELECT geneid, genes.date_edited, FROM_UNIXTIME(genes.date_edited) as date_edited_pretty,
-        genename, geneabbrev, chromosome, 
+        genename, geneabbrev, chromosome, genes.hidden,
         start, end, regulation, experimentid,
         COUNT(DISTINCT transfac, study) as numFactors
        FROM genes
          INNER JOIN regulatory_sequences USING (geneid)
          INNER JOIN factor_matches USING(seqid)
        WHERE experimentid = ?
+       AND genes.hidden <= $showHidden
+       AND regulatory_sequences.hidden <= $showHidden
+       AND factor_matches.hidden <= $showHidden
        GROUP BY geneid
 EOT;
       $query = $this->db->query($sql, array($experimentid));
@@ -137,11 +159,13 @@ EOT;
 
    public function getGeneSummary() {
       $this->load->database();
+      $showHidden = $this->showHidden();
       $sql = <<<EOT
        SELECT geneabbrev, genename, chromosome, start, end,
         COUNT(DISTINCT e.comparisontypeid) as numComps,
         COUNT(g.geneid) as numExps, geneid
        FROM genes g INNER JOIN experiments e USING (experimentid)
+       WHERE g.hidden <= $showHidden AND e.hidden <= $showHidden
        GROUP BY genename
 EOT;
 
@@ -167,10 +191,13 @@ EOT;
    public function getExpsPerGene() {
       $this->load->database();
       $geneid = $this->input->get('geneid');
+      $showHidden = $this->showHidden();
       $sql = <<<EOT
-       sELECT     label, regulation   FROM genes INNER JOIN
-                    experiments
-USING (         experimentid            ) Where genename = ?
+       SELECT label, regulation
+       FROM genes INNER JOIN experiments USING (experimentid)
+       WHERE genename = ?
+       AND genes.hidden <= $showHidden
+       AND experiments.hidden <= $showHidden
 EOT;
 
       $query = $this->db->query($sql, array($geneid));
@@ -180,24 +207,30 @@ EOT;
 
    public function getTFSummary() {
       $this->load->database();
+      $showHidden = $this->showHidden();
       
       $sql = <<<EOT
        SELECT *
        FROM 
           (SELECT transfac, count(*) as numOccs
           FROM factor_matches
+          WHERE hidden <= $showHidden
           GROUP BY transfac) a
         INNER JOIN 
           (SELECT transfac, count(*) as numGenes
           FROM 
              (SELECT DISTINCT transfac, geneid
-             FROM factor_matches INNER JOIN regulatory_sequences r USING (seqid)) f1
+             FROM factor_matches INNER JOIN regulatory_sequences r USING (seqid)
+             WHERE factor_matches.hidden <= $showHidden
+             AND r.hidden <= $showHidden
+            ) f1
           GROUP BY transfac) b USING (transfac)
         INNER JOIN
           (SELECT transfac, count(*) as numStudies
           FROM 
              (SELECT DISTINCT transfac, study
-             FROM factor_matches) f1
+             FROM factor_matches
+             WHERE hidden <= $showHidden) f1
           GROUP BY transfac) c USING (transfac)
 EOT;
 
@@ -213,6 +246,8 @@ EOT;
       $la_s = $this->input->get('la_s');
       $lq = $this->input->get('lq');
       $ld = $this->input->get('ld');
+
+      $showHidden = $this->showHidden();
       
       $sql = <<<EOT
        SELECT transfac, numOccs, numGenes, numStudies
@@ -220,29 +255,41 @@ EOT;
           (SELECT transfac, seqid, count(*) as numOccs
           FROM factor_matches
           WHERE la > ? AND la_slash > ? AND lq > ? AND ld <= ?
+          AND hidden <= $showHidden
           GROUP BY transfac) a
         INNER JOIN 
           (SELECT transfac, count(*) as numGenes
           FROM 
              (SELECT DISTINCT transfac, geneid
-             FROM factor_matches INNER JOIN regulatory_sequences r USING (seqid)) f1
+             FROM factor_matches INNER JOIN regulatory_sequences r USING (seqid)
+             WHERE factor_matches.hidden <= $showHidden
+             AND r.hidden <= $showHidden
+            ) f1
           GROUP BY transfac) b USING (transfac)
         INNER JOIN
           (SELECT transfac, count(*) as numStudies
           FROM 
              (SELECT DISTINCT transfac, study
              FROM factor_matches
-               WHERE la > ? AND la_slash > ? AND lq > ? AND ld <= ?) f1
+               WHERE la > ? AND la_slash > ? AND lq > ? AND
+                ld <= ? AND hidden <= $showHidden) f1
           GROUP BY transfac) c USING (transfac)
         INNER JOIN regulatory_sequences using (seqid)
         INNER JOIN genes using (geneid)
-       WHERE 
+       WHERE genes.hidden <= $showHidden
+       AND regulatory_sequences.hidden <= $showHidden
 EOT;
 
       for ($i = 0; $i < count($experimentid); $i++) {
-         if ($i != 0)
+         if ($i != 0) {
             $sql .= " OR ";
+         } else {
+            $sql .= " AND (";
+         }
          $sql .= "experimentid = ?";
+      }
+      if (count($experimentid)) {
+         $sql .= ") ";
       }
 
       $query = $this->db->query($sql, array_merge(array($la, $la_s, $lq, $ld, $la, $la_s, $lq, $ld), $experimentid));
@@ -253,6 +300,7 @@ EOT;
    public function getTFOccur() {
       $this->load->database();
       
+      $showHidden = $this->showHidden();
       $tfName = $this->input->get('tf');
       $sql = <<<EOT
        SELECT celltype, species, label, genename, geneabbrev, study, beginning, length, sense
@@ -262,6 +310,11 @@ EOT;
           inner join experiments using (experimentid)
           inner join comparison_types using (comparisontypeid)
        where transfac = ?
+       AND factor_matches.hidden <= $showHidden
+       AND regulatory_sequences.hidden <= $showHidden
+       AND genes.hidden <= $showHidden
+       AND experiments.hidden <= $showHidden
+       AND comparison_types.hidden <= $showHidden
 EOT;
 
       $query = $this->db->query($sql, array($tfName));
@@ -288,10 +341,14 @@ EOT;
    public function getFactorList($asArray = false, $geneid = false) {
       $this->load->database();
       $geneid = $geneid ?: $this->input->get('geneid');
+      $showHidden = $this->showHidden();
       $sql = <<<EOT
-       SELECT study, transfac, COUNT(seqid) as numTimes
+       SELECT study, transfac, COUNT(seqid) as numTimes,
+       (MIN(factor_matches.hidden) || MIN(regulatory_sequences.hidden)) as hidden
        FROM regulatory_sequences INNER JOIN factor_matches USING(seqid)
        WHERE geneid = ?
+       AND regulatory_sequences.hidden <= $showHidden
+       AND factor_matches.hidden <= $showHidden
        GROUP BY study, transfac
 EOT;
       $query = $this->db->query($sql, array($geneid));
@@ -307,6 +364,9 @@ EOT;
        SELECT COUNT(seqid) as numTimes
        FROM regulatory_sequences INNER JOIN factor_matches USING(seqid)
        WHERE geneid = ?
+       AND regulatory_sequences.hidden <= $showHidden
+       AND factor_matches.hidden <= $showHidden
+
 EOT;
       $query = $this->db->query($sql, array($geneid));
       $countInfo = $query->row();
@@ -341,12 +401,16 @@ EOT;
       $comparisontypeid = $this->input->get('comparisontypeid');
       $experiment = $this->input->get('experiment');
 
+      $showHidden = $this->showHidden();
+      $joiner = 'WHERE';
+
       $sql = <<<EOT
        SELECT DISTINCT study, transfac, COUNT(seqid) as numTimes
        FROM regulatory_sequences INNER JOIN factor_matches USING(seqid) INNER JOIN genes USING(geneid) 
 EOT;
  
       if($experiment){
+         $joiner = 'AND';
           $sql .= " INNER JOIN experiments USING(experimentid)
                    WHERE label = '$experiment' AND
                    factor_matches.la >= ? AND
@@ -355,6 +419,7 @@ EOT;
                    factor_matches.ld <= ?";
       }
       elseif($comparisontypeid){
+         $joiner = 'AND';
           $sql .= " INNER JOIN experiments USING(experimentid) INNER JOIN comparison_types USING(comparisontypeid)
                    WHERE factor_matches.la >= ? AND
                    factor_matches.la_slash >= ? AND
@@ -362,6 +427,7 @@ EOT;
                    factor_matches.ld <= ?";
       }
       elseif($species){
+         $joiner = 'AND';
           $sql .= " INNER JOIN experiments USING(experimentid) INNER JOIN comparison_types USING(comparisontypeid)
                    WHERE species = '$species' AND
                    factor_matches.la >= ? AND
@@ -370,13 +436,17 @@ EOT;
                    factor_matches.ld <= ?";
       }
       else{
+         $joiner = 'AND';
          $sql .= " WHERE factor_matches.la >= ? AND
                    factor_matches.la_slash >= ? AND
                    factor_matches.lq >= ? AND
                    factor_matches.ld <= ?";
       }
-      
-      $sql .= " GROUP BY study, transfac";
+
+      $sql .= "$joiner factor_matches.hidden <= $showHidden AND
+         regulatory_sequences.hidden <= $showHidden AND
+         genes.hidden <= $showHidden
+         GROUP BY study, transfac";
 
       $query = $this->db->query($sql, array($minLa, $minLaSlash, $minLq, $maxLd));
 
@@ -421,6 +491,10 @@ EOT;
                    factor_matches.lq >= ? AND
                    factor_matches.ld <= ?";
       }
+      
+      $sql .= "$joiner factor_matches.hidden <= $showHidden AND
+         regulatory_sequences.hidden <= $showHidden AND
+         genes.hidden <= $showHidden";
 
 
       $query = $this->db->query($sql, array($minLa, $minLaSlash, $minLq, $maxLd));
@@ -442,12 +516,16 @@ EOT;
 public function getComparisonFromGeneList() {
     $this->load->database();
     $genename = $this->input->get('genename');
+    $showHidden = $this->showHidden();
     $sql = <<<EOT
     SELECT comparison_types.species, comparison_types.celltype, experiments.label
     FROM comparison_types, experiments, genes
     WHERE genes.experimentid = experiments.experimentid AND
           experiments.comparisontypeid = comparison_types.comparisontypeid AND
-          genes.genename = ?;
+          genes.genename = ?
+          AND genes.hidden <= $showHidden
+          AND comparison_types.hidden <= $showHidden
+          AND experiments.hidden <= $showHidden
 EOT;
     $query = $this->db->query($sql, $genename);
     $result = $query->result();
@@ -467,11 +545,17 @@ public function getGeneFoundListFromDB() {
       $studies = $this->input->get('studies');
       
       $isAll = false;
+      $showHidden = $this->showHidden();
 
+      // TODO: join these tables? Filter by comparison/experiment?
       $sql = <<<EOT
       SELECT DISTINCT genes.genename, genes.regulation
       FROM genes, regulatory_sequences, factor_matches, experiments, comparison_types
-      WHERE genes.geneid = regulatory_sequences.geneid AND
+      WHERE 
+            genes.hidden <= $showHidden AND
+            factor_matches.hidden <= $showHidden AND
+            regulatory_sequences.hidden <= $showHidden AND
+            genes.geneid = regulatory_sequences.geneid AND
             factor_matches.seqid = regulatory_sequences.seqid AND (
 EOT;
       for($i = 0; $i < count($transFacs); $i++){
@@ -563,11 +647,16 @@ EOT;
          $params[] = $study;
       }
 
+      $showHidden = $this->showHidden();
+
       $sql = <<<EOT
-      SELECT *, regulatory_sequences.date_edited,
-        FROM_UNIXTIME(regulatory_sequences.date_edited) as date_edited_pretty
+      SELECT *, regulatory_sequences.date_edited, 
+       regulatory_sequences.hidden,
+       FROM_UNIXTIME(regulatory_sequences.date_edited) as date_edited_pretty
        FROM regulatory_sequences INNER JOIN factor_matches USING(seqid)
        WHERE geneid = ? $transfacFilter
+       AND regulatory_sequences.hidden <= $showHidden
+       AND factor_matches.hidden <= $showHidden
 EOT;
       $query = $this->db->query($sql, $params);
 
@@ -593,18 +682,17 @@ EOT;
     * Given sequence info, give info of similar sequences.
     */
    private function getSimilarSequenceInfo($sequenceInfo) {
+      $showHidden = $this->showHidden();
+
       $sql = <<<EOT
        SELECT regulatory_sequences.*
-         -- ,       GROUP_CONCAT(DISTINCT transfac ORDER BY transfac SEPARATOR '/') as transfacs,
-       -- GROUP_CONCAT(DISTINCT study ORDER BY study SEPARATOR '/') as studies
        FROM regulatory_sequences
-      -- INNER JOIN factor_matches USING(seqid)
        WHERE geneid = ?
        AND seqid != ?
        AND beginning = ?
        AND sense = ?
        AND length IN (?, ?, ?)
-       -- GROUP BY seqid
+       AND hidden <= $showHidden
 EOT;
 
       $params = array(
@@ -637,6 +725,8 @@ EOT;
       if (!$seqid) {
          $seqid = $this->input->post('seqid');
       }
+
+      $showHidden = $this->showHidden();
       $sql = <<<EOT
        SELECT regulatory_sequences.*,
         genes.geneabbrev,
@@ -651,6 +741,10 @@ EOT;
         INNER JOIN experiments USING (experimentid)
         INNER JOIN comparison_types USING (comparisontypeid)
        WHERE seqid = ?
+       AND genes.hidden <= $showHidden
+       AND regulatory_sequences.hidden <= $showHidden
+       AND experiments.hidden <= $showHidden
+       AND comparison_types.hidden <= $showHidden
 EOT;
       $query = $this->db->query($sql, array($seqid));
       $sequenceInfo = $query->row_array();
@@ -659,6 +753,7 @@ EOT;
        SELECT *, FROM_UNIXTIME(date_edited) as date_edited_pretty
        FROM factor_matches
        WHERE seqid = ?
+       AND hidden <= $showHidden
 EOT;
    
       $query = $this->db->query($sql, array($seqid));
@@ -857,10 +952,6 @@ EOT;
       $query = $this->db->query($sql, $updateData);
       $this->db->trans_complete();
 
-      $sql = <<<EOT
-       SELECT genes.experimentid, genes.geneid, factor_matches.seqid
-EOT;
-
       $returnData = array(
          'geneData' => $this->getGeneList(true, $this->input->post('selectedExperimentid')),
          'sequenceData' => $this->getSequenceList(true,
@@ -873,6 +964,39 @@ EOT;
          'factorData' => $this->getFactorList(true, $this->input->post('selectedGeneid'))
       );
       echo json_encode($returnData);
+   }
+
+   public function toggleRow() {
+      $this->load->database();
+      $this->db->trans_start();
+      
+      $field = $this->input->post('field');
+      $tablesByField = array(
+         'comparisontypeid' => 'comparison_types',
+         'experimentid' => 'experiments',
+         'geneid' => 'genes',
+         'seqid' => 'regulatory_sequences',
+         'matchid' => 'factor_matches'
+      );
+
+      if (!isset($tablesByField[$field])) {
+         echo "Invalid field: $field";
+         return;
+      }
+
+      $table = $tablesByField[$field];
+      $isHidden = $this->input->post('isHidden');
+      $newHidden = $isHidden ? 0 : 1;
+
+      $sql = <<<EOT
+       UPDATE {$table}
+       SET hidden = ?
+       WHERE {$field} = ?
+EOT;
+
+      $this->db->query($sql, array($newHidden, $this->input->post('value')));
+
+      $this->db->trans_complete();
    }
 }
 
