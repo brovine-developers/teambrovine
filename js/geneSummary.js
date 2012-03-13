@@ -62,12 +62,16 @@ function setupGeneSummary() {
       "sScrollY": height,
       "aoColumns": [
          {"sTitle": "Gene", "mDataProp": "genename"},
-         {"sTitle": "Gene Abbrev", "mDataProp": "geneabbrev"},
+         {"sTitle": "Abbrev", "mDataProp": "geneabbrev"},
          {"sTitle": "Chr", "mDataProp": "chromosome"},
          {"sTitle": "Start", "mDataProp": "start"},
          {"sTitle": "End", "mDataProp": "end"},
          {"sTitle": "Comps", "mDataProp": "numComps"},
+         {"sTitle": "Up", "mDataProp": "numCompsUp"},
+         {"sTitle": "Down", "mDataProp": "numCompsDown"},
          {"sTitle": "Exps", "mDataProp": "numExps"},
+         {"sTitle": "Up", "mDataProp": "numExpsUp"},
+         {"sTitle": "Down", "mDataProp": "numExpsDown"}
       ]
 
    });
@@ -83,7 +87,7 @@ function setupGeneSummary() {
       "sScrollY": height,
       "aoColumns": [ 
          {"sTitle": "Experiment", "mDataProp": "label"},
-         {"sTitle": "Regulation", "mDataProp": "regulation"},
+         {"sTitle": "Regulation", "mDataProp": "regulation"}
       ]
 
    });

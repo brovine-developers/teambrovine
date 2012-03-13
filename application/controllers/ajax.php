@@ -163,7 +163,23 @@ EOT;
       $sql = <<<EOT
        SELECT geneabbrev, genename, chromosome, start, end,
         COUNT(DISTINCT e.comparisontypeid) as numComps,
-        COUNT(g.geneid) as numExps, geneid
+        COUNT(g.geneid) as numExps, geneid,
+        (SELECT COUNT(DISTINCT experimentid)
+         FROM genes 
+         WHERE regulation = 'down'
+         AND genename = g.genename) as numExpsDown,
+        (SELECT COUNT(DISTINCT experimentid)
+         FROM genes 
+         WHERE regulation = 'up'
+         AND genename = g.genename) as numExpsUp,
+        (SELECT COUNT(DISTINCT comparisontypeid)
+         FROM genes INNER JOIN experiments USING (experimentid)
+         WHERE regulation = 'down'
+         AND genename = g.genename) as numCompsDown,
+        (SELECT COUNT(DISTINCT comparisontypeid)
+         FROM genes INNER JOIN experiments USING (experimentid)
+         WHERE regulation = 'up'
+         AND genename = g.genename) as numCompsUp
        FROM genes g INNER JOIN experiments e USING (experimentid)
        WHERE g.hidden <= $showHidden AND e.hidden <= $showHidden
        GROUP BY genename
