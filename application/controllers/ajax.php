@@ -329,6 +329,7 @@ EOT;
             'genename' => $row->genename,
             'geneabbrev' => $row->geneabbrev,
             'study' => $row->study,
+            'studyPretty' => str_replace('/', ' /<br>', $row->study),
             'beginning' => $row->beginning,
             'length' => $row->length,
             'sense' => $row->sense

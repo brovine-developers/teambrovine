@@ -206,7 +206,7 @@ function setupExperimentHierarchy() {
          {"sTitle": "Transfac", "mDataProp": "transfac"},
          {"sTitle": "Studies", "mDataProp": "numStudies"},
          {"sTitle": "Genes", "mDataProp": "numGenes"},
-         {"sTitle": "Occurrences", "mDataProp": "numOccs"},
+         {"sTitle": "Occurrences", "mDataProp": "numOccs"}
       ]
 
    });
@@ -227,10 +227,10 @@ function setupExperimentHierarchy() {
          {"sTitle": "Experiment", "mDataProp": "label"},
          {"sTitle": "Gene Name", "mDataProp": "genename"},
          {"sTitle": "Gene Abbrev", "mDataProp": "geneabbrev"},
-         {"sTitle": "Study", "mDataProp": "study"},        
+         {"sTitle": "Study", "mDataProp": "studyPretty"},        
          {"sTitle": "Beginning", "mDataProp": "beginning"},
          {"sTitle": "Sense", "mDataProp": "sense"},
-         {"sTitle": "Length", "mDataProp": "length"},
+         {"sTitle": "Length", "mDataProp": "length"}
       ]
       
    });
