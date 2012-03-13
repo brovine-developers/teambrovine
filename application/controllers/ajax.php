@@ -104,9 +104,9 @@ EOT;
       echo json_encode($result);
    }
 
-   public function getGeneList() {
+   public function getGeneList($asArray = false, $experimentid = false) {
       $this->load->database();
-      $experimentid = $this->input->get('experimentid');
+      $experimentid = $experimentid ?: $this->input->get('experimentid');
       // Count(DISTINCT) is slow, but it works well here.
       $sql = <<<EOT
        SELECT geneid, genes.date_edited, FROM_UNIXTIME(genes.date_edited) as date_edited_pretty,
@@ -128,7 +128,11 @@ EOT;
          }
       }
 
-      echo json_encode($results);
+      if ($asArray) {
+         return $results;
+      } else {
+         echo json_encode($results);
+      }
    }
 
    public function getGeneSummary() {
@@ -281,9 +285,9 @@ EOT;
       echo json_encode($out);
    }
 
-   public function getFactorList() {
+   public function getFactorList($asArray = false, $geneid = false) {
       $this->load->database();
-      $geneid = $this->input->get('geneid');
+      $geneid = $geneid ?: $this->input->get('geneid');
       $sql = <<<EOT
        SELECT study, transfac, COUNT(seqid) as numTimes
        FROM regulatory_sequences INNER JOIN factor_matches USING(seqid)
@@ -317,7 +321,11 @@ EOT;
       );
 
 
-      echo json_encode($result);
+      if ($asArray) {
+         return $result;
+      } else {
+         echo json_encode($result);
+      }
    }
 
    //RyanTestFunction
@@ -538,16 +546,18 @@ EOT;
       }
    }
 
-   public function getSequenceList() {
+   public function getSequenceList($asArray = false, $geneid = false, 
+    $transfac = false, $study = false, $allRowSelected = false) {
       $this->load->database();
-      $geneid = $this->input->get('geneid');
-      $transfac = $this->input->get('transfac');
-      $study = $this->input->get('study');
+      $geneid = $geneid ?: $this->input->get('geneid');
+      $transfac = $transfac ?: $this->input->get('transfac');
+      $study = $study ?: $this->input->get('study');
 
       $transfacFilter = '';
       $params = array($geneid);
 
-      if ($transfac != 'All' && $study != '-') {
+      // If $allRowSelected, don't apply the filter.
+      if ($transfac != 'All' && $study != '-' && !$allRowSelected) {
          $transfacFilter = 'AND transfac = ? AND study = ?';
          $params[] = $transfac;
          $params[] = $study;
@@ -572,7 +582,11 @@ EOT;
 
       $promoter = $this->fetchPromoter($geneid);
       $this->calculateSequencesFromPromoter($sequences, $promoter);
-      echo json_encode($sequences);
+      if ($asArray) {
+         return $sequences;
+      } else {
+         echo json_encode($sequences);
+      }
    }
 
    /**
@@ -642,7 +656,7 @@ EOT;
       $sequenceInfo = $query->row_array();
 
       $sql = <<<EOT
-       SELECT * 
+       SELECT *, FROM_UNIXTIME(date_edited) as date_edited_pretty
        FROM factor_matches
        WHERE seqid = ?
 EOT;
@@ -664,6 +678,9 @@ EOT;
 
       foreach ($factorMatchInfo as &$row) {
          $row['studyPretty'] = str_replace('/', ' /<br>', $row['study']);
+         if ($row['date_edited'] == 0) {
+            $row['date_edited_pretty'] = 'Never';
+         }
       }
 
       $allData = array(
@@ -810,6 +827,52 @@ EOT;
        array($length, $sense, $beginning, time(), $seqid));
       $this->db->trans_complete();
       $this->getSequenceInfo();
+   }
+   
+   public function updateMatch() {
+      $this->load->database();
+      $this->db->trans_start();
+      $matchid = $this->input->post('matchid');
+
+      $fields = array('study', 'transfac', 'la', 'la_slash',
+       'lq', 'ld', 'lpv', 'sc', 'sm', 'spv', 'ppv');
+
+      $updateData = array();
+      $sqlParts = '';
+      foreach ($fields as $name) {
+         $updateData[] = $this->input->post($name);
+         $sqlParts .= "$name = ?,\n";
+      }
+
+      $updateData[] = time();
+      $updateData[] = $matchid;
+
+      $sql = <<<EOT
+       UPDATE factor_matches SET
+        $sqlParts
+        date_edited = ?
+       WHERE
+        matchid = ?
+EOT;
+      $query = $this->db->query($sql, $updateData);
+      $this->db->trans_complete();
+
+      $sql = <<<EOT
+       SELECT genes.experimentid, genes.geneid, factor_matches.seqid
+EOT;
+
+      $returnData = array(
+         'geneData' => $this->getGeneList(true, $this->input->post('selectedExperimentid')),
+         'sequenceData' => $this->getSequenceList(true,
+            $this->input->post('selectedGeneid'),
+            // Use the new transfac and study.
+            $this->input->post('transfac'), 
+            $this->input->post('study'),
+            $this->input->post('allRowSelected')
+         ),
+         'factorData' => $this->getFactorList(true, $this->input->post('selectedGeneid'))
+      );
+      echo json_encode($returnData);
    }
 }
 

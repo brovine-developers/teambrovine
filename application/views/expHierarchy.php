@@ -230,6 +230,12 @@ and scroll. */ ?>
          <tbody>
          </tbody>
       </table>
+      <div class="row">
+         <div class="span12">
+            <a class="btn btn-warning disabled" id="editMatch"><i class="icon-pencil icon-white"></i> Edit Factor</a>
+            <a class="btn btn-danger disabled" id="hideMatch"><i class="icon-minus-sign icon-white"></i> Hide Factor</a>
+         </div>
+      </div>
    </div>
 </div>
 
@@ -394,6 +400,94 @@ and scroll. */ ?>
          <div class="control-group">
             <div class="controls">
                <a id="editSequenceSave" class="btn btn-primary">Save</a>
+               <a class="btn" data-dismiss="modal">Cancel</a>
+            </div>
+         </div>
+      </fieldset>
+   </form>
+</div>
+
+<div class="modal hide fade" id="editMatchModal">
+   <form class="form-horizontal">
+      <fieldset>
+         <legend>Edit Factor Info</legend>
+         <div class="control-group">
+            <label for="matchStudyInput" class="control-label">Study</label>
+            <div class="controls">
+               <input id="matchStudyInput">
+            </div>
+         </div>
+         <div class="control-group">
+            <label for="matchTransfacInput" class="control-label">Factor</label>
+            <div class="controls">
+               <input id="matchTransfacInput">
+            </div>
+         </div>
+         <div class="control-group">
+            <label for="matchLaInput" class="control-label">La</label>
+            <div class="controls">
+               <input id="matchLaInput">
+            </div>
+         </div>
+         <div class="control-group">
+            <label for="matchLaSlashInput" class="control-label">La/</label>
+            <div class="controls">
+               <input id="matchLaSlashInput">
+            </div>
+         </div>
+         <div class="control-group">
+            <label for="matchLqInput" class="control-label">Lq</label>
+            <div class="controls">
+               <input id="matchLqInput">
+            </div>
+         </div>
+         <div class="control-group">
+            <label for="matchLdInput" class="control-label">Ld</label>
+            <div class="controls">
+               <input id="matchLdInput">
+            </div>
+         </div>
+         <div class="control-group">
+            <label for="matchLpvInput" class="control-label">Lpv</label>
+            <div class="controls">
+               <input id="matchLpvInput">
+            </div>
+         </div>
+         <div class="control-group">
+            <label for="matchScInput" class="control-label">Sc</label>
+            <div class="controls">
+               <input id="matchScInput">
+            </div>
+         </div>
+         <div class="control-group">
+            <label for="matchSmInput" class="control-label">Sm</label>
+            <div class="controls">
+               <input id="matchSmInput">
+            </div>
+         </div>
+         <div class="control-group">
+            <label for="matchSpvInput" class="control-label">Spv</label>
+            <div class="controls">
+               <input id="matchSpvInput">
+            </div>
+         </div>
+         <div class="control-group">
+            <label for="matchPpvInput" class="control-label">Ppv</label>
+            <div class="controls">
+               <input id="matchPpvInput">
+            </div>
+         </div>
+         <div class="control-group">
+            <label class="control-label">Last Edited</label>
+            <div class="controls">
+               <label style="padding-top: 5px" id="matchLastEdited"></label>
+            </div>
+         </div>
+
+         <input type="hidden" id="matchidInput" value="0">
+         <div class="control-group">
+            <div class="controls">
+               <a id="editMatchSave" class="btn btn-primary">Save</a>
                <a class="btn" data-dismiss="modal">Cancel</a>
             </div>
          </div>

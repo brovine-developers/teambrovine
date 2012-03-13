@@ -1,7 +1,9 @@
 var curGeneid;
 var geneModal;
-var factorModal;
 var sequenceModal;
+var matchModal;
+var comparisonModal;
+var experimentModal;
 
 function getTimestamp() {
    // http://www.perturb.org/display/786_Javascript_Unixtime.html
@@ -43,6 +45,14 @@ function selectTableRow(table, matchData) {
          $(this).addClass('selected');
       }
    });
+}
+
+function getSelectedRow(table) {
+   return table.$('tr.selected')[0];
+}
+
+function getSelectedRowData(table) {
+   return table.fnGetData(getSelectedRow(table));
 }
 
 function setupEditAndDelete() {
@@ -251,6 +261,97 @@ function setupEditAndDelete() {
 
       }, 'json');
    });
+   
+   // Match Modal ////////////////////////////////////////////////////////
+   
+   matchModal = $('#editMatchModal').modal({
+      'show': false
+   });
+
+   $('#editMatch').click(function() {
+      if (!$(this).hasClass('disabled')) {
+         var matchData = matchList.fnGetData(matchList.$('.selected')[0]);
+         $('#matchStudyInput').val(matchData.study);
+         $('#matchTransfacInput').val(matchData.transfac);
+         $('#matchLaInput').val(matchData.la);
+         $('#matchLaSlashInput').val(matchData.la_slash);
+         $('#matchLqInput').val(matchData.lq);
+         $('#matchLdInput').val(matchData.ld);
+         $('#matchLpvInput').val(matchData.lpv);
+         $('#matchScInput').val(matchData.sc);
+         $('#matchSmInput').val(matchData.sm);
+         $('#matchSpvInput').val(matchData.spv);
+         $('#matchPpvInput').val(matchData.ppv);
+         $('#matchidInput').val(matchData.seqid);
+         $('#matchLastEdited').html(matchData.date_edited_pretty);
+
+         matchModal.modal('show');
+      }
+   });
+
+   $('#editMatchSave').click(function() {
+      // Save match info here.
+
+      var row = matchList.$('tr.selected')[0];
+      var oldMatchData = matchList.fnGetData(row);
+      // Make a new matchData object for the row. 
+
+
+      var newMatchData = $.extend(
+       {}, oldMatchData, {
+         study: $('#matchStudyInput').val(),
+         studyPretty: $('#matchStudyInput').val().replace('/', ' /<br>'),
+         transfac: $('#matchTransfacInput').val(),
+         la: $('#matchLaInput').val(),
+         la_slash: $('#matchLaSlashInput').val(),
+         lq: $('#matchLqInput').val(),
+         ld: $('#matchLdInput').val(),
+         lpv: $('#matchLpvInput').val(),
+         sc: $('#matchScInput').val(),
+         sm: $('#matchSmInput').val(),
+         spv: $('#matchSpvInput').val(),
+         ppv: $('#matchPpvInput').val(),
+         date_edited: getTimestamp(),
+         date_edited_pretty: getPrettyTime(),
+      });
+
+      matchList.fnUpdate(newMatchData, row);
+      console.log(newMatchData);
+      console.log(row);
+      matchModal.modal('hide');
+
+      var selectedGeneid = getSelectedRowData(geneList).geneid;
+      var selectedFactorData = getSelectedRowData(factorList);
+      var selectedSeqid = getSelectedRowData(sequenceList).seqid;
+
+      var selectedExperimentid = getSelectedRowData(experimentList).experimentid;
+
+      var serverData = $.extend({}, newMatchData, {
+         selectedExperimentid: selectedExperimentid,
+         selectedGeneid: selectedGeneid,
+         allRowSelected: selectedFactorData.allRow
+      });
+
+      jQuery.post('ajax/updateMatch', serverData, function(data) {
+         updateGeneListData(data.geneData);
+         selectTableRow(geneList, { geneid: selectedGeneid });
+         
+         updateSequenceListData(data.sequenceData);
+         selectTableRow(sequenceList, { seqid: selectedSeqid });
+         
+         updateFactorListData(data.factorData);
+         if (selectedFactorData.allRow) {
+            selectTableRow(factorList, { 
+               allRow: 1 
+            });
+         } else {
+            selectTableRow(factorList, { 
+               transfac: newMatchData.transfac,
+               study: newMatchData.study
+            });
+         }
+      }, 'json');
+   });
 }
 
 function updateSpeciesListData(data) {
@@ -308,10 +409,22 @@ function updateSequenceInfoData(data) {
    matchList.fnClearTable();
    matchList.fnAddData(data.factorMatchInfo);
 
+   matchList.$('tr').click(function(e) {
+      matchList.$('tr').removeClass('selected');
+      $(this).addClass('selected');
+      var rowData = matchList.fnGetData(this);
+
+      var matchid = rowData.matchid;
+      $('#editMatch').removeClass('disabled');
+      $('#hideMatch').removeClass('disabled');
+
+      fixAllTableWidths();
+   });
+
+
    $("#sequenceInfo").removeClass("hidden");
    fixTableWidth(similarList);
    fixTableWidth(matchList);
-
 }
 
 function updateSequenceInfo(seqid) {
@@ -324,6 +437,22 @@ function updateSequenceInfo(seqid) {
    }, 'json');
 }
 
+function updateSequenceListData(data) {
+   sequenceList.fnClearTable();
+   sequenceList.fnAddData(data);
+   fixTableWidth(sequenceList);
+
+   sequenceList.$('tr').click(function() {
+      sequenceList.$('tr').removeClass('selected');
+      $(this).addClass('selected');
+      $('#editSequence').removeClass('disabled');
+      $('#hideSequence').removeClass('disabled');
+      var rowData = sequenceList.fnGetData(this);
+
+      updateSequenceInfo(rowData.seqid);
+   });
+}
+
 function updateSequenceList(geneid, transfac, study) {
    jQuery.get("ajax/getSequenceList",
    {
@@ -334,57 +463,62 @@ function updateSequenceList(geneid, transfac, study) {
    function(data) {
       $('#editSequence').addClass('disabled');
       $('#hideSequence').addClass('disabled');
-
-      sequenceList.fnClearTable();
       $('#sequenceInfo').addClass('hidden');
-      sequenceList.fnAddData(data);
-      fixTableWidth(sequenceList);
 
-      sequenceList.$('tr').click(function() {
-         sequenceList.$('tr').removeClass('selected');
-         $(this).addClass('selected');
-         $('#editSequence').removeClass('disabled');
-         $('#hideSequence').removeClass('disabled');
-         var rowData = sequenceList.fnGetData(this);
-
-         updateSequenceInfo(rowData.seqid);
-      });
+      updateSequenceListData(data);
    },
    'json'
    );
+}
+
+function updateFactorListData(data) {
+   factorList.fnClearTable();
+   factorList.fnAddData(data);
+   fixTableWidth(factorList);
+   factorList.$('tr').click(function(e) {
+      factorList.$('tr').removeClass('selected');
+      $(this).addClass('selected');
+      var rowData = factorList.fnGetData(this);
+      var transfac = rowData.transfac;
+      var study = rowData.study;
+      updateSequenceList(curGeneid, transfac, study);
+   });
 }
 
 function updateFactorList() {
    jQuery.get("ajax/getFactorList",
    { 'geneid': curGeneid },
    function(data) {
-      factorList.fnClearTable();
       sequenceList.fnClearTable();
       $('#sequenceInfo').addClass('hidden');
       $('#editSequence').addClass('disabled');
       $('#hideSequence').addClass('disabled');
 
-      factorList.fnAddData(data);
-      fixTableWidth(factorList);
-      factorList.$('tr').click(function(e) {
-         factorList.$('tr').removeClass('selected');
-         $(this).addClass('selected');
-         var rowData = factorList.fnGetData(this);
-         var transfac = rowData.transfac;
-         var study = rowData.study;
-         updateSequenceList(curGeneid, transfac, study);
-      });
-
+      updateFactorListData(data);
    },
    'json'
    );
+}
+
+function updateGeneListData(data) {
+   geneList.fnClearTable();
+   geneList.fnAddData(data);
+   fixTableWidth(geneList);
+   geneList.$('tr').click(function(e) {
+      geneList.$('tr').removeClass('selected');
+      $(this).addClass('selected');
+      var rowData = geneList.fnGetData(this);
+      curGeneid = rowData.geneid;
+      updateFactorList();
+      $('#editGene').removeClass('disabled');
+      $('#hideGene').removeClass('disabled');
+   });
 }
 
 function updateGeneList(experimentid) {
    jQuery.get("ajax/getGeneList",
    { 'experimentid': experimentid },
    function(data) {
-      geneList.fnClearTable();
       sequenceList.fnClearTable();
       factorList.fnClearTable();
       $('#sequenceInfo').addClass('hidden');
@@ -393,18 +527,7 @@ function updateGeneList(experimentid) {
       $('#editSequence').addClass('disabled');
       $('#hideSequence').addClass('disabled');
 
-      geneList.fnAddData(data);
-      fixTableWidth(geneList);
-      geneList.$('tr').click(function(e) {
-         geneList.$('tr').removeClass('selected');
-         $(this).addClass('selected');
-         var rowData = geneList.fnGetData(this);
-         curGeneid = rowData.geneid;
-         updateFactorList();
-         $('#editGene').removeClass('disabled');
-         $('#hideGene').removeClass('disabled');
-      });
-
+      updateGeneListData(data);
    },
    'json'
    );
