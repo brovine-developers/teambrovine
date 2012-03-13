@@ -1,5 +1,6 @@
 var curGeneid;
 var experiment;
+var tfReload;
 
 function updateSpeciesList() {
    jQuery.get("ajax/getSpeciesList",
@@ -42,6 +43,7 @@ function updateTFSummary(experimentid, la, la_slash, lq, ld) {
       },
       function(data) {
          tfSummary.fnClearTable();
+         tfOccur.fnClearTable();
          tfSummary.fnAddData(data);
          fixTableWidth(tfSummary);
 
@@ -229,19 +231,35 @@ function setupExperimentHierarchy() {
 
    
    $("#minla").keyup(function () {
-      updateTF();
+      clearTimeout(tfReload);
+
+      setTimeout(function () {
+         updateTF();
+      }, 500);
    });
    
    $("#minlaslash").keyup(function () {
-      updateTF();
+      clearTimeout(tfReload);
+
+      setTimeout(function () {
+         updateTF();
+      }, 500);
    });
    
    $("#minlq").keyup(function () {
-      updateTF();
+      clearTimeout(tfReload);
+
+      setTimeout(function () {
+         updateTF();
+      }, 500);
    });
    
    $("#maxld").keyup(function () {
-      updateTF();
+      clearTimeout(tfReload);
+
+      setTimeout(function () {
+         updateTF();
+      }, 500);
    });
    
    updateSpeciesList();
