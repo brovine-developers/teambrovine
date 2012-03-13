@@ -268,7 +268,7 @@ function setupExperimentHierarchy() {
    });
 
    factorList = $('#factorList').dataTable({
-      "sDom": "<'row'<'span4'f>r>t<'row'<'span4'i>>",
+      "sDom": "<'row'<'span6'f>r>t<'row'<'span6'i>>",
       "bPaginate": false,
       "sScrollY": secondRowHeight,
       "oLanguage": {
@@ -334,7 +334,7 @@ function setupExperimentHierarchy() {
    });
 
    geneFoundList = $('#geneFoundList').dataTable( {
-      "sDom": "<'row'<'span4'f>r>t<'row'<'span4'i>>",
+      "sDom": "<'row'<'span6'f>r>t<'row'<'span6'i>>",
       "bPaginate": false,
       "sScrollY": secondRowHeight,
       "oLanguage": {
