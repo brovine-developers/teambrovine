@@ -85,7 +85,7 @@ function setupEditAndDelete() {
       var row = geneList.$('.selected')[0];
       var oldGeneData = geneList.fnGetData(row);
       // Make a new geneData object for the row. 
-      var newGeneData = {
+      var newGeneData = $.extend({}, oldGeneData, {
          geneid: $('#geneidInput').val(),
          genename: $('#genenameInput').val(),
          geneabbrev: $('#geneabbrevInput').val(),
@@ -94,18 +94,26 @@ function setupEditAndDelete() {
          end: $('#geneendInput').val(),
          regulation: geneRegulation,
          date_edited: getTimestamp(),
-         date_edited_pretty: getPrettyTime(),
-         numFactors: oldGeneData.numFactors
-      };
+         date_edited_pretty: getPrettyTime()
+      });
 
       geneList.fnUpdate(newGeneData, row);
       geneModal.modal('hide');
 
-      jQuery.post('ajax/updateGene', newGeneData, function() {
-         // Do nothing on success, I guess.
-         // Maybe we should put up a spinner but who's got the time.
-         // This looks faster, too.
+      var comparisonRow = comparisonList.$('tr.selected')[0];
+      var compData = comparisonList.fnGetData(comparisonRow);
+      var serverData = $.extend({}, newGeneData, {
+         comparisontypeid: compData.comparisontypeid
       });
+
+      jQuery.post('ajax/updateGene', serverData, function(experimentData) {
+         // Update experiment data on save. The numbers might change.
+         updateExperimentListData(experimentData);
+         var matchData = {
+            experimentid: oldGeneData.experimentid
+         };
+         selectTableRow(experimentList, matchData);
+      }, 'json');
    });
 
    // Comparison Modal ////////////////////////////////////////////////////////
@@ -330,6 +338,23 @@ function updateGeneList(experimentid) {
    );
 }
 
+function updateExperimentListData(data) {
+   experimentList.fnClearTable();
+   experimentList.fnAddData(data);
+   fixTableWidth(experimentList);
+   experimentList.$('tr').click(function(e) {
+      experimentList.$('tr').removeClass('selected');
+      $(this).addClass('selected');
+      $('#editExperiment').removeClass('disabled');
+      $('#hideExperiment').removeClass('disabled');
+
+      var rowData = experimentList.fnGetData(this);
+      var experimentid = rowData.experimentid;
+      updateGeneList(experimentid);
+   });
+}
+
+
 function updateExperimentList(comparisontypeid) {
    jQuery.get("ajax/getExperimentList",
    {
@@ -343,20 +368,9 @@ function updateExperimentList(comparisontypeid) {
       $('#editExperiment').addClass('disabled');
       $('#hideExperiment').addClass('disabled');
 
-      experimentList.fnClearTable();
       $('#sequenceInfo').empty();
-      experimentList.fnAddData(data);
-      fixTableWidth(experimentList);
-      experimentList.$('tr').click(function(e) {
-         experimentList.$('tr').removeClass('selected');
-         $(this).addClass('selected');
-         $('#editExperiment').removeClass('disabled');
-         $('#hideExperiment').removeClass('disabled');
-
-         var rowData = experimentList.fnGetData(this);
-         var experimentid = rowData.experimentid;
-         updateGeneList(experimentid);
-      });
+      
+      updateExperimentListData(data);
    },
    'json'
    );

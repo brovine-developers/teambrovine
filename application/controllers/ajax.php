@@ -51,7 +51,17 @@ EOT;
 
    public function getExperimentList() {
       $this->load->database();
-      $comparisonTypeId = $this->input->get('comparisontypeid');
+      $comparisonTypeId = $this->input->post('comparisontypeid');
+      if (!$comparisonTypeId) {
+         $comparisonTypeId = $this->input->get('comparisontypeid');
+      }
+
+      if ($comparisonTypeId) {
+         $comparisonTypeId = (array) $comparisonTypeId;
+      } else {
+         $comparisonTypeId = array();
+      }
+
       $sql = <<<EOT
       SELECT experimentid, label, hidden, date_edited,
        FROM_UNIXTIME(date_edited) as date_edited_pretty,
@@ -71,6 +81,7 @@ EOT;
       ) as genecount_down
       FROM experiments
       WHERE 
+
 EOT;
 
       for ($i = 0; $i < count($comparisonTypeId); $i++) {
@@ -79,7 +90,7 @@ EOT;
          $sql .= "comparisontypeid = ?";
       }
       
-      $sql .= "ORDER BY label";
+      $sql .= " ORDER BY label";
       
       $query = $this->db->query($sql, $comparisonTypeId);
       $result = $query->result();
@@ -99,7 +110,7 @@ EOT;
       $sql = <<<EOT
        SELECT geneid, date_edited, FROM_UNIXTIME(date_edited) as date_edited_pretty,
         genename, geneabbrev, chromosome, 
-        start, end, regulation,
+        start, end, regulation, experimentid,
         (SELECT COUNT(DISTINCT transfac)
          FROM regulatory_sequences INNER JOIN factor_matches USING(seqid)
          WHERE regulatory_sequences.geneid = genes.geneid
@@ -673,6 +684,9 @@ EOT;
 
       $this->load->database();
       $query = $this->db->query($sql, $geneData);
+      
+      // Update experiment list at the end.
+      $this->getExperimentList();
    }
 
    public function updateComparison() {
