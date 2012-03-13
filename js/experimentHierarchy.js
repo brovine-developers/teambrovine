@@ -523,11 +523,15 @@ function setupExperimentHierarchy() {
          {"sTitle": "Lq", "mDataProp": "lq", "sType": "numeric"},
          {"sTitle": "Ld", "mDataProp": "ld", "sType": "numeric"},
          {"sTitle": "Lpv", "mDataProp": "lpv", "sType": "numeric"},
+         /*
          {"sTitle": "Sc", "mDataProp": "sc", "sType": "numeric"},
          {"sTitle": "Sm", "mDataProp": "sm", "sType": "numeric"},
          {"sTitle": "Spv", "mDataProp": "spv", "sType": "numeric"},
          {"sTitle": "Ppv", "mDataProp": "ppv", "sType": "numeric"},
+         */
          {"sTitle": "Sequence", "mDataProp": "sequence"},
+         {"sTitle": "Factor", "mDataProp": "transfac"},
+         {"sTitle": "Study", "mDataProp": "studyPretty"},
          {"sTitle": "Sequenceid", "mDataProp": "seqid", "bVisible": false}
       ]
    
@@ -556,6 +560,10 @@ function setupExperimentHierarchy() {
    
    $('#geneList_wrapper tr th:contains(Gene)').tooltip({
       title: "Hover for full name"
+   });
+   
+   $('#geneList_wrapper tr th:contains(Factors)').tooltip({
+      title: "Unique factor / study pairs"
    });
    
    $('#experimentList_wrapper tr th:contains(Up)').tooltip({

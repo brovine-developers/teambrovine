@@ -107,16 +107,17 @@ EOT;
    public function getGeneList() {
       $this->load->database();
       $experimentid = $this->input->get('experimentid');
+      // Count(DISTINCT) is slow, but it works well here.
       $sql = <<<EOT
-       SELECT geneid, date_edited, FROM_UNIXTIME(date_edited) as date_edited_pretty,
+       SELECT geneid, genes.date_edited, FROM_UNIXTIME(genes.date_edited) as date_edited_pretty,
         genename, geneabbrev, chromosome, 
         start, end, regulation, experimentid,
-        (SELECT COUNT(DISTINCT transfac)
-         FROM regulatory_sequences INNER JOIN factor_matches USING(seqid)
-         WHERE regulatory_sequences.geneid = genes.geneid
-        ) as numFactors
+        COUNT(DISTINCT transfac, study) as numFactors
        FROM genes
+         INNER JOIN regulatory_sequences USING (geneid)
+         INNER JOIN factor_matches USING(seqid)
        WHERE experimentid = ?
+       GROUP BY geneid
 EOT;
       $query = $this->db->query($sql, array($experimentid));
       $results = $query->result();
@@ -560,6 +561,10 @@ EOT;
       $query = $this->db->query($sql, $params);
 
       $sequences = $query->result_array();
+
+      foreach ($sequences as &$row) {
+         $row['studyPretty'] = str_replace('/', ' /<br>', $row['study']);
+      }
 
       $promoter = $this->fetchPromoter($geneid);
       $this->calculateSequencesFromPromoter($sequences, $promoter);
