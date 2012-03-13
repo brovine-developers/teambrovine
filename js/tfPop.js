@@ -18,6 +18,7 @@ function updateSpeciesList() {
          });
 
          experimentList.fnClearTable();
+         comparisonList.fnClearTable();
          tfSummary.fnClearTable();
          tfOccur.fnClearTable();
          
@@ -84,9 +85,13 @@ function updateExperimentList(comparisontypeid) {
       $('#sequenceInfo').empty();
       experimentList.fnAddData(data);
       fixTableWidth(experimentList);
+      
       experimentList.$('tr').click(function(e) {
          exps = new Array();
          $(this).toggleClass('selected');
+        
+         tfSummary.fnClearTable();
+         tfOccur.fnClearTable();
          
          experimentList.$('tr.selected').each(function(i) {
             var rowData = experimentList.fnGetData(this);
@@ -120,6 +125,7 @@ function updateComparisonList(curSpecies) {
                comps[i] = rowData.comparisontypeid;
             });
 
+            experimentList.fnClearTable();
             tfSummary.fnClearTable();
             tfOccur.fnClearTable();
             
