@@ -1024,6 +1024,14 @@ function setupExperimentHierarchy() {
       $('#showHiddenForm').submit();
    });
 
+   $("#colorRows").change(function() {
+      if ($(this).prop('checked')) {
+         $('#content').addClass('coloredRows');
+      } else {
+         $('#content').removeClass('coloredRows');
+      }
+   });
+
    // Get the list of species from the server.
    updateSpeciesList();
 }

@@ -2,13 +2,17 @@
    <div class="span12">
       <h1>Experiment Hierarchy</h1>
       <p>
-         Begin by selecting a species. Yellow rows have been edited, and red rows have been hidden.
+         Begin by selecting a species.
       </p>
       <p>
          <form action="ExperimentHierarchy" method="get" id="showHiddenForm">
             <label class="checkbox">
                <input type="checkbox" id="showHidden" name="showHidden" value="1" <?=$showHidden?>>
-               Show Hidden Entries 
+               Show hidden entries 
+            </label>
+            <label class="checkbox">
+               <input type="checkbox" id="colorRows" name="colorRows" value="1">
+               Color edited rows yellow and hidden rows red
             </label>
          </form>
       </p>
