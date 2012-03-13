@@ -615,7 +615,7 @@ EOT;
     */
    public function getSequenceInfo() {
       $this->load->database();
-      $seqid = $this->input->post('seqid');
+      $seqid = $this->input->get('seqid');
       $sql = <<<EOT
        SELECT regulatory_sequences.*,
         genes.geneabbrev,
@@ -655,10 +655,16 @@ EOT;
 
       $sequenceInfo['similar'] = $this->getSimilarSequenceInfo($sequenceInfo);
 
-      $this->load->view('sequenceInfo', array(
+      foreach ($factorMatchInfo as &$row) {
+         $row['studyPretty'] = str_replace('/', ' /<br>', $row['study']);
+      }
+
+      $allData = array(
          'sequenceInfo' => $sequenceInfo,
          'factorMatchInfo' => $factorMatchInfo
-      ));
+      );
+
+      echo json_encode($allData);
    }
 
    public function updateGene() {

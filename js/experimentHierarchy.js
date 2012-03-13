@@ -221,7 +221,7 @@ function updateSpeciesListData(data) {
       geneList.fnClearTable();
       factorList.fnClearTable();
       sequenceList.fnClearTable();
-      $('#sequenceInfo').empty();
+      $('#sequenceInfo').addClass('hidden');
       updateComparisonList(curSpecies);
       fixAllTableWidths();
    });
@@ -246,10 +246,32 @@ function updateSpeciesList() {
 }
 
 function updateSequenceInfo(seqid) {
-   $('#sequenceInfo').load("ajax/getSequenceInfo",
+   jQuery.get("ajax/getSequenceInfo",
    {
       'seqid': seqid
-   });
+   },
+   function(data) {
+      $("#sequenceStart").html(data.sequenceInfo.beginning);
+      $("#sequenceLength").html(data.sequenceInfo.length);
+      $("#sequenceSense").html(data.sequenceInfo.sense);
+      $("#sequenceSequence").html(data.sequenceInfo.sequence);
+      $("#sequenceGene").html(data.sequenceInfo.genename + " (" + 
+       data.sequenceInfo.geneabbrev + ")");
+      $("#sequenceSpecies").html(data.sequenceInfo.species);
+      $("#sequenceComparison").html(data.sequenceInfo.celltype);
+      $("#sequenceExperiment").html(data.sequenceInfo.label);
+
+      similarList.fnClearTable();
+      similarList.fnAddData(data.sequenceInfo.similar);
+
+      matchList.fnClearTable();
+      matchList.fnAddData(data.factorMatchInfo);
+
+      $("#sequenceInfo").removeClass("hidden");
+      fixTableWidth(similarList);
+      fixTableWidth(matchList);
+
+   }, 'json');
 }
 
 function updateSequenceList(geneid, transfac, study) {
@@ -264,7 +286,7 @@ function updateSequenceList(geneid, transfac, study) {
       $('#hideSequence').addClass('disabled');
 
       sequenceList.fnClearTable();
-      $('#sequenceInfo').empty();
+      $('#sequenceInfo').addClass('hidden');
       sequenceList.fnAddData(data);
       fixTableWidth(sequenceList);
 
@@ -288,7 +310,7 @@ function updateFactorList() {
    function(data) {
       factorList.fnClearTable();
       sequenceList.fnClearTable();
-      $('#sequenceInfo').empty();
+      $('#sequenceInfo').addClass('hidden');
       $('#editSequence').addClass('disabled');
       $('#hideSequence').addClass('disabled');
 
@@ -315,7 +337,7 @@ function updateGeneList(experimentid) {
       geneList.fnClearTable();
       sequenceList.fnClearTable();
       factorList.fnClearTable();
-      $('#sequenceInfo').empty();
+      $('#sequenceInfo').addClass('hidden');
       $('#editGene').addClass('disabled');
       $('#hideGene').addClass('disabled');
       $('#editSequence').addClass('disabled');
@@ -368,7 +390,7 @@ function updateExperimentList(comparisontypeid) {
       $('#editExperiment').addClass('disabled');
       $('#hideExperiment').addClass('disabled');
 
-      $('#sequenceInfo').empty();
+      $('#sequenceInfo').addClass('hidden');
       
       updateExperimentListData(data);
    },
@@ -533,6 +555,44 @@ function setupExperimentHierarchy() {
          {"sTitle": "Factor", "mDataProp": "transfac"},
          {"sTitle": "Study", "mDataProp": "studyPretty"},
          {"sTitle": "Sequenceid", "mDataProp": "seqid", "bVisible": false}
+      ]
+   
+   });
+   
+   similarList = $('#similarList').dataTable({
+      "sDom": "<'row'<'span6'f>r>t<'row'<'span6'i>>",
+      "bPaginate": false,
+      "oLanguage": {
+         "sSearch": "Search Similar Sequences"
+      },
+      "sScrollY": "200px",
+      "aoColumns": [
+         {"sTitle": "Begin", "mDataProp": "beginning"},
+         {"sTitle": "Length", "mDataProp": "length"},
+         {"sTitle": "Sense", "mDataProp": "sense"},
+         {"sTitle": "Sequence", "mDataProp": "sequence"}
+      ]
+   });
+   
+   matchList = $('#matchList').dataTable({
+      "sDom": "<'row'<'span12'f>r>t<'row'<'span12'i>>",
+      "bPaginate": false,
+      "sScrollY": thirdRowHeight,
+      "oLanguage": {
+         "sSearch": "Search Matching Factors"
+      },
+      "aoColumns": [
+         {"sTitle": "Factor", "mDataProp": "transfac"},
+         {"sTitle": "Study", "mDataProp": "studyPretty"},
+         {"sTitle": "La", "mDataProp": "la", "sType": "numeric"},
+         {"sTitle": "La/", "mDataProp": "la_slash", "sType": "numeric"},
+         {"sTitle": "Lq", "mDataProp": "lq", "sType": "numeric"},
+         {"sTitle": "Ld", "mDataProp": "ld", "sType": "numeric"},
+         {"sTitle": "Lpv", "mDataProp": "lpv", "sType": "numeric"},
+         {"sTitle": "Sc", "mDataProp": "sc", "sType": "numeric"},
+         {"sTitle": "Sm", "mDataProp": "sm", "sType": "numeric"},
+         {"sTitle": "Spv", "mDataProp": "spv", "sType": "numeric"},
+         {"sTitle": "Ppv", "mDataProp": "ppv", "sType": "numeric"}
       ]
    
    });
@@ -705,6 +765,8 @@ function fixAllTableWidths() {
    fixTableWidth(geneList);
    fixTableWidth(factorList);
    fixTableWidth(sequenceList);
+   fixTableWidth(similarList);
+   fixTableWidth(matchList);
 }  
 
 $(document).ready(function() {

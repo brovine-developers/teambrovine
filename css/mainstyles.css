@@ -32,3 +32,7 @@ body {
 .dataTables_filter, .dataTables_filter label {
    width: 100%;
 }
+
+.hidden {
+   display: none;
+}

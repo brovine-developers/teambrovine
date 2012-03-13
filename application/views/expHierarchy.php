@@ -167,7 +167,71 @@ and scroll. */ ?>
       <a class="btn btn-danger disabled" id="hideSequence"><i class="icon-minus-sign icon-white"></i> Hide Sequence</a>
    </div>
 </div>
-<div class="row" id="sequenceInfo">
+<div class="row hidden" id="sequenceInfo">
+   <div class="span12">
+      <div class="row">
+         <div class="span6">
+            <h2>Sequence Info</h2>
+         </div>
+         <div class="span6">
+            <h3>Similar Sequences</h3>
+         </div>
+      </div>
+      <div class="row">
+         <div class="span6">
+            <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered">
+               <tbody>
+                  <tr>
+                     <th>Start</th>
+                     <td id="sequenceStart"></td>
+                  </tr>
+                  <tr>
+                     <th>Length</th>
+                     <td id="sequenceLength"></td>
+                  </tr>
+                  <tr>
+                     <th>Sense</th>
+                     <td id="sequenceSense"></td>
+                  </tr>
+                  <tr>
+                     <th>Sequence</th>
+                     <td id="sequenceSequence"></td>
+                  </tr>
+                  <tr>
+                     <th>Gene</th>
+                     <td id="sequenceGene"></td>
+                  </tr>
+                  <tr>
+                     <th>Species</th>
+                     <td id="sequenceSpecies"></td>
+                  </tr>
+                  <tr>
+                     <th>Comparison</th>
+                     <td id="sequenceComparison"></td>
+                  </tr>
+                  <tr>
+                     <th>Experiment</th>
+                     <td id="sequenceExperiment"></td>
+                  </tr>
+               </tbody>
+            </table>
+         </div>
+         <div class="span6">
+            <table class="table table-striped table-bordered" id="similarList">
+               <thead>
+               </thead>
+               <tbody>
+               </tbody>
+            </table>
+         </div>
+      </div>
+      <table class="table table-striped table-bordered" id="matchList">
+         <thead>
+         </thead>
+         <tbody>
+         </tbody>
+      </table>
+   </div>
 </div>
 
 <!-- Here be modals. -->
