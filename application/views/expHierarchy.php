@@ -8,7 +8,7 @@
 
 </div>
 
-<div class="row ruleRow">
+<div class="row">
    <div class="span2 selector"> 
       <table class="table table-striped table-bordered" id="speciesList">
          <thead>
@@ -34,27 +34,16 @@
       </table>
    </div>
 </div>
-<? // No editing or deleting Species / Comparisons.
-/*
 <div class="row ruleRow">
-   <div class="span2">
-      With selected species:<br>
-      <a class="btn btn-warning disabled" id="editSpecies"><i class="icon-pencil icon-white"></i> Edit</a>
-      <a class="btn btn-danger disabled" id="hideSpecies"><i class="icon-minus-sign icon-white"></i> Hide</a>
-   </div>
-   <div class="span4">
-      With selected comparison:<br>
-      <a class="btn btn-warning disabled" id="editComparison"><i class="icon-pencil icon-white"></i> Edit</a>
-      <a class="btn btn-danger disabled" id="hideComparison"><i class="icon-minus-sign icon-white"></i> Hide</a>
+   <div class="span4 offset2">
+      <a class="btn btn-warning disabled" id="editComparison"><i class="icon-pencil icon-white"></i> Edit Comparison</a>
+      <a class="btn btn-danger disabled" id="hideComparison"><i class="icon-minus-sign icon-white"></i> Hide Comparison</a>
    </div>
    <div class="span6">
-      With selected experiment:<br>
-      <a class="btn btn-warning disabled" id="editExperiment"><i class="icon-pencil icon-white"></i> Edit</a>
-      <a class="btn btn-danger disabled" id="hideExperiment"><i class="icon-minus-sign icon-white"></i> Hide</a>
+      <a class="btn btn-warning disabled" id="editExperiment"><i class="icon-pencil icon-white"></i> Edit Experiment</a>
+      <a class="btn btn-danger disabled" id="hideExperiment"><i class="icon-minus-sign icon-white"></i> Hide Experiment</a>
    </div>
 </div>
- */
-?>
 <div class="row">
    <div class="span8">
          <div class="row" id="geneFilterOptions">
@@ -92,10 +81,6 @@
    <div class="span8">
       <a class="btn btn-warning disabled" id="editGene"><i class="icon-pencil icon-white"></i> Edit Gene</a>
       <a class="btn btn-danger disabled" id="hideGene"><i class="icon-minus-sign icon-white"></i> Hide Gene</a>
-   </div>
-   <div class="span4">
-      <a class="btn btn-warning disabled" id="editFactor"><i class="icon-pencil icon-white"></i> Edit Factor</a>
-      <a class="btn btn-danger disabled" id="hideFactor"><i class="icon-minus-sign icon-white"></i> Hide Factor</a>
    </div>
 </div>
 <div class="row">
@@ -244,6 +229,40 @@ and scroll. */ ?>
          <div class="control-group">
             <div class="controls">
                <a id="editGeneSave" class="btn btn-primary">Save</a>
+               <a class="btn" data-dismiss="modal">Cancel</a>
+            </div>
+         </div>
+      </fieldset>
+   </form>
+</div>
+
+<div class="modal hide fade" id="editComparisonModal">
+   <form class="form-horizontal">
+      <fieldset>
+         <legend>Edit Comparison</legend>
+         <div class="control-group">
+            <label for="comparisonSpeciesInput" class="control-label">Species</label>
+            <div class="controls">
+               <input id="comparisonSpeciesInput">
+            </div>
+         </div>
+         <div class="control-group">
+            <label for="comparisonCelltypeInput" class="control-label">Comparison</label>
+            <div class="controls">
+               <input id="comparisonCelltypeInput">
+            </div>
+         </div>
+         <div class="control-group">
+            <label class="control-label">Last Edited</label>
+            <div class="controls">
+               <label style="padding-top: 5px" id="comparisonLastEdited"></label>
+            </div>
+         </div>
+
+         <input type="hidden" id="comparisontypeidInput" value="0">
+         <div class="control-group">
+            <div class="controls">
+               <a id="editComparisonSave" class="btn btn-primary">Save</a>
                <a class="btn" data-dismiss="modal">Cancel</a>
             </div>
          </div>

@@ -25,7 +25,7 @@ EOT;
       $curSpecies = $this->input->get('species');
       
       $sql = <<<EOT
-      SELECT *
+      SELECT *, FROM_UNIXTIME(date_edited) as date_edited_pretty
       FROM comparison_types
       WHERE 
 EOT;
@@ -40,14 +40,13 @@ EOT;
       
       $query = $this->db->query($sql, $curSpecies);
       $result = $query->result();
-      $out = array();
       foreach ($result as $row) {
-         $out[] = array(
-            'comparisontypeid' => $row->comparisontypeid,
-            'comparison' => ucfirst($row->species) . ": {$row->celltype}"
-         );
+         $row->comparison =  ucfirst($row->species) . ": {$row->celltype}";
+         if ($row->date_edited == 0) {
+            $row->date_edited_pretty = 'Never';
+         }
       }
-      echo json_encode($out);
+      echo json_encode($result);
    }
 
    public function getExperimentList() {
@@ -668,6 +667,70 @@ EOT;
       $this->load->database();
       $query = $this->db->query($sql, $geneData);
    }
-   
+
+   public function updateComparison() {
+      $this->load->database();
+      $this->db->trans_start();
+      // These are in the order of the params.
+      $fields = array('celltype', 'species');
+
+      $celltype = $this->input->post('celltype');
+      $species = $this->input->post('species');
+      $compid = $this->input->post('comparisontypeid');
+
+      $comparisonData = array($celltype, $species, time(), $compid);
+
+      // Get if one exists.
+      $sql = <<<EOT
+       SELECT comparisontypeid
+       FROM comparison_types
+       WHERE celltype = ?
+       AND species = ?
+       AND comparisontypeid != ?
+EOT;
+      $query = $this->db->query($sql, array($celltype, $species, $compid));
+      $row = $query->row();
+
+      $existingCompId = false;
+      if ($row) {
+         $existingCompId = $row->comparisontypeid;
+      }
+
+      if (!$existingCompId) {
+         // If there's no existing comparison with that celltype and species, 
+         // update the existing row.
+         $sql = <<<EOT
+          UPDATE comparison_types SET
+           celltype = ?,
+           species = ?,
+           date_edited = ?
+          WHERE
+           comparisontypeid = ?
+EOT;
+
+         $query = $this->db->query($sql, $comparisonData);
+      } else {
+         // If there's an existing comparison, merge the two.
+         // Update everything pointing at the old one to the new one.
+         $sql = <<<EOT
+          UPDATE experiments SET
+           comparisontypeid = ?
+          WHERE comparisontypeid = ?
+EOT;
+         $query = $this->db->query($sql, array(
+            $existingCompId, $compid)
+         );
+
+         // Delete the old one.
+         $sql = <<<EOT
+          DELETE FROM comparison_types WHERE
+           comparisontypeid = ?
+EOT;
+         $query = $this->db->query($sql, array($compid));
+      }
+
+      $this->getSpeciesList();
+      $this->db->trans_complete();
+   }
 }
 

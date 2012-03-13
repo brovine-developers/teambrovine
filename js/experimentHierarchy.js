@@ -24,7 +24,31 @@ function getPrettyTime() {
    return mysqlDateTime;
 }
 
+/**
+ * Given a dataTable object and an object with data to match, select the row matching
+ * that data.
+ */
+function selectTableRow(table, matchData) {
+   table.$('tr').each(function() {
+      var rowData = table.fnGetData(this);
+      var shouldSelect = true;
+      for (name in matchData) {
+         if (rowData[name] != matchData[name]) {
+            shouldSelect = false;
+            break;
+         }
+      }
+
+      if (shouldSelect) {
+         $(this).addClass('selected');
+      }
+   });
+}
+
 function setupEditAndDelete() {
+
+   // Gene Modal //////////////////////////////////////////////////////////////
+
    geneModal = $('#editGeneModal').modal({
       'show': false
    });
@@ -83,6 +107,77 @@ function setupEditAndDelete() {
          // This looks faster, too.
       });
    });
+
+   // Comparison Modal ////////////////////////////////////////////////////////
+   
+   comparisonModal = $('#editComparisonModal').modal({
+      'show': false
+   });
+
+   $('#editComparison').click(function() {
+      if (!$(this).hasClass('disabled')) {
+         var comparisonData = comparisonList.fnGetData(comparisonList.$('.selected')[0]);
+         $('#comparisonCelltypeInput').val(comparisonData.celltype);
+         $('#comparisonSpeciesInput').val(comparisonData.species);
+         $('#comparisontypeidInput').val(comparisonData.comparisontypeid);
+         $('#comparisonLastEdited').html(comparisonData.date_edited_pretty);
+
+         comparisonModal.modal('show');
+      }
+   });
+
+   $('#editComparisonSave').click(function() {
+      // Save comparison info here.
+
+      var row = comparisonList.$('.selected')[0];
+      var oldComparisonData = comparisonList.fnGetData(row);
+      // Make a new comparisonData object for the row. 
+      var newComparisonData = {
+         comparisontypeid: $('#comparisontypeidInput').val(),
+         celltype: $('#comparisonCelltypeInput').val(),
+         species: $('#comparisonSpeciesInput').val(),
+         date_edited: getTimestamp(),
+         date_edited_pretty: getPrettyTime()
+      };
+
+      newComparisonData.comparison = 
+       newComparisonData.species.charAt(0).toUpperCase() +
+       newComparisonData.species.substr(1) + 
+       ": " +
+       newComparisonData.celltype;
+
+      comparisonList.fnUpdate(newComparisonData, row);
+      comparisonModal.modal('hide');
+
+      jQuery.post('ajax/updateComparison', newComparisonData, function(data) {
+         // Update species list on update.
+         updateSpeciesListData(data);
+         matchData = {
+            'species': newComparisonData.species
+         };
+         selectTableRow(speciesList, matchData);
+      }, 'json');
+   });
+}
+
+function updateSpeciesListData(data) {
+   speciesList.fnClearTable();
+   speciesList.fnAddData(data);
+   
+   speciesList.$('tr').click(function(e) {
+      speciesList.$('tr').removeClass('selected');
+      $(this).addClass('selected');
+      var rowData = speciesList.fnGetData(this);
+
+      var curSpecies = rowData.species;
+      experimentList.fnClearTable();
+      geneList.fnClearTable();
+      factorList.fnClearTable();
+      sequenceList.fnClearTable();
+      $('#sequenceInfo').empty();
+      updateComparisonList(curSpecies);
+      fixAllTableWidths();
+   });
 }
 
 function updateSpeciesList() {
@@ -90,28 +185,14 @@ function updateSpeciesList() {
    function(data) {
       $('#editGene').addClass('disabled');
       $('#hideGene').addClass('disabled');
-      $('#editFactor').addClass('disabled');
-      $('#hideFactor').addClass('disabled');
       $('#editSequence').addClass('disabled');
       $('#hideSequence').addClass('disabled');
+      $('#editComparison').addClass('disabled');
+      $('#hideComparison').addClass('disabled');
+      $('#editExperiment').addClass('disabled');
+      $('#hideExperiment').addClass('disabled');
 
-      speciesList.fnClearTable();
-      speciesList.fnAddData(data);
-      
-      speciesList.$('tr').click(function(e) {
-         speciesList.$('tr').removeClass('selected');
-         $(this).addClass('selected');
-         var rowData = speciesList.fnGetData(this);
-
-         var curSpecies = rowData.species;
-         experimentList.fnClearTable();
-         geneList.fnClearTable();
-         factorList.fnClearTable();
-         sequenceList.fnClearTable();
-         $('#sequenceInfo').empty();
-         updateComparisonList(curSpecies);
-         fixAllTableWidths();
-      });
+      updateSpeciesListData(data);
    },
    'json'
    );
@@ -161,8 +242,6 @@ function updateFactorList() {
       factorList.fnClearTable();
       sequenceList.fnClearTable();
       $('#sequenceInfo').empty();
-      $('#editFactor').addClass('disabled');
-      $('#hideFactor').addClass('disabled');
       $('#editSequence').addClass('disabled');
       $('#hideSequence').addClass('disabled');
 
@@ -175,13 +254,6 @@ function updateFactorList() {
          var transfac = rowData.transfac;
          var study = rowData.study;
          updateSequenceList(curGeneid, transfac, study);
-         if (!rowData.allRow) {
-            $('#editFactor').removeClass('disabled');
-            $('#hideFactor').removeClass('disabled');
-         } else {
-            $('#editFactor').addClass('disabled');
-            $('#hideFactor').addClass('disabled');
-         }
       });
 
    },
@@ -199,8 +271,6 @@ function updateGeneList(experimentid) {
       $('#sequenceInfo').empty();
       $('#editGene').addClass('disabled');
       $('#hideGene').addClass('disabled');
-      $('#editFactor').addClass('disabled');
-      $('#hideFactor').addClass('disabled');
       $('#editSequence').addClass('disabled');
       $('#hideSequence').addClass('disabled');
 
@@ -229,10 +299,10 @@ function updateExperimentList(comparisontypeid) {
    function(data) {
       $('#editGene').addClass('disabled');
       $('#hideGene').addClass('disabled');
-      $('#editFactor').addClass('disabled');
-      $('#hideFactor').addClass('disabled');
       $('#editSequence').addClass('disabled');
       $('#hideSequence').addClass('disabled');
+      $('#editExperiment').addClass('disabled');
+      $('#hideExperiment').addClass('disabled');
 
       experimentList.fnClearTable();
       $('#sequenceInfo').empty();
@@ -258,10 +328,12 @@ function updateComparisonList(curSpecies) {
       function(data) {
          $('#editGene').addClass('disabled');
          $('#hideGene').addClass('disabled');
-         $('#editFactor').addClass('disabled');
-         $('#hideFactor').addClass('disabled');
          $('#editSequence').addClass('disabled');
          $('#hideSequence').addClass('disabled');
+         $('#editComparison').addClass('disabled');
+         $('#hideComparison').addClass('disabled');
+         $('#editExperiment').addClass('disabled');
+         $('#hideExperiment').addClass('disabled');
 
          comparisonList.fnClearTable();
          comparisonList.fnAddData(data);
@@ -270,6 +342,9 @@ function updateComparisonList(curSpecies) {
             comparisonList.$('tr').removeClass('selected');
             $(this).addClass('selected');
             var rowData = comparisonList.fnGetData(this);
+            
+            $('#editComparison').removeClass('disabled');
+            $('#hideComparison').removeClass('disabled');
 
             var comparisonTypeId = rowData.comparisontypeid;
             geneList.fnClearTable();
