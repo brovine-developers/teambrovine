@@ -49,11 +49,14 @@ function updateTFSummary(experimentid, la, la_slash, lq, ld) {
          fixTableWidth(tfSummary);
 
          tfSummary.$('tr').click(function(e) {
-            tfSummary.$('tr').removeClass('selected');
-            $(this).addClass('selected');
-            var rowData = tfSummary.fnGetData(this);
-
-            var tf = rowData.transfac;
+            var tf = new Array();
+            $(this).toggleClass('selected');
+            
+            tfSummary.$('tr.selected').each(function(i) {
+               var rowData = tfSummary.fnGetData(this);
+               tf[i] = rowData.transfac;
+            });
+         
             updateTFOccurrences(tf);
          });
       },
