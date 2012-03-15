@@ -328,13 +328,38 @@ EOT;
       $showHidden = $this->showHidden();
       $tfName = $this->input->get('tf');
       $sql = <<<EOT
-       SELECT celltype, species, label, genename, geneabbrev, study, beginning, length, sense
+       SELECT distinct celltype, species, label, genename, geneabbrev, study, beginning, length, sense
        FROM factor_matches
-          inner join regulatory_sequences using (seqid)
-          inner join genes using (geneid)
-          inner join experiments using (experimentid)
-          inner join comparison_types using (comparisontypeid)
-       where transfac = ?
+         inner join regulatory_sequences using (seqid)
+         inner join genes using (geneid)
+         inner join experiments using (experimentid)
+         inner join comparison_types using (comparisontypeid)
+EOT;
+      
+      for ($i = 0; $i < count($tfName); $i++) {
+         $sql .= <<<EOT
+         inner join (SELECT distinct geneid
+                       FROM factor_matches
+                         inner join regulatory_sequences using (seqid)
+                       where transfac = ?) i
+EOT;
+        $sql .= $i . <<<EOT
+         using (geneid)
+EOT;
+      }
+
+
+      $sql .= <<<EOT
+       WHERE 
+EOT;
+      
+      for ($i = 0; $i < count($tfName); $i++) {
+         if ($i != 0)
+            $sql .= " OR ";
+         $sql .= "transfac = ?";
+      }
+
+      $sql .= <<<EOT
        AND factor_matches.hidden <= $showHidden
        AND regulatory_sequences.hidden <= $showHidden
        AND genes.hidden <= $showHidden
@@ -342,7 +367,7 @@ EOT;
        AND comparison_types.hidden <= $showHidden
 EOT;
 
-      $query = $this->db->query($sql, array($tfName));
+      $query = $this->db->query($sql, array_merge($tfName, $tfName));
       $result = $query->result();
       $out = array();
       foreach ($result as $row) {
