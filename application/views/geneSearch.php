@@ -35,6 +35,9 @@
 </div>
 
 <div class="row ruleRow">
+ <div class ="span12">
+      <h6>Ctrl+Click or AppleKey+Click to add multiple Transfacs.</h6>
+   </div>
    <div class="span6">
       <table class="table table-striped table-bordered" id="factorList">
          <thead>

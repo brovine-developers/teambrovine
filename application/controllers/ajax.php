@@ -565,46 +565,98 @@ EOT;
      echo json_encode($out);
   }
 
+public function isCommon($value, $list){
+   for($i = 0; $i < sizeof($list); $i++){
+     if(!in_array($value, $list[$i])){
+        return FALSE;
+     }
+     // for($j = 0; $j < sizeof($list[$i]); $j++){
+       //  if($value != $list[$i][$j]){
+         //   return FALSE;
+        // }
+     // }
+   }
+   return TRUE;
+}
+
 public function getGeneFoundListFromDB() {
       $this->load->database();
       $transFacs = $this->input->get('transFacs');
       $studies = $this->input->get('studies');
-      
+      $geneIDList = array(array()); 
       $isAll = false;
       $showHidden = $this->showHidden();
+      $sqlAll = "SELECT DISTINCT genes.geneid
+                 FROM genes
+                 WHERE genes.hidden <= $showHidden";
+
+
+      $allQuery = $this->db->query($sqlAll);
+      
+      $allresult = $allQuery->result();
+      $allList = array();
+      foreach ($allresult as $row) {
+          array_push($allList, $row->geneid);
+      }
+      $geneIDList[0] = $allList;
+
+      $sqlSub = "";
+      for($i = 0; $i < sizeof($transFacs); $i++){
+         if($transFacs[$i] = 'All'){
+            continue;
+         }
+         $sqlSub = "
+         SELECT DISTINCT genes.geneid
+         FROM genes, regulatory_sequences, factor_matches
+         WHERE genes.hidden <= $showHidden AND
+               factor_matches.hidden <= $showHidden AND
+               regulatory_sequences.hidden <= $showHidden AND
+               factor_matches.seqid = regulatory_sequences.seqid AND
+               factor_matches.transfac = '$transFacs[$i]' AND
+               factor_matches.study = '$studies[$i]' AND
+               genes.geneid = regulatory_sequences.geneid
+
+         ";
+         $tquery = $this->db->query($sqlSub);
+
+         $tresult = $tquery->result();
+         $tempList = array();
+         foreach ($tresult as $row) {
+             array_push($tempList, $row->geneid);
+         }
+         array_push($geneIDList, $tempList);
+         //print_r($geneIDList);
+     }
+
+     $commonGenes = array();
+     for($i = 0; $i < sizeof($geneIDList); $i++){
+       for($j = 0; $j < sizeof($geneIDList[$i]); $j++){
+           if($this->isCommon($geneIDList[$i][$j], $geneIDList)){
+              array_push($commonGenes, $geneIDList[$i][$j]);
+              //print_r($commonGenes);
+           }
+        }
+     }
+           
 
       // TODO: join these tables? Filter by comparison/experiment?
       $sql = <<<EOT
       SELECT DISTINCT genes.genename, genes.regulation
-      FROM genes, regulatory_sequences, factor_matches, experiments, comparison_types
+      FROM genes
       WHERE 
-            genes.hidden <= $showHidden AND
-            factor_matches.hidden <= $showHidden AND
-            regulatory_sequences.hidden <= $showHidden AND
-            genes.geneid = regulatory_sequences.geneid AND
-            factor_matches.seqid = regulatory_sequences.seqid AND (
+            genes.hidden <= $showHidden AND 
 EOT;
-      for($i = 0; $i < count($transFacs); $i++){
-         if($transFacs[$i] == 'All'){
-            $isAll = true;
-         }
+
+      $sql .= "(";
+      for($i = 0; $i < sizeof($commonGenes); $i++){
+         $sql .= " genes.geneid = $commonGenes[$i] OR ";
       }
       
-      for($i = 0; $i < count($transFacs); $i++){
-        if($isAll){
-           $sql = str_replace(" AND (", "", $sql);
-           break;
-        }
-        else{
-           $sql .= "(factor_matches.transFac = '$transFacs[$i]' AND
-                    factor_matches.study = '$studies[$i]') OR ";
-        }
+      if(sizeof($commonGenes) == 0){
+         $sql .= " genes.geneid = -100 OR ";
       }
-     
-      if(!$isAll){
-         $sql = substr($sql, 0, -4);
-         $sql .= ")";
-      }
+      $sql = substr($sql, 0, -4);
+      $sql .= ")";
  
       $query = $this->db->query($sql);
 
