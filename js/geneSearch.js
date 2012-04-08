@@ -9,9 +9,13 @@ var minLaVal;
 var minLaSlashVal;
 var minLqVal;
 var maxLdVal;
+var points;
 
 var filterTimer;
 var filter_timer_on = 0;
+
+var FILTER_MAX = "Max: ";
+var FILTER_MIN = "Min: ";
 
 function clearFactorSelections(){
    transFacs = [];
@@ -24,37 +28,40 @@ function filterInputTimer(){
 }
 
 function setupGeneFilter(){
-   $('#minla').keydown(function() {
-     if(filter_timer_on == 1){
-        clearTimeout(filterTimer);
-     }
-     filterTimer = setTimeout("filterInputTimer()", 750);
-     filter_timer_on = 1;
-   });
-
-   $('#minlaslash').keydown(function() {
-     if(filter_timer_on == 1){
-        clearTimeout(filterTimer);
-     }
-     filterTimer = setTimeout("filterInputTimer()",750);
-     filter_timer_on = 1;
-   });
-
-   $('#minlq').keydown(function() {
-     if(filter_timer_on == 1){
-        clearTimeout(filterTimer);
-     }
-     filterTimer = setTimeout("filterInputTimer()", 750);
-     filter_timer_on = 1;
-   });
-
-   $('#maxld').keydown(function() {
-     if(filter_timer_on == 1){
-        clearTimeout(filterTimer);
-     }
-     filterTimer = setTimeout("filterInputTimer()", 750);
-     filter_timer_on = 1;
-   });
+   jQuery.get("ajax/getMetricExtremes",
+      function(data) {
+         jQuery.each(data, function (i, val) {
+            data[i] = parseFloat(val);
+         });
+         
+         points = {
+            'la': { min: data.la_min, max: data.la_max},
+            'la_slash': { min: data.las_min, max: data.las_max},
+            'lq': { min: data.lq_min, max: data.lq_max},
+            'ld': { min: data.ld_min, max: data.ld_max}
+         };
+         
+         $('input.filter').val("");
+         
+         var inc = 0;
+         
+         jQuery.each(points, function (i, val) {
+            $('div.filter:eq(' + inc + ') input').attr("placeholder", val.min + " - " + val.max);
+            inc++;
+         });
+         
+         $('input.filter').removeAttr("disabled");
+         
+         $('input.filter').change(function() {
+           if(filter_timer_on == 1){
+              clearTimeout(filterTimer);
+           }
+           filterTimer = setTimeout("filterInputTimer()", 750);
+           filter_timer_on = 1;
+         });
+      },
+      'json'
+   );
 }
 
 function updateGeneFilter(){ 
@@ -279,12 +286,12 @@ function setupExperimentHierarchy() {
       },
       "aoColumns": [
          {"sTitle": "Factor", "mDataProp": "transfac"},
-         {"sTitle": "Study", "mDataProp": "studyPretty"},
+         //{"sTitle": "Study", "mDataProp": "studyPretty"},
          {"sTitle": "#", "mDataProp": "numTimes"},
-         {"sTitle": "AllRow", "mDataProp": "allRow", "bVisible": false},
-         {"sTitle": "StudyOrig", "mDataProp": "study", "bVisible": false}
+         {"sTitle": "AllRow", "mDataProp": "allRow", "bVisible": false}//,
+         //{"sTitle": "StudyOrig", "mDataProp": "study", "bVisible": false}
       ],
-      "aaSortingFixed": [[3,'desc']]
+      "aaSortingFixed": [[2,'desc']]
 
    });
  
@@ -359,13 +366,8 @@ function fixAllTableWidths() {
    fixTableWidth(factorList);
 }
 
-$(document).ready(function() {
+$(window).load(function() {
    setupExperimentHierarchy();
    setupPlaceholders();
-   fixAllTableWidths();
-});
-
-// Work around for chrome. Sometimes, it doesn't properly fix tables.
-$(window).load(function() {
    fixAllTableWidths();
 });

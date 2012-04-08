@@ -51,3 +51,23 @@ body {
 .coloredRows .editedRow, .coloredRows .editedRow td {
    background-color: #ffffb3 !important;
 }
+
+.span2-5 {
+   width: 200px;
+}
+
+.span1-5 {
+   width: 80px;
+}
+
+.well.form-inline .ruleTop {
+   margin-top: 27px;
+}
+
+.well.form-inline {
+   padding-top: 7px;
+}
+
+.row.pad {
+   margin-bottom: 10px;
+}

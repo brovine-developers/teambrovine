@@ -1,9 +1,34 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
+define("ASCII_A", 97);
+
 class Ajax extends CI_Controller {
    // Returns 1 when we should show hidden, 0 otherwise.
    public function showHidden() {
       return $this->input->get_post('showHidden') ? 1 : 0;
+   }
+   
+   /**
+    * Returns a list of high/low values for the metrics specified.
+    */
+   public function getMetricExtremes() {
+      $this->load->database();
+      $showHidden = $this->showHidden();
+      
+      $sql = <<<EOT
+         SELECT max(la) as la_max, min(la) as la_min, 
+                max(la_slash) as las_max, min(la_slash) as las_min, 
+                max(lq) as lq_max, min(lq) as lq_min, 
+                max(ld) as ld_max, min(ld) as ld_min
+         FROM   factor_matches
+         WHERE  hidden <= $showHidden        
+EOT;
+
+      $query = $this->db->query($sql);
+      $ret = $query->result();
+      
+      if ($query->num_rows() > 0)
+         echo json_encode($ret[0]);
    }
 
    public function getSpeciesList() {
@@ -456,7 +481,7 @@ EOT;
       $joiner = 'WHERE';
 
       $sql = <<<EOT
-       SELECT DISTINCT study, transfac, COUNT(seqid) as numTimes
+       SELECT DISTINCT transfac, COUNT(seqid) as numTimes
        FROM regulatory_sequences INNER JOIN factor_matches USING(seqid) INNER JOIN genes USING(geneid) 
 EOT;
  
@@ -497,13 +522,13 @@ EOT;
       $sql .= " $joiner factor_matches.hidden <= $showHidden AND
          regulatory_sequences.hidden <= $showHidden AND
          genes.hidden <= $showHidden
-         GROUP BY study, transfac";
+         GROUP BY transfac";
 
       $query = $this->db->query($sql, array($minLa, $minLaSlash, $minLq, $maxLd));
 
       $result = $query->result_array();
       foreach ($result as &$row) {
-         $row['studyPretty'] = str_replace('/', ' /<br>', $row['study']);
+         //$row['studyPretty'] = str_replace('/', ' /<br>', $row['study']);
          $row['allRow'] = 0;
       }
 
@@ -604,86 +629,43 @@ public function isCommon($value, $list){
    return TRUE;
 }
 
-public function getGeneFoundListFromDB() {
+   /**
+    * Gets the genes in common with all transfacs specified.
+    */
+   public function getGeneFoundListFromDB() {
       $this->load->database();
       $transFacs = $this->input->get('transFacs');
-      $studies = $this->input->get('studies');
       $geneIDList = array(array()); 
       $isAll = false;
       $showHidden = $this->showHidden();
-      $sqlAll = "SELECT DISTINCT genes.geneid
-                 FROM genes
-                 WHERE genes.hidden <= $showHidden";
-
-
-      $allQuery = $this->db->query($sqlAll);
       
-      $allresult = $allQuery->result();
-      $allList = array();
-      foreach ($allresult as $row) {
-          array_push($allList, $row->geneid);
-      }
-      $geneIDList[0] = $allList;
-
-      $sqlSub = "";
-      for($i = 0; $i < sizeof($transFacs); $i++){
-         if($transFacs[$i] = 'All'){
-            continue;
-         }
-         $sqlSub = "
-         SELECT DISTINCT genes.geneid
-         FROM genes, regulatory_sequences, factor_matches
-         WHERE genes.hidden <= $showHidden AND
-               factor_matches.hidden <= $showHidden AND
-               regulatory_sequences.hidden <= $showHidden AND
-               factor_matches.seqid = regulatory_sequences.seqid AND
-               factor_matches.transfac = '$transFacs[$i]' AND
-               factor_matches.study = '$studies[$i]' AND
-               genes.geneid = regulatory_sequences.geneid
-
-         ";
-         $tquery = $this->db->query($sqlSub);
-
-         $tresult = $tquery->result();
-         $tempList = array();
-         foreach ($tresult as $row) {
-             array_push($tempList, $row->geneid);
-         }
-         array_push($geneIDList, $tempList);
-         //print_r($geneIDList);
-     }
-
-     $commonGenes = array();
-     for($i = 0; $i < sizeof($geneIDList); $i++){
-       for($j = 0; $j < sizeof($geneIDList[$i]); $j++){
-           if($this->isCommon($geneIDList[$i][$j], $geneIDList)){
-              array_push($commonGenes, $geneIDList[$i][$j]);
-              //print_r($commonGenes);
-           }
-        }
-     }
-           
-
-      // TODO: join these tables? Filter by comparison/experiment?
       $sql = <<<EOT
-      SELECT DISTINCT genes.genename, genes.regulation
-      FROM genes
-      WHERE 
-            genes.hidden <= $showHidden AND 
+         select a.genename, a.regulation
+            from
+EOT;
+      
+      for ($i = 0; $i < count($transFacs); $i++) {
+         if ($i != 0)
+            $sql .= <<<EOT
+             inner join
 EOT;
 
-      $sql .= "(";
-      for($i = 0; $i < sizeof($commonGenes); $i++){
-         $sql .= " genes.geneid = $commonGenes[$i] OR ";
+         $sql .= <<<EOT
+            (SELECT distinct genename, regulation
+            from genes g inner join regulatory_sequences r using(geneid)
+            inner join factor_matches f using(seqid)
+            where transfac=? and g.hidden <= $showHidden) 
+EOT;
+
+         $sql .= chr($i + ASCII_A);
+
+         if ($i != 0)
+            $sql .= <<<EOT
+               using(genename) 
+EOT;
       }
-      
-      if(sizeof($commonGenes) == 0){
-         $sql .= " genes.geneid = -100 OR ";
-      }
-      $sql = substr($sql, 0, -4);
-      $sql .= ")";
  
-      $query = $this->db->query($sql);
+      $query = $this->db->query($sql, $transFacs);
 
       $result = $query->result();
       $out = array();

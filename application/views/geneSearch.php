@@ -46,32 +46,46 @@
          </tbody>
       </table>
    </div>
+   
    <div class="span6">
-      <div class="well">
-         <h3>Filter Options</h3>
-         <div class="row" id="geneFilterOptions">
-            <div class="span1">
-               <label>Min La<br>
-                  <input type="text" class="span1" id="minla">
-               </label>
+      <form class="well form-inline">
+         <fieldset>
+            <legend>Filter Options</legend>
+         </fieldset>
+         <fieldset class="ruleTop">
+            <div class="row pad">
+               <div class="span2-5 filter">
+                  <label class="control-label">Min La: &nbsp;</label>
+                  <span class="begin"></span>
+                  <input type="text" class="filter span1-5" id="minla" placeholder="Loading..." disabled />
+                  <span class="end"></span>
+               </div>
+               
+               <div class="span2-5 filter">
+                  <label>Min La/: &nbsp;</label>
+                  <span class="begin"></span>
+                  <input type="text" class="filter span1-5" id="minlaslash" placeholder="Loading..." disabled />
+                  <span class="end"></span>
+               </div>
             </div>
-            <div class="span1">
-               <label>Min La/<br>
-                  <input type="text" class="span1" id="minlaslash">
-               </label>
+               
+            <div class="row pad">
+               <div class="span2-5 filter">
+                  <label>Min Lq: &nbsp;</label>
+                  <span class="begin"></span>
+                  <input type="text" class="filter span1-5" id="minlq" placeholder="Loading..." disabled />
+                  <span class="end"></span>
+               </div>
+               
+               <div class="span2-5 filter">
+                  <label>Max Ld: &nbsp;</label>
+                  <span class="begin"></span>
+                  <input type="text" class="filter span1-5" id="maxld" placeholder="Loading..." disabled />
+                  <span class="end"></span>
+               </div>
             </div>
-            <div class="span1">
-               <label>Min Lq<br>
-               <input type="text" class="span1" id="minlq">
-               </label>
-            </div>
-            <div class="span1">
-               <label>Max Ld<br>
-                  <input type="text" class="span1" id="maxld">
-               </label>
-            </div>
-         </div>
-      </div>
+         </fieldset>
+      </form>
    </div>
 </div>
 

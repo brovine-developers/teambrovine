@@ -103,9 +103,8 @@ the event listeners for it. Need to get click, keypress,
 and scroll. */ ?>
          <div class="row" id="sequenceFilterOptions">
             <div class="span1">
-               <label>Min La<br>
+               <label>Min La</label>
                   <input type="text" class="span1" id="minla">
-               </label>
             </div>
             <div class="span1">
                <label>Min La/<br>
