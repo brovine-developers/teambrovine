@@ -237,39 +237,42 @@ function setupExperimentHierarchy() {
       ]
       
    });
-
    
-   $("#minla").keyup(function () {
-      clearTimeout(tfReload);
+   var tfReload;
 
-      setTimeout(function () {
-         updateTF();
-      }, 500);
-   });
-   
-   $("#minlaslash").keyup(function () {
-      clearTimeout(tfReload);
+   jQuery.get("ajax/getMetricExtremes",
+      function(data) {
+         jQuery.each(data, function (i, val) {
+            data[i] = parseFloat(val);
+         });
+         
+         points = {
+            'la': { min: data.la_min, max: data.la_max},
+            'la_slash': { min: data.las_min, max: data.las_max},
+            'lq': { min: data.lq_min, max: data.lq_max},
+            'ld': { min: data.ld_min, max: data.ld_max}
+         };
+         
+         $("#sequenceFilterOptions input[type='text']").val("");
+         
+         var inc = 0;
+         
+         jQuery.each(points, function (i, val) {
+            $("#sequenceFilterOptions input[type='text']:eq(" + inc + ")").attr("placeholder", val.min + " - " + val.max);
+            inc++;
+         });
+         
+         $("#sequenceFilterOptions input[type='text']").removeAttr("disabled");
+         $("#sequenceFilterOptions input[type='text']").keyup(function () {
+            clearTimeout(tfReload);
 
-      setTimeout(function () {
-         updateTF();
-      }, 500);
-   });
-   
-   $("#minlq").keyup(function () {
-      clearTimeout(tfReload);
-
-      setTimeout(function () {
-         updateTF();
-      }, 500);
-   });
-   
-   $("#maxld").keyup(function () {
-      clearTimeout(tfReload);
-
-      setTimeout(function () {
-         updateTF();
-      }, 500);
-   });
+            tfReload = setTimeout(function () {
+               updateTF();
+            }, 250);
+         });
+      },
+      'json'
+   );
    
    updateSpeciesList();
 }

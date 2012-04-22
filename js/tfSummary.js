@@ -6,12 +6,24 @@ function updateTFSummary() {
          fixTableWidth(tfSummary);
 
          tfSummary.$('tr').click(function(e) {
-            tfSummary.$('tr').removeClass('selected');
-            $(this).addClass('selected');
-            var rowData = tfSummary.fnGetData(this);
+            tfs = new Array();
 
-            var tf = rowData.transfac;
-            updateTFOccurrences(tf);
+            if (e.metaKey || e.ctrlKey) {
+               $(this).toggleClass('selected');
+
+               tfSummary.$('tr.selected').each(function(i) {
+                  var rowData = tfSummary.fnGetData(this);
+                  tfs.push(rowData.transfac);
+               });
+            }
+            else {
+               tfSummary.$('tr').removeClass('selected');
+               $(this).addClass('selected');
+
+               tfs.push(tfSummary.fnGetData(this).transfac);
+            }
+
+            if (tfs.length != 0) updateTFOccurrences(tfs);
          });
       },
       'json'

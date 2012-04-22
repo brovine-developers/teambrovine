@@ -392,7 +392,8 @@ EOT;
        AND comparison_types.hidden <= $showHidden
 EOT;
 
-      $query = $this->db->query($sql, array_merge($tfName, $tfName));
+      $tfArr = is_array($tfName) ? $tfName : array($tfName);
+      $query = $this->db->query($sql, array_merge($tfArr, $tfArr));
       $result = $query->result();
       $out = array();
       foreach ($result as $row) {
