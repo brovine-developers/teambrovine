@@ -171,20 +171,26 @@ class Import extends CI_Controller {
 
    private function getFileNames($path) {
       $expectedEndings = array(
-         'hits'      => ' promoter TESS Hits 1.csv',
-         'jobParams' => ' promoter TESS Job Parameters.csv',
-         'sequences' => ' promoter TESS Sequences.csv'
+         'hits'      => array(' promoter TESS Hits 1.csv', ' Hits 1.csv'),
+         'jobParams' => array(' promoter TESS Job Parameters.csv', ' Job Parameters.csv'),
+         'sequences' => array(' promoter TESS Sequences.csv', ' Sequences.csv') 
       );
 
       $dirName = dirname($path);
       $fileName = basename($path);
       $groupName = '';
-      foreach ($expectedEndings as $ending) {
-         // If the filename ends with $ending, pull out the ending.
-         if (substr($fileName, -1 * strlen($ending)) == $ending) {
-            $groupName = substr($fileName, 0, -1 * strlen($ending));
-            break;
+      $which = -1;
+      foreach ($expectedEndings as $endingArr) {
+         foreach ($endingArr as $idx => $ending) {
+            // If the filename ends with $ending, pull out the ending.
+            if (substr($fileName, -1 * strlen($ending)) == $ending) {
+               $groupName = substr($fileName, 0, -1 * strlen($ending));
+               $which = $idx;
+               break;
+            }
          }
+
+         if ($groupName) break;
       }
 
       if (!$groupName) {
@@ -192,8 +198,13 @@ class Import extends CI_Controller {
       }
       
       $files = array();
-      foreach ($expectedEndings as $fileType => $ending) {
-         $files[$fileType] = "$dirName/$groupName$ending";
+      foreach ($expectedEndings as $fileType => $endingArr) {
+         foreach ($endingArr as $idx => $ending) {
+            if ($which == $idx) {
+               $files[$fileType] = "$dirName/$groupName$ending";
+               break;
+            }
+         }
       }
       return array('files' => $files, 'groupName' => $groupName);
    }
