@@ -568,10 +568,11 @@ function updateFactorListData(data) {
    });
 }
 
-function updateFactorList() {
+function updateFactorList(exp) {
    jQuery.get("ajax/getFactorList",
    { 
       'geneid': curGeneid,
+      'expid': exp,
       'showHidden': showHidden
    },
    function(data) {
@@ -595,7 +596,8 @@ function updateGeneListData(data) {
       $(this).addClass('selected');
       var rowData = geneList.fnGetData(this);
       curGeneid = rowData.geneid;
-      updateFactorList();
+      var expid = getSelectedRowData(experimentList).experimentid;
+      updateFactorList(expid);
       $('#editGene').removeClass('disabled');
       $('#hideGene').removeClass('disabled');
       updateHideButtonText($('#hideGene'), rowData.hidden);
@@ -791,12 +793,10 @@ function setupExperimentHierarchy() {
       },
       "aoColumns": [
          {"sTitle": "Factor", "mDataProp": "transfac"},
-         {"sTitle": "Study", "mDataProp": "studyPretty"},
          {"sTitle": "#", "mDataProp": "numTimes"},
-         {"sTitle": "AllRow", "mDataProp": "allRow", "bVisible": false},
-         {"sTitle": "StudyOrig", "mDataProp": "study", "bVisible": false}
+         {"sTitle": "AllRow", "mDataProp": "allRow", "bVisible": false}
       ],
-      "aaSortingFixed": [[3,'desc']]
+      "aaSortingFixed": [[2,'desc']]
       
    
    });

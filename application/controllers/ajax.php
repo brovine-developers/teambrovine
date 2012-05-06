@@ -418,21 +418,30 @@ EOT;
    public function getFactorList($asArray = false, $geneid = false) {
       $this->load->database();
       $geneid = $geneid ?: $this->input->get('geneid');
+      $expid = $this->input->get('expid');
       $showHidden = $this->showHidden();
       $sql = <<<EOT
-       SELECT study, transfac, COUNT(seqid) as numTimes,
+       SELECT transfac, COUNT(seqid) as numTimes,
        (MIN(factor_matches.hidden) || MIN(regulatory_sequences.hidden)) as hidden
-       FROM regulatory_sequences INNER JOIN factor_matches USING(seqid)
+       FROM regulatory_sequences
+       INNER JOIN genes using(geneid)
+       INNER JOIN factor_matches USING(seqid)
+       INNER JOIN experiments using(experimentid)
        WHERE geneid = ?
+EOT;
+
+      if ($expid)
+         $sql .= " AND experimentid = ? ";
+      
+      $sql .= <<<EOT
        AND regulatory_sequences.hidden <= $showHidden
        AND factor_matches.hidden <= $showHidden
-       GROUP BY study, transfac
+       GROUP BY transfac
 EOT;
-      $query = $this->db->query($sql, array($geneid));
+      $query = $this->db->query($sql, array($geneid, $expid));
 
       $result = $query->result_array();
       foreach ($result as &$row) {
-         $row['studyPretty'] = str_replace('/', ' /<br>', $row['study']);
          $row['allRow'] = 0;
       }
 
@@ -450,8 +459,6 @@ EOT;
 
       // Add "All" Row.
       $result[] = array(
-         'study' => '-',
-         'studyPretty' => '-',
          'transfac' => 'All',
          'numTimes' => $countInfo->numTimes,
          'allRow' => 1
