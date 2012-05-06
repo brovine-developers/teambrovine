@@ -793,7 +793,7 @@ function setupExperimentHierarchy() {
       },
       "aoColumns": [
          {"sTitle": "Factor", "mDataProp": "transfac"},
-         {"sTitle": "#", "mDataProp": "numTimes"},
+         {"sTitle": "(#) Occurs", "mDataProp": "numTimes"},
          {"sTitle": "AllRow", "mDataProp": "allRow", "bVisible": false}
       ],
       "aaSortingFixed": [[2,'desc']]
