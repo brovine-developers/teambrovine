@@ -352,6 +352,11 @@ EOT;
       
       $showHidden = $this->showHidden();
       $tfName = $this->input->get('tf');
+      $expid = $this->input->get('expid');
+
+       $tfName = is_array($tfName) ? $tfName : array($tfName);
+       $expid = is_array($expid) ? $expid : array($expid);
+
       $sql = <<<EOT
        SELECT distinct celltype, species, label, genename, geneabbrev, study, beginning, length, sense
        FROM factor_matches
@@ -374,9 +379,7 @@ EOT;
       }
 
 
-      $sql .= <<<EOT
-       WHERE 
-EOT;
+      $sql .= " WHERE ( ";
       
       for ($i = 0; $i < count($tfName); $i++) {
          if ($i != 0)
@@ -384,18 +387,26 @@ EOT;
          $sql .= "transfac = ?";
       }
 
+      $sql .= " ) AND ( ";
+
+        for ($i = 0; $i < count($expid); $i++) {
+            if ($i != 0)
+               $sql .= " OR ";
+            $sql .= "experimentid = ?";
+        }
+
       $sql .= <<<EOT
-       AND factor_matches.hidden <= $showHidden
+       ) AND factor_matches.hidden <= $showHidden
        AND regulatory_sequences.hidden <= $showHidden
        AND genes.hidden <= $showHidden
        AND experiments.hidden <= $showHidden
        AND comparison_types.hidden <= $showHidden
 EOT;
 
-      $tfArr = is_array($tfName) ? $tfName : array($tfName);
-      $query = $this->db->query($sql, array_merge($tfArr, $tfArr));
+      $query = $this->db->query($sql, array_merge($tfName, $tfName, $expid));
       $result = $query->result();
       $out = array();
+
       foreach ($result as $row) {
          $out[] = array(
             'celltype' => $row->celltype,
