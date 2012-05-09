@@ -243,8 +243,9 @@ EOT;
       $geneid = $this->input->get('geneid');
       $showHidden = $this->showHidden();
       $sql = <<<EOT
-       SELECT label, regulation
+       SELECT label, celltype, species, regulation
        FROM genes INNER JOIN experiments USING (experimentid)
+       INNER JOIN comparison_types USING (comparisontypeid)
        WHERE genename = ?
        AND genes.hidden <= $showHidden
        AND experiments.hidden <= $showHidden

@@ -87,6 +87,8 @@ function setupGeneSummary() {
       "sScrollY": height,
       "aoColumns": [ 
          {"sTitle": "Experiment", "mDataProp": "label"},
+         {"sTitle": "Comparison", "mDataProp": "celltype"},
+         {"sTitle": "Species", "mDataProp": "species"},
          {"sTitle": "Regulation", "mDataProp": "regulation"}
       ]
 
