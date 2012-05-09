@@ -355,8 +355,12 @@ EOT;
       $tfName = $this->input->get('tf');
       $expid = $this->input->get('expid');
 
-       $tfName = is_array($tfName) ? $tfName : array($tfName);
-       $expid = is_array($expid) ? $expid : array($expid);
+       $tfName = is_array($tfName) ? $tfName :
+           (trim($tfName) != "" ? array($tfName) : array());
+
+       $expid = is_array($expid) ? $expid :
+           (trim($expid) != "" ? array($expid) : array());
+
 
       $sql = <<<EOT
        SELECT distinct celltype, species, label, genename, geneabbrev, study, beginning, length, sense
@@ -388,7 +392,7 @@ EOT;
          $sql .= "transfac = ?";
       }
 
-      $sql .= " ) AND ( ";
+      if (count($expid) > 0) $sql .= " ) AND ( ";
 
         for ($i = 0; $i < count($expid); $i++) {
             if ($i != 0)
@@ -396,8 +400,10 @@ EOT;
             $sql .= "experimentid = ?";
         }
 
+      $sql .= " ) AND ";
+
       $sql .= <<<EOT
-       ) AND factor_matches.hidden <= $showHidden
+       factor_matches.hidden <= $showHidden
        AND regulatory_sequences.hidden <= $showHidden
        AND genes.hidden <= $showHidden
        AND experiments.hidden <= $showHidden

@@ -58,9 +58,8 @@ function setupTFSummary() {
       "sScrollY": height,
       "aoColumns": [
          {"sTitle": "Transfac", "mDataProp": "transfac"},
-         {"sTitle": "Studies", "mDataProp": "numStudies"},
          {"sTitle": "Genes", "mDataProp": "numGenes"},
-         {"sTitle": "Occurrences", "mDataProp": "numOccs"},
+         {"sTitle": "Occurrences", "mDataProp": "numOccs"}
       ]
 
    });
@@ -82,7 +81,7 @@ function setupTFSummary() {
          {"sTitle": "Species", "mDataProp": "species"},
          {"sTitle": "Beginning", "mDataProp": "beginning"},
          {"sTitle": "Sense", "mDataProp": "sense"},
-         {"sTitle": "Length", "mDataProp": "length"},
+         {"sTitle": "Length", "mDataProp": "length"}
       ]
 
    });
