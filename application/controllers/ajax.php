@@ -492,115 +492,143 @@ EOT;
       $minLq = $this->input->get('minLq');
       $maxLd = $this->input->get('maxLd');
 
+      if (!isset($minLa) || trim($minLa) == "")
+         $minLa = -99999;
+
+      if (!isset($minLaSlash) || trim($minLaSlash) == "")
+         $minLaSlash = -99999;
+      
+      if (!isset($minLq) || trim($minLq) == "")
+         $minLq = -99999;
+      
+      if (!isset($maxLd) || trim($maxLd) == "")
+         $maxLd = 99999;
+      
       $species = $this->input->get('species');
       $comparisontypeid = $this->input->get('comparisontypeid');
       $experiment = $this->input->get('experiment');
 
-      $showHidden = $this->showHidden();
-      $joiner = 'WHERE';
+      if ($experiment && !is_array($experiment))
+         $experiment = array($experiment);
 
-      $sql = <<<EOT
-       SELECT DISTINCT transfac, COUNT(seqid) as numTimes
-       FROM regulatory_sequences INNER JOIN factor_matches USING(seqid) INNER JOIN genes USING(geneid) 
-EOT;
- 
+      if ($species && !is_array($species))
+         $species = array($species);
+
+      if ($comparisontypeid && !is_array($comparisontypeid))
+         $comparisontypeid = array($comparisontypeid);
+
+      $showHidden = $this->showHidden();
+      $joiner = 'OR';
+
       if($experiment){
-         $joiner = 'AND';
-          $sql .= " INNER JOIN experiments USING(experimentid)
-                   WHERE label = '$experiment' AND
-                   factor_matches.la >= ? AND
-                   factor_matches.la_slash >= ? AND
-                   factor_matches.lq >= ? AND
-                   factor_matches.ld <= ?";
+          $first = true;
+          $add = " INNER JOIN experiments USING(experimentid)
+                   WHERE (";
+
+          foreach ($experiment as $exp) {
+             if (!$first)
+                $add .= $joiner;
+             $add .= " experimentid = '$exp' ";
+             $first = false;
+          }
+            
+          $add .= ") AND ";
       }
       elseif($comparisontypeid){
-         $joiner = 'AND';
-          $sql .= " INNER JOIN experiments USING(experimentid) INNER JOIN comparison_types USING(comparisontypeid)
-                   WHERE factor_matches.la >= ? AND
-                   factor_matches.la_slash >= ? AND
-                   factor_matches.lq >= ? AND
-                   factor_matches.ld <= ?";
+          $first = true;
+          $add = " INNER JOIN experiments USING(experimentid) INNER JOIN comparison_types USING(comparisontypeid) WHERE ( ";
+
+          foreach ($comparisontypeid as $exp) {
+             if (!$first)
+                $add .= $joiner;
+             $add .= " comparisontypeid = '$exp' ";
+             $first = false;
+          }
+            
+          $add .= ") AND ";
       }
       elseif($species){
-         $joiner = 'AND';
-          $sql .= " INNER JOIN experiments USING(experimentid) INNER JOIN comparison_types USING(comparisontypeid)
-                   WHERE species = '$species' AND
-                   factor_matches.la >= ? AND
-                   factor_matches.la_slash >= ? AND
-                   factor_matches.lq >= ? AND
-                   factor_matches.ld <= ?";
+          $first = true;
+          $add = " INNER JOIN experiments USING(experimentid) INNER JOIN comparison_types USING(comparisontypeid) WHERE ( ";
+
+          foreach ($species as $exp) {
+             if (!$first)
+                $add .= $joiner;
+             $add .= " species = '$exp' ";
+             $first = false;
+          }
+            
+          $add .= ") AND ";
       }
-      else{
-         $joiner = 'AND';
-         $sql .= " WHERE factor_matches.la >= ? AND
-                   factor_matches.la_slash >= ? AND
-                   factor_matches.lq >= ? AND
-                   factor_matches.ld <= ?";
+      else {
+         $add = " WHERE ";
       }
 
-      $sql .= " $joiner factor_matches.hidden <= $showHidden AND
-         regulatory_sequences.hidden <= $showHidden AND
-         genes.hidden <= $showHidden
-         GROUP BY transfac";
+      $start = <<<EOT
+       SELECT transfac, numOccs, numGenes, numStudies
+EOT;
 
-      $query = $this->db->query($sql, array($minLa, $minLaSlash, $minLq, $maxLd));
+      $sql = <<<EOT
+       FROM 
+          (SELECT transfac, seqid, count(*) as numOccs
+          FROM factor_matches
+          INNER JOIN regulatory_sequences r USING (seqid)
+          INNER JOIN genes using (geneid)
+          $add
+           la > ? AND la_slash > ? AND lq > ? AND ld <= ?
+          AND factor_matches.hidden <= $showHidden
+          GROUP BY transfac) a
+        INNER JOIN 
+          (SELECT transfac, count(*) as numGenes
+          FROM 
+             (SELECT DISTINCT transfac, geneid
+             FROM factor_matches
+             INNER JOIN regulatory_sequences r USING (seqid)
+             INNER JOIN genes using (geneid)
+             $add
+             la > ? AND la_slash > ? AND lq > ? AND
+             ld <= ? AND factor_matches.hidden <= $showHidden
+             AND r.hidden <= $showHidden
+            ) f1
+          GROUP BY transfac) b USING (transfac)
+        INNER JOIN
+          (SELECT transfac, count(*) as numStudies
+          FROM 
+             (SELECT DISTINCT transfac, study
+             FROM factor_matches
+               INNER JOIN regulatory_sequences using (seqid)
+               INNER JOIN genes using (geneid)
+               $add
+                la > ? AND la_slash > ? AND lq > ? AND
+                ld <= ? AND factor_matches.hidden <= $showHidden) f1
+          GROUP BY transfac) c USING (transfac)
+EOT;
+
+      $sqli = $start . $sql;
+
+      $sqli .= " GROUP BY transfac";
+      $query = $this->db->query($sqli, array($minLa, $minLaSlash, $minLq, $maxLd, $minLa, $minLaSlash, $minLq, $maxLd, $minLa, $minLaSlash, $minLq, $maxLd));
 
       $result = $query->result_array();
       foreach ($result as &$row) {
-         //$row['studyPretty'] = str_replace('/', ' /<br>', $row['study']);
          $row['allRow'] = 0;
       }
 
-      // Get All Count
-      $sql = <<<EOT
-       SELECT COUNT(seqid) as numTimes
-       FROM regulatory_sequences INNER JOIN factor_matches USING(seqid) INNER JOIN genes USING(geneid)
+      $start = <<<EOT
+       SELECT sum(numOccs) as numO, sum(numGenes) as numG, sum(numStudies) as numS
 EOT;
 
-      if($experiment){
-          $sql .= " INNER JOIN experiments USING(experimentid)
-                   WHERE label = '$experiment' AND
-                   factor_matches.la >= ? AND
-                   factor_matches.la_slash >= ? AND
-                   factor_matches.lq >= ? AND
-                   factor_matches.ld <= ?";
-      }
-      elseif($comparisontypeid){
-          $sql .= " INNER JOIN experiments USING(experimentid) INNER JOIN comparison_types USING(comparisontypeid)
-                   WHERE factor_matches.la >= ? AND
-                   factor_matches.la_slash >= ? AND
-                   factor_matches.lq >= ? AND
-                   factor_matches.ld <= ?";
-      }
-      elseif($species){
-          $sql .= " INNER JOIN experiments USING(experimentid) INNER JOIN comparison_types USING(comparisontypeid)
-                   WHERE species = '$species' AND
-                   factor_matches.la >= ? AND
-                   factor_matches.la_slash >= ? AND
-                   factor_matches.lq >= ? AND
-                   factor_matches.ld <= ?";
-      }
-      else{
-         $sql .= " WHERE factor_matches.la >= ? AND
-                   factor_matches.la_slash >= ? AND
-                   factor_matches.lq >= ? AND
-                   factor_matches.ld <= ?";
-      }
-      
-      $sql .= " $joiner factor_matches.hidden <= $showHidden AND
-         regulatory_sequences.hidden <= $showHidden AND
-         genes.hidden <= $showHidden";
+      $sqli = $start . $sql; 
 
-
-      $query = $this->db->query($sql, array($minLa, $minLaSlash, $minLq, $maxLd));
+      $query = $this->db->query($sqli, array($minLa, $minLaSlash, $minLq, $maxLd, $minLa, $minLaSlash, $minLq, $maxLd, $minLa, $minLaSlash, $minLq, $maxLd));
       $countInfo = $query->row();
 
       // Add "All" Row.
       $result[] = array(
-         'study' => '-',
-         'studyPretty' => '-',
          'transfac' => 'All',
-         'numTimes' => $countInfo->numTimes,
+         'numOccs' => $countInfo->numO,
+         'numGenes' => $countInfo->numG,
+         'numStudies' => $countInfo->numS,
          'allRow' => 1
       );
 
