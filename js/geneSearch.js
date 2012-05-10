@@ -134,7 +134,7 @@ function updateExperimentList(comparisontypeid) {
          experimentList.$('tr').removeClass('selected');
          $(this).addClass('selected');
          var rowData = experimentList.fnGetData(this);
-         experiment = rowData.label;
+         experiment = rowData.experimentid;
          updateGeneFilter();
          fixAllTableWidths();
       });
@@ -285,14 +285,13 @@ function setupExperimentHierarchy() {
          "sSearch": "Search Transcription Factors"
       },
       "aoColumns": [
-         {"sTitle": "Factor", "mDataProp": "transfac"},
-         //{"sTitle": "Study", "mDataProp": "studyPretty"},
-         {"sTitle": "#", "mDataProp": "numTimes"},
-         {"sTitle": "AllRow", "mDataProp": "allRow", "bVisible": false}//,
-         //{"sTitle": "StudyOrig", "mDataProp": "study", "bVisible": false}
+         {"sTitle": "Transfac", "mDataProp": "transfac"},
+         {"sTitle": "Studies", "mDataProp": "numStudies"},
+         {"sTitle": "Genes", "mDataProp": "numGenes"},
+         {"sTitle": "Occurrences", "mDataProp": "numOccs"},
+         {"sTitle": "AllRow", "mDataProp": "allRow", "bVisible": false}
       ],
-      "aaSortingFixed": [[2,'desc']]
-
+      "aaSortingFixed": [[4, "desc"]]
    });
  
    speciesList = $('#speciesList').dataTable({

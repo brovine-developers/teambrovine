@@ -327,6 +327,8 @@ EOT;
           GROUP BY transfac) c USING (transfac)
         INNER JOIN regulatory_sequences using (seqid)
         INNER JOIN genes using (geneid)
+        INNER JOIN experiments using (experimentid)
+        INNER JOIN comparison_types using (comparisontypeid)
        WHERE genes.hidden <= $showHidden
        AND regulatory_sequences.hidden <= $showHidden
 EOT;
@@ -344,6 +346,7 @@ EOT;
       }
 
       $query = $this->db->query($sql, array_merge(array($la, $la_s, $lq, $ld, $la, $la_s, $lq, $ld), $experimentid));
+
 
       echo json_encode($query->result());
    }
