@@ -140,6 +140,8 @@ function updateComparisonList(curSpecies) {
 }
 
 function updateFactorList(minLaVal, minLaSlashVal, minLqVal, maxLdVal, species, comparisontypeid, experiment) {
+   geneFoundList.fnClearTable();
+   comparisonFromGeneList.fnClearTable();
    updateMultiselectList(factorList, "transfac", "getDistinctFactorList",
       {
          'species' : species,
@@ -172,7 +174,9 @@ function updateComparisonFromGeneList(genename) {
 function updateGeneFoundList(transFacs) {
    updateMultiselectList(geneFoundList, "genename", "getGeneFoundListFromDB",
       { 'transFacs' : transFacs },
-      function () {},
+      function () {
+         comparisonFromGeneList.fnClearTable();
+      },
       function (specs) {
          updateComparisonFromGeneList(specs);
       }
