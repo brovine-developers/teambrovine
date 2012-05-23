@@ -99,160 +99,83 @@ function updateGeneFilter(){
 }
 
 function updateSpeciesList() {
-   jQuery.get("ajax/getSpeciesList",
-   function(data) {
-      speciesList.fnClearTable();
-      speciesList.fnAddData(data);
-
-      speciesList.$('tr').click(function(e) {
-         speciesList.$('tr').removeClass('selected');
-         $(this).addClass('selected');
-         var rowData = speciesList.fnGetData(this);
-         species = rowData.species;
-         experimentList.fnClearTable();
-         updateComparisonList(species);
-         comparisontypeid = undefined;
-         experiment = undefined;
-         updateGeneFilter();
-         fixAllTableWidths();
-      });
-   },
-   'json'
-   );
+   updateMultiselectList(speciesList, "species", "getSpeciesList", {},
+    function () { 
+       experimentList.fnClearTable();
+       comparisonList.fnClearTable();
+    },
+    function (specs) {
+       species = specs;
+       updateComparisonList(specs);
+       comparisontypeid = undefined;
+       experiment = undefined;
+       updateGeneFilter();
+       fixAllTableWidths();
+    });
 }
 
 function updateExperimentList(comparisontypeid) {
-   jQuery.get("ajax/getExperimentList",
-   {
-      'comparisontypeid': comparisontypeid
-   },
-   function(data) {
-      experimentList.fnClearTable();
-      experimentList.fnAddData(data);
-      fixTableWidth(experimentList);
-      experimentList.$('tr').click(function(e) {
-         experimentList.$('tr').removeClass('selected');
-         $(this).addClass('selected');
-         var rowData = experimentList.fnGetData(this);
-         experiment = rowData.experimentid;
+   updateMultiselectList(experimentList, "experimentid", "getExperimentList",
+      { 'comparisontypeid': comparisontypeid },
+      function () {},
+      function (specs) {
+         experiment = specs;
          updateGeneFilter();
          fixAllTableWidths();
-      });
-   },
-   'json'
+      }
    );
 }
 
 function updateComparisonList(curSpecies) {
-   jQuery.get("ajax/getComparisonList",
-      {
-         'species': curSpecies
-      },
-      function(data) {
-         comparisonList.fnClearTable();
-         comparisonList.fnAddData(data);
-
-         comparisonList.$('tr').click(function(e) {
-            comparisonList.$('tr').removeClass('selected');
-            $(this).addClass('selected');
-            var rowData = comparisonList.fnGetData(this);
-            comparisontypeid = rowData.comparisontypeid;
-            updateExperimentList(comparisontypeid);
-            experiment = undefined;
-            updateGeneFilter();
-         });
-      },
-      'json'
+   updateMultiselectList(comparisonList, "comparisontypeid", "getComparisonList",
+      { 'species': curSpecies },
+      function () {},
+      function (specs) {
+         comparisontypeid = specs;
+         updateExperimentList(specs);
+         experiment = undefined;
+         updateGeneFilter();
+      }
    );
-
 }
 
 function updateFactorList(minLaVal, minLaSlashVal, minLqVal, maxLdVal, species, comparisontypeid, experiment) {
-   jQuery.get("ajax/getDistinctFactorList",
-   {
-       'species' : species,
-       'comparisontypeid' : comparisontypeid,
-       'experiment' : experiment,
-       'minLa' : minLaVal,
-       'minLaSlash' : minLaSlashVal,
-       'minLq' : minLqVal,
-       'maxLd' : maxLdVal
-   },
-   function(data) {
-
-      factorList.fnClearTable();
-      factorList.fnAddData(data);
-      
-      fixTableWidth(factorList);
-      factorList.$('tr').click(function(e) {
-         if(e.metaKey|| e.ctrlKey){
-            if($(this).hasClass('selected')){
-               var rowData = factorList.fnGetData(this);
-               $(this).removeClass('selected');
-               transFacs.splice(transFacs.indexOf(rowData.transfac, 1));
-               studies.splice(studies.indexOf(rowData.study, 1));
-            }
-            else{
-	       $(this).addClass('selected');
-               var rowData = factorList.fnGetData(this);
-               transFacs.push(rowData.transfac);
-               studies.push(rowData.study);
-            }
-	 }
-         else{
-            factorList.$('tr').removeClass('selected');
-            $(this).addClass('selected');
-          
-            transFacs.length = 0;
-            studies.length = 0;
-          
-            var rowData = factorList.fnGetData(this);
-            transFacs.push(rowData.transfac);
-            studies.push(rowData.study);
-         }
-         updateGeneFoundList(transFacs, studies);
+   updateMultiselectList(factorList, "transfac", "getDistinctFactorList",
+      {
+         'species' : species,
+         'comparisontypeid' : comparisontypeid,
+         'experiment' : experiment,
+         'minLa' : minLaVal,
+         'minLaSlash' : minLaSlashVal,
+         'minLq' : minLqVal,
+         'maxLd' : maxLdVal
+      },
+      function () {},
+      function (specs) {
+         updateGeneFoundList(specs);
          updateComparisonFromGeneList("");
-      });
-     updateGeneFoundList(transFacs, studies);
-   },
-   'json'
+      }
    );
 }
 
 function updateComparisonFromGeneList(genename) {
    jQuery.get("ajax/getComparisonFromGeneList",
-      {
-         'genename' : genename
-      },
+      { 'genename' : genename },
       function(data) {
          comparisonFromGeneList.fnClearTable();
          comparisonFromGeneList.fnAddData(data);
          fixTableWidth(comparisonFromGeneList);
-      },
-      'json'
+      }, 'json'
    );
 }
 
-function updateGeneFoundList(transFacs, studies) {
-   jQuery.get("ajax/getGeneFoundListFromDB",
-      {
-         'transFacs' : transFacs,
-         'studies' : studies
-      },
-      function(data) {
-         geneFoundList.fnClearTable();
-         geneFoundList.fnAddData(data);
-         fixTableWidth(geneFoundList);
-         updateComparisonFromGeneList("");
-         geneFoundList.$('tr').click(function(e) {
-            geneFoundList.$('tr').removeClass('selected');
-            $(this).addClass('selected');
-            var rowData = geneFoundList.fnGetData(this);
-            var genename = rowData.genename;
-            updateComparisonFromGeneList(genename);
-         });
-      },
-      'json'
+function updateGeneFoundList(transFacs) {
+   updateMultiselectList(geneFoundList, "genename", "getGeneFoundListFromDB",
+      { 'transFacs' : transFacs },
+      function () {},
+      function (specs) {
+         updateComparisonFromGeneList(specs);
+      }
    );
 }
 

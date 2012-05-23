@@ -17,6 +17,9 @@ function updateMultiselectList(table, id, loc, params, clears, calls) {
          table.fnAddData(data);
 
          table.$('tr').click(function(e) {
+            if (!e.metaKey && !e.ctrlKey)
+               table.$('tr').removeClass('selected');
+
             var specs = new Array();
             $(this).toggleClass('selected');
 
