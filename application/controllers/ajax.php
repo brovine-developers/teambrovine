@@ -1,8 +1,40 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 define("ASCII_A", 97);
+define("CSV_PATH", "/home/tcirwin/prj/brovine/genedata-uploads/");
 
 class Ajax extends CI_Controller {
+
+   /**
+    * Gets the Apriori data.
+    */
+   public function getApriori() {
+      $this->load->database();
+      $this->load->helper("SQLDataSource");
+      $this->load->helper("Apriori");
+
+      //$data = new CSVDataSource(CSV_PATH . "factor_baskets_sparse.csv",
+      // CSV_PATH . "genes.csv", CSV_PATH . "factors.csv");
+
+      $data = new SQLDataSource($this->db);
+      $ap = new Apriori($data, 0.88, 0.95, 0.2);
+
+      $ap->findFrequentItemsets();
+      $tmp = $ap->getFrequentNamedItemsets();
+      $sets = array();
+
+      foreach ($tmp as $item) {
+         $sets[] = array(
+            "items" => $item->getSetNames(),
+            "count" => $item->getCount(),
+            "sup" => $item->sup,
+            "numItems" => count($item->getSetNames())
+         );
+      }
+
+      echo json_encode($sets);
+   }
+
    // Returns 1 when we should show hidden, 0 otherwise.
    public function showHidden() {
       return $this->input->get_post('showHidden') ? 1 : 0;
@@ -299,7 +331,7 @@ EOT;
       $ld = $this->input->get('ld');
 
       $showHidden = $this->showHidden();
-      
+
       $sql = <<<EOT
        SELECT transfac, numOccs, numGenes, numStudies
        FROM 
@@ -492,10 +524,13 @@ EOT;
          echo json_encode($result);
       }
    }
+   
+   
 
    //RyanTestFunction
    public function getDistinctFactorList() {
       $this->load->database();
+      $this->load->helper("Ajax");
 
       $minLa = $this->input->get('minLa');
       $minLaSlash = $this->input->get('minLaSlash');
@@ -528,51 +563,7 @@ EOT;
          $comparisontypeid = array($comparisontypeid);
 
       $showHidden = $this->showHidden();
-      $joiner = 'OR';
-
-      if($experiment){
-          $first = true;
-          $add = " INNER JOIN experiments USING(experimentid)
-                   WHERE (";
-
-          foreach ($experiment as $exp) {
-             if (!$first)
-                $add .= $joiner;
-             $add .= " experimentid = '$exp' ";
-             $first = false;
-          }
-            
-          $add .= ") AND ";
-      }
-      elseif($comparisontypeid){
-          $first = true;
-          $add = " INNER JOIN experiments USING(experimentid) INNER JOIN comparison_types USING(comparisontypeid) WHERE ( ";
-
-          foreach ($comparisontypeid as $exp) {
-             if (!$first)
-                $add .= $joiner;
-             $add .= " comparisontypeid = '$exp' ";
-             $first = false;
-          }
-            
-          $add .= ") AND ";
-      }
-      elseif($species){
-          $first = true;
-          $add = " INNER JOIN experiments USING(experimentid) INNER JOIN comparison_types USING(comparisontypeid) WHERE ( ";
-
-          foreach ($species as $exp) {
-             if (!$first)
-                $add .= $joiner;
-             $add .= " species = '$exp' ";
-             $first = false;
-          }
-            
-          $add .= ") AND ";
-      }
-      else {
-         $add = " WHERE ";
-      }
+      $add = getSearchJoiner($experiment, $comparisontypeid, $species);
 
       $start = <<<EOT
        SELECT transfac, numOccs, numGenes, numStudies
@@ -694,7 +685,41 @@ public function isCommon($value, $list){
       $transFacs = $this->input->get('transFacs');
       $geneIDList = array(array()); 
       $isAll = false;
+      $this->load->helper("Ajax");
+
+      $las = array();
+      $minLa = $this->input->get('minLa');
+      $minLaSlash = $this->input->get('minLaSlash');
+      $minLq = $this->input->get('minLq');
+      $maxLd = $this->input->get('maxLd');
+
+      if (!isset($minLa) || trim($minLa) == "")
+         $minLa = -99999;
+
+      if (!isset($minLaSlash) || trim($minLaSlash) == "")
+         $minLaSlash = -99999;
+      
+      if (!isset($minLq) || trim($minLq) == "")
+         $minLq = -99999;
+      
+      if (!isset($maxLd) || trim($maxLd) == "")
+         $maxLd = 99999;
+      
+      $species = $this->input->get('species');
+      $comparisontypeid = $this->input->get('comparisontypeid');
+      $experiment = $this->input->get('experiment');
+
+      if ($experiment && !is_array($experiment))
+         $experiment = array($experiment);
+
+      if ($species && !is_array($species))
+         $species = array($species);
+
+      if ($comparisontypeid && !is_array($comparisontypeid))
+         $comparisontypeid = array($comparisontypeid);
+
       $showHidden = $this->showHidden();
+      $add = getSearchJoiner($experiment, $comparisontypeid, $species);
       
       $sql = <<<EOT
          select a.genename, a.regulation
@@ -711,10 +736,14 @@ EOT;
             (SELECT distinct genename, regulation
             from genes g inner join regulatory_sequences r using(geneid)
             inner join factor_matches f using(seqid)
-            where transfac=? and g.hidden <= $showHidden) 
+            $add
+            transfac=? and 
+           la > ? AND la_slash > ? AND lq > ? AND ld <= ?
+          AND g.hidden <= $showHidden) 
 EOT;
 
          $sql .= chr($i + ASCII_A);
+         $las += array($transFacs[$i], $minLa, $minLaSlash, $minLq, $maxLd);
 
          if ($i != 0)
             $sql .= <<<EOT
@@ -722,7 +751,7 @@ EOT;
 EOT;
       }
  
-      $query = $this->db->query($sql, $transFacs);
+      $query = $this->db->query($sql, $las);
 
       $result = $query->result();
       $out = array();

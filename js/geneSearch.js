@@ -95,7 +95,6 @@ function updateGeneFilter(){
    }
    clearFactorSelections();
    updateFactorList(minLaVal, minLaSlashVal, minLqVal, maxLdVal, species, comparisontypeid, experiment);
-   //updateGeneFoundList(transFacs, studies);
 }
 
 function updateSpeciesList() {
@@ -154,7 +153,8 @@ function updateFactorList(minLaVal, minLaSlashVal, minLqVal, maxLdVal, species, 
       },
       function () {},
       function (specs) {
-         updateGeneFoundList(specs);
+         updateGeneFoundList(minLaVal, minLaSlashVal, minLqVal, maxLdVal,
+          species, comparisontypeid, experiment, specs);
          updateComparisonFromGeneList("");
       }
    );
@@ -171,9 +171,19 @@ function updateComparisonFromGeneList(genename) {
    );
 }
 
-function updateGeneFoundList(transFacs) {
+function updateGeneFoundList(minLaVal, minLaSlashVal, minLqVal, maxLdVal,
+ species, comparisontypeid, experiment, transFacs) {
    updateMultiselectList(geneFoundList, "genename", "getGeneFoundListFromDB",
-      { 'transFacs' : transFacs },
+      { 
+         'transFacs' : transFacs,
+         'species' : species,
+         'comparisontypeid' : comparisontypeid,
+         'experiment' : experiment,
+         'minLa' : minLaVal,
+         'minLaSlash' : minLaSlashVal,
+         'minLq' : minLqVal,
+         'maxLd' : maxLdVal
+      },
       function () {
          comparisonFromGeneList.fnClearTable();
       },
