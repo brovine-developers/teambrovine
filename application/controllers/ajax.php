@@ -725,6 +725,8 @@ public function isCommon($value, $list){
          select a.genename, a.regulation
             from
 EOT;
+
+      $las = array(); 
       
       for ($i = 0; $i < count($transFacs); $i++) {
          if ($i != 0)
@@ -743,14 +745,14 @@ EOT;
 EOT;
 
          $sql .= chr($i + ASCII_A);
-         $las += array($transFacs[$i], $minLa, $minLaSlash, $minLq, $maxLd);
+         array_push($las, $transFacs[$i], $minLa, $minLaSlash, $minLq, $maxLd);
 
          if ($i != 0)
             $sql .= <<<EOT
                using(genename) 
 EOT;
       }
- 
+
       $query = $this->db->query($sql, $las);
 
       $result = $query->result();
