@@ -79,6 +79,13 @@ class Main extends CI_Controller {
       $this->template->add_js('js/tfPop.js');
       $this->_renderPage('TF Popularity');
    }
+
+   public function FreqTransfacs() {
+      $this->_initPage();
+      $this->template->write_view('content', 'apSumm.php');
+      $this->template->add_js('js/apSumm.js');
+      $this->_renderPage('Frequent Transcription Factors');
+   }
    
    /**
     * _initPage is a function I wrote to simplify initializing a page.
@@ -110,10 +117,10 @@ class Main extends CI_Controller {
          'Upload' => 'Upload',
          'ExperimentHierarchy' => 'Experiment Hierarchy',
          'GeneSummary' => 'Gene Summary',
-         'TranscriptionFactorSummary' => 'Transcription Factor Summary',
-	 /*Ryan*/
+         'TranscriptionFactorSummary' => 'TF Summary',
 	 'GeneSearch' => 'Gene Search',
-         'TFPop' => 'TF Popularity'
+         'TFPop' => 'TF Popularity',
+         'FreqTransfacs' => 'TF Frequency'
       );
       $data = array(
          'siteName' => 'Team Brovine!',

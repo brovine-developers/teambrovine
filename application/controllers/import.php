@@ -1,7 +1,7 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 class Import extends CI_Controller {
-   private static $targetPath = '/var/www/html/genedata-uploads/';
+   private static $targetPath = '/home/tcirwin/prj/brovine/genedata-uploads/';//'/var/www/html/genedata-uploads/';
 
    public function importExisting() {
       $this->load->database();
