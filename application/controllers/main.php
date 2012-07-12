@@ -134,6 +134,13 @@ class Main extends CI_Controller {
       $this->template->add_versioned_js('js/tfPop.js');
       $this->render->renderPage('TF Popularity');
    }
+
+   public function FreqTransfacs() {
+      $this->render->initPage();
+      $this->template->write_view('content', 'apSumm.php');
+      $this->template->add_js('js/apSumm.js');
+      $this->render->renderPage('Frequent Transcription Factors');
+   }
 }
 
 /* End of file welcome.php */
