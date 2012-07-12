@@ -67,11 +67,7 @@ function setupGeneSummary() {
          {"sTitle": "Start", "mDataProp": "start"},
          {"sTitle": "End", "mDataProp": "end"},
          {"sTitle": "Comps", "mDataProp": "numComps"},
-         {"sTitle": "Up", "mDataProp": "numCompsUp"},
-         {"sTitle": "Down", "mDataProp": "numCompsDown"},
-         {"sTitle": "Exps", "mDataProp": "numExps"},
-         {"sTitle": "Up", "mDataProp": "numExpsUp"},
-         {"sTitle": "Down", "mDataProp": "numExpsDown"}
+         {"sTitle": "Exps", "mDataProp": "numExps"}
       ]
 
    });

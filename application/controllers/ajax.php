@@ -140,19 +140,7 @@ EOT;
          FROM genes
          WHERE genes.experimentid = experiments.experimentid
          AND hidden <= $showHidden
-      ) as genecount_all,
-       (SELECT COUNT(*)
-         FROM genes
-         WHERE genes.experimentid = experiments.experimentid
-         AND genes.regulation = 'up'
-         AND hidden <= $showHidden
-      ) as genecount_up,
-       (SELECT COUNT(*)
-         FROM genes
-         WHERE genes.experimentid = experiments.experimentid
-         AND genes.regulation = 'down'
-         AND hidden <= $showHidden
-      ) as genecount_down
+      ) as genecount_all
       FROM experiments
       WHERE 
       hidden <= $showHidden AND (
@@ -220,23 +208,7 @@ EOT;
       $sql = <<<EOT
        SELECT geneabbrev, genename, chromosome, start, end,
         COUNT(DISTINCT e.comparisontypeid) as numComps,
-        COUNT(g.geneid) as numExps, geneid,
-        (SELECT COUNT(DISTINCT experimentid)
-         FROM genes 
-         WHERE regulation = 'down'
-         AND genename = g.genename) as numExpsDown,
-        (SELECT COUNT(DISTINCT experimentid)
-         FROM genes 
-         WHERE regulation = 'up'
-         AND genename = g.genename) as numExpsUp,
-        (SELECT COUNT(DISTINCT comparisontypeid)
-         FROM genes INNER JOIN experiments USING (experimentid)
-         WHERE regulation = 'down'
-         AND genename = g.genename) as numCompsDown,
-        (SELECT COUNT(DISTINCT comparisontypeid)
-         FROM genes INNER JOIN experiments USING (experimentid)
-         WHERE regulation = 'up'
-         AND genename = g.genename) as numCompsUp
+        COUNT(g.geneid) as numExps, geneid
        FROM genes g INNER JOIN experiments e USING (experimentid)
        WHERE g.hidden <= $showHidden AND e.hidden <= $showHidden
        GROUP BY genename

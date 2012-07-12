@@ -272,9 +272,7 @@ function setupExperimentHierarchy() {
       },
       "aoColumns": [
          {"sTitle": "Experiment", "mDataProp": "label"},
-         {"sTitle": "Genes", "mDataProp": "genecount_all"},
-         {"sTitle": "Up", "mDataProp": "genecount_up"},
-         {"sTitle": "Down", "mDataProp": "genecount_down"},
+         {"sTitle": "Gene Count", "mDataProp": "genecount_all"},
          {"sTitle": "Experimentid", "mDataProp": "experimentid", "bVisible": false}
       ]
    });

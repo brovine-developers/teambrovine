@@ -70,7 +70,8 @@ function getSelectedRowData(table) {
 function colorDeletedAndEdited(nRow, aData) {
    if (aData.hidden == "1") {
       $(nRow).addClass('hiddenRow');
-   } else if (aData.date_edited > 0) {
+   } 
+   else if (aData.date_edited > 0) {
       $(nRow).addClass('editedRow');
    }
 }
@@ -753,9 +754,7 @@ function setupExperimentHierarchy() {
       },
       "aoColumns": [
          {"sTitle": "Experiment", "mDataProp": "label"},
-         {"sTitle": "Genes", "mDataProp": "genecount_all"},
-         {"sTitle": "Up", "mDataProp": "genecount_up"},
-         {"sTitle": "Down", "mDataProp": "genecount_down"},
+         {"sTitle": "Gene Count", "mDataProp": "genecount_all"},
          {"sTitle": "Experimentid", "mDataProp": "experimentid", "bVisible": false}
       ]
    });
@@ -818,12 +817,6 @@ function setupExperimentHierarchy() {
          {"sTitle": "Lq", "mDataProp": "lq", "sType": "numeric"},
          {"sTitle": "Ld", "mDataProp": "ld", "sType": "numeric"},
          {"sTitle": "Lpv", "mDataProp": "lpv", "sType": "numeric"},
-         /*
-         {"sTitle": "Sc", "mDataProp": "sc", "sType": "numeric"},
-         {"sTitle": "Sm", "mDataProp": "sm", "sType": "numeric"},
-         {"sTitle": "Spv", "mDataProp": "spv", "sType": "numeric"},
-         {"sTitle": "Ppv", "mDataProp": "ppv", "sType": "numeric"},
-         */
          {"sTitle": "Sequence", "mDataProp": "sequence"},
          {"sTitle": "Factor", "mDataProp": "transfac"},
          {"sTitle": "Study", "mDataProp": "studyPretty"},
