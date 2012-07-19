@@ -21,13 +21,3 @@ function updateRegFilter(elem) {
       names.push(item.name);
    });
 }
-
-/*Riverwood
-21604 Moscow Rd.
-Monte Rio
-
-beach towels
-blue mat
-garbage cans in
-mail to guerneville
-foldy chair*/
