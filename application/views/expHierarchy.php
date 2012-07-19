@@ -56,7 +56,8 @@
    </div>
 </div>
 <div class="row">
-   <div class="span8">
+   <div class="span2"><h4>Filter by Regulation: </h4></div>
+   <div class="span6">
          <input type="text" id="regFilter" placeholder="Search for Regulations" />
          <br />
    </div>
