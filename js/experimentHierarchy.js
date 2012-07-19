@@ -1,4 +1,5 @@
 var curGeneid;
+var regInput;
 var geneModal;
 var sequenceModal;
 var matchModal;
@@ -6,6 +7,7 @@ var comparisonModal;
 var experimentModal;
 var showHidden;
 var objShowHidden;
+var Brovine = Brovine || {};
 
 function getTimestamp() {
    // http://www.perturb.org/display/786_Javascript_Unixtime.html
@@ -910,26 +912,28 @@ function setupExperimentHierarchy() {
       title: "Number of matching regulatory elements"
    });
 
-   // Setup Gene filter
-   var geneFilterVal = $("#geneFilterOptions input[type='radio']:checked").val();
-
    var filterGeneList = function(oSettings, aData, iDataIndex) {
       if (oSettings.sTableId != "geneList") {
          return true;
       }
 
-      // aData[4] is regulation.
-      return (geneFilterVal == 'all' || geneFilterVal == aData[4]);
+      if (regInput.getItems().length == 0) {
+         return true;
+      }
+
+      for (i = 0; i < regInput.getItems().length; i++) {
+         var item = regInput.getItems()[i];
+
+         // aData[4] is regulation.
+         if (item == aData[4]) {
+            return true;
+         }
+      }
+
+      return false;
    };
 
    $.fn.dataTableExt.afnFiltering.push(filterGeneList);
-
-   // Add radio button listener to redraw table.
-   $('#geneFilterOptions input').change(function() {
-      // Find button val outside the loop for speed purposes.
-      geneFilterVal = $("#geneFilterOptions input[type='radio']:checked").val();
-      geneList.fnDraw();
-   });
 
    // Setup Regulatory Sequence filter
    var minLaVal;
@@ -1089,4 +1093,7 @@ $(document).ready(function() {
 // Work around for chrome. Sometimes, it doesn't properly fix tables.
 $(window).load(function() {
    fixAllTableWidths();
+   regInput = Brovine.newRegInput("#regFilter", function() {
+      geneList.fnDraw();
+   });
 });

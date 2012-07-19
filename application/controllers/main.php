@@ -47,6 +47,8 @@ class Main extends CI_Controller {
       $this->template->write_view('content', 'expHierarchy.php', array(
          'showHidden' => $showHidden   
       ));
+      $this->template->add_js('js/jquery.tokeninput.js');
+      $this->template->add_js('js/tokeninput-loader.js');
       $this->template->add_js('js/experimentHierarchy.js');
       $this->_renderPage('Experiment Hierarchy');
    }
@@ -90,6 +92,8 @@ class Main extends CI_Controller {
       $this->template->add_css('css/jquery.dataTables.css');
       $this->template->add_css('bootstrap/css/bootstrap.min.css');
       $this->template->add_css('css/DT_bootstrap.css');
+      $this->template->add_css('css/token-input-facebook.css');
+      $this->template->add_css('css/token-input.css');
       $this->template->add_js('js/jquery-1.7.1.min.js');
       $this->template->add_js('bootstrap/js/bootstrap.js');
       $this->template->add_js('js/jquery.dataTables.min.js');

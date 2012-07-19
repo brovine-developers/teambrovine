@@ -57,17 +57,8 @@
 </div>
 <div class="row">
    <div class="span8">
-         <div class="row" id="geneFilterOptions">
-            <label class="radio span2">
-               <input type="radio" name="regulationRadio" value="all" checked> Show All Genes
-            </label>
-            <label class="radio span2">
-               <input type="radio" name="regulationRadio" value="up"> Up Regulated Only
-            </label>
-            <label class="radio span2">
-               <input type="radio" name="regulationRadio" value="down"> Down Regulated Only
-            </label>
-         </div>
+         <input type="text" id="regFilter" placeholder="Search for Regulations" />
+         <br />
    </div>
 </div>
 <div class="row">

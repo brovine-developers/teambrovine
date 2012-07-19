@@ -35,6 +35,35 @@ class Ajax extends CI_Controller {
       echo json_encode($sets);
    }
 
+   public function getRegHints() {
+      $this->load->database();
+      $showHidden = $this->showHidden();
+
+      $guess = $this->input->get('q');
+
+      if (!$guess)
+         $guess = '';
+
+      $sql = <<<EOT
+         SELECT DISTINCT regulation
+         FROM genes
+         WHERE regulation LIKE '%$guess%'
+           AND hidden <= $showHidden
+EOT;
+
+      $query = $this->db->query($sql);
+      $ret = $query->result();
+      $out = array();
+
+      foreach ($ret as $row) {
+         $out[] = array(
+            'name' => $row->regulation
+         );
+      }
+      
+      echo json_encode($out);
+   }
+
    // Returns 1 when we should show hidden, 0 otherwise.
    public function showHidden() {
       return $this->input->get_post('showHidden') ? 1 : 0;
