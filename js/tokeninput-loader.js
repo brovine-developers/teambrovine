@@ -40,5 +40,29 @@ Brovine.newRegInput = function (elem, func) {
 
    that.getItems = getItems;
 
+   var filter = function (table, col) {
+      return function (oSettings, aData, iDataIndex) {
+         if (oSettings.sTableId != table) {
+            return true;
+         }
+
+         if (that.getItems().length == 0) {
+            return true;
+         }
+
+         for (i = 0; i < that.getItems().length; i++) {
+            var item = that.getItems()[i];
+
+            if (item == aData[col]) {
+               return true;
+            }
+         }
+
+         return false;
+      };
+   };
+
+   that.filter = filter;
+
    return that;
 };

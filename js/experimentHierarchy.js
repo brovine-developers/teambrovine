@@ -912,29 +912,6 @@ function setupExperimentHierarchy() {
       title: "Number of matching regulatory elements"
    });
 
-   var filterGeneList = function(oSettings, aData, iDataIndex) {
-      if (oSettings.sTableId != "geneList") {
-         return true;
-      }
-
-      if (regInput.getItems().length == 0) {
-         return true;
-      }
-
-      for (i = 0; i < regInput.getItems().length; i++) {
-         var item = regInput.getItems()[i];
-
-         // aData[4] is regulation.
-         if (item == aData[4]) {
-            return true;
-         }
-      }
-
-      return false;
-   };
-
-   $.fn.dataTableExt.afnFiltering.push(filterGeneList);
-
    // Setup Regulatory Sequence filter
    var minLaVal;
    var minLaSlashVal;
@@ -1093,7 +1070,10 @@ $(document).ready(function() {
 // Work around for chrome. Sometimes, it doesn't properly fix tables.
 $(window).load(function() {
    fixAllTableWidths();
-   regInput = Brovine.newRegInput("#regFilter", function() {
+
+   var regInput = Brovine.newRegInput("#regFilter", function() {
       geneList.fnDraw();
    });
+
+   $.fn.dataTableExt.afnFiltering.push(regInput.filter("geneList", 4));
 });
