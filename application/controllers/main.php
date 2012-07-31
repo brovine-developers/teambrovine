@@ -57,6 +57,8 @@ class Main extends CI_Controller {
       $this->_initPage();
       $this->template->write_view('content', 'geneSumm.php');
       $this->template->add_js('js/geneSummary.js');
+         $this->template->add_js('js/jquery.tokeninput.js');
+         $this->template->add_js('js/tokeninput-loader.js');
       $this->_renderPage('Gene Summary');
    }
    
