@@ -67,11 +67,12 @@ class Main extends CI_Controller {
       $this->_renderPage('Transcription Factor Summary');
    }
 
-   /*Ryan*/
    public function GeneSearch() {
 	$this->_initPage();
 	$this->template->write_view('content', 'geneSearch.php');
 	$this->template->add_js('js/geneSearch.js');
+         $this->template->add_js('js/jquery.tokeninput.js');
+         $this->template->add_js('js/tokeninput-loader.js');
 	$this->_renderPage('Gene Search');
    }
    
