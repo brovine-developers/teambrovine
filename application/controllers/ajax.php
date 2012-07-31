@@ -399,7 +399,7 @@ EOT;
 
 
       $sql = <<<EOT
-       SELECT distinct celltype, species, label, genename, geneabbrev, study, beginning, length, sense
+       SELECT distinct celltype, species, label, genename, geneabbrev, study, beginning, length, sense, regulation
        FROM factor_matches
          inner join regulatory_sequences using (seqid)
          inner join genes using (geneid)
@@ -459,10 +459,11 @@ EOT;
             'genename' => $row->genename,
             'geneabbrev' => $row->geneabbrev,
             'study' => $row->study,
-            'studyPretty' => str_replace('/', ' /<br>', $row->study),
+            'studyPretty' => str_replace('/', ', ', $row->study),
             'beginning' => $row->beginning,
             'length' => $row->length,
-            'sense' => $row->sense
+            'sense' => $row->sense,
+            'regulation' => $row->regulation
          );
       }
       

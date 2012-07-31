@@ -1,3 +1,5 @@
+var Brovine = Brovine || {};
+
 function updateTFSummary() {
    jQuery.get("ajax/getTFSummary",
       function(data) {
@@ -77,11 +79,12 @@ function setupTFSummary() {
          {"sTitle": "Comparison", "mDataProp": "celltype"},
          {"sTitle": "Experiment", "mDataProp": "label"},
          {"sTitle": "Gene Name", "mDataProp": "genename"},
-         {"sTitle": "Model", "mDataProp": "study"},
+         {"sTitle": "Model", "mDataProp": "studyPretty"},
          {"sTitle": "Species", "mDataProp": "species"},
          {"sTitle": "Beginning", "mDataProp": "beginning"},
          {"sTitle": "Sense", "mDataProp": "sense"},
-         {"sTitle": "Length", "mDataProp": "length"}
+         {"sTitle": "Length", "mDataProp": "length"},
+         {"sTitle": "Regulation", "mDataProp": "regulation"}
       ]
 
    });
@@ -92,5 +95,10 @@ function setupTFSummary() {
 $(document).ready(function() {
    setupTFSummary();
    setupPlaceholders();
+   var regInput = Brovine.newRegInput("#regFilter", function() {
+      tfOccur.fnDraw();
+   });
+
+   $.fn.dataTableExt.afnFiltering.push(regInput.filter("tf_occur", 8));
 });
 
