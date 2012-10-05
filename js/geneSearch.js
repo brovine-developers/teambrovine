@@ -1,5 +1,7 @@
-var transFacs = new Array();
-var studies = new Array();
+var Brovine = Brovine || {};
+
+var transFacs = [];
+var studies = [];
 var species;
 var comparisontypeid;
 var experiment;
@@ -301,7 +303,13 @@ function fixAllTableWidths() {
 }
 
 $(window).load(function() {
+   var regInput = Brovine.newRegInput("#regFilter", function() {
+      geneFoundList.fnDraw();
+   });
+
    setupExperimentHierarchy();
    setupPlaceholders();
    fixAllTableWidths();
+   
+   $.fn.dataTableExt.afnFiltering.push(regInput.filter("geneFoundList", 1));
 });

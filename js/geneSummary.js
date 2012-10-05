@@ -1,3 +1,5 @@
+var Brovine = Brovine || {};
+
 function updateGeneSummary() {
    jQuery.get("ajax/getGeneSummary",
       function(data) {
@@ -96,4 +98,10 @@ function setupGeneSummary() {
 $(document).ready(function() {
    setupGeneSummary();
    setupPlaceholders();
+
+   var regInput = Brovine.newRegInput("#regFilter", function() {
+      expsPerGene.fnDraw();
+   });
+
+   $.fn.dataTableExt.afnFiltering.push(regInput.filter("experimentGene", 3));
 });
