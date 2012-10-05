@@ -31,6 +31,7 @@ Brovine.newRegInput = function (elem, func) {
       onAdd: fireToken,
       onDelete: fireToken,
       theme: 'facebook',
+      preventDuplicates: true,
       hintText: 'Start typing a Regulation'
    });
 
