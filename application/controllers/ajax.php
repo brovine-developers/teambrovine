@@ -45,7 +45,7 @@ class Ajax extends CI_Controller {
          $guess = '';
 
       $sql = <<<EOT
-         SELECT DISTINCT regulation
+         SELECT DISTINCT(regulation), MAX(geneid) as gid
          FROM genes
          WHERE regulation LIKE '%$guess%'
            AND hidden <= $showHidden
@@ -54,11 +54,15 @@ EOT;
       $query = $this->db->query($sql);
       $ret = $query->result();
       $out = array();
+      $i = 0;
 
       foreach ($ret as $row) {
          $out[] = array(
+            'id' => $row->gid,
             'name' => $row->regulation
          );
+
+         $i++;
       }
       
       echo json_encode($out);
