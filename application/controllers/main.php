@@ -50,6 +50,7 @@ class Main extends CI_Controller {
       $this->template->add_js('js/jquery.tokeninput.js');
       $this->template->add_js('js/tokeninput-loader.js');
       $this->template->add_js('js/experimentHierarchy.js');
+      $this->template->add_js('js/scripture.js');
       $this->_renderPage('Experiment Hierarchy');
    }
 

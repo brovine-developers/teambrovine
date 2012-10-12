@@ -35,6 +35,14 @@ class Ajax extends CI_Controller {
       echo json_encode($sets);
    }
 
+   public function saveFile() {
+      $filename = $this->input->get_post('filename');
+      $data = $this->input->get_post('data');
+
+      $this->load->helper('download');
+      force_download($filename, $data);
+   }
+
    public function getRegHints() {
       $this->load->database();
       $showHidden = $this->showHidden();

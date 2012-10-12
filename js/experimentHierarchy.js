@@ -761,6 +761,17 @@ function setupExperimentHierarchy() {
       ]
    });
 
+   geneCols = [
+      {"sTitle": "Gene", "mDataProp": "geneabbrev"},
+      {"sTitle": "Chr", "mDataProp": "chromosome"},
+      {"sTitle": "Start", "mDataProp": "start"},
+      {"sTitle": "End", "mDataProp": "end"},
+      {"sTitle": "Reg", "mDataProp": "regulation"},
+      {"sTitle": "Factors", "mDataProp": "numFactors"},
+      {"sTitle": "Geneid", "mDataProp": "geneid", "bVisible": false},
+      {"sTitle": "GeneName", "mDataProp": "genename", "bVisible": false}
+   ];
+
    geneList = $('#geneList').dataTable({
       "sDom": "<'row'<'span8'f>r>t<'row'<'span3'i>>",
       "bPaginate": false,
@@ -783,6 +794,11 @@ function setupExperimentHierarchy() {
       ]
    
    });
+
+   factorCols = [
+      {"sTitle": "Factor", "mDataProp": "transfac"},
+      {"sTitle": "(#) Occurs", "mDataProp": "numTimes"}
+   ];
    
    factorList = $('#factorList').dataTable({
       "sDom": "<'row'<'span4'f>r>t<'row'<'span4'i>>",
@@ -798,8 +814,6 @@ function setupExperimentHierarchy() {
          {"sTitle": "AllRow", "mDataProp": "allRow", "bVisible": false}
       ],
       "aaSortingFixed": [[2,'desc']]
-      
-   
    });
    
    sequenceList = $('#sequenceList').dataTable({
@@ -1069,6 +1083,58 @@ $(document).ready(function() {
 
 // Work around for chrome. Sometimes, it doesn't properly fix tables.
 $(window).load(function() {
+   var dataToCsv = function (data, objs) {
+      var ans = "";
+      var start = true;
+
+      for (var i = 0; i < data.length; i++) {
+         start = true;
+
+         for (key in objs) {
+            if (!start)
+               ans += ", ";
+
+            ans += data[i][objs[key].mDataProp];
+            start = false;
+         }
+
+         ans += "\n";
+      }
+
+      return ans;
+   }
+
+   var headerCreate = function (objs) {
+      var ans = "";
+
+      for (key in objs)
+         ans += objs[key].mDataProp + ", ";
+
+      return ans + "\n";
+   }
+
+   $("#geneExport").localDownload({
+      "func": function () {
+         var headers = headerCreate(geneCols);
+         var data = dataToCsv(geneList.fnGetData(), geneCols);
+         return data && data.length != 0 ? headers + data : false;
+      },
+      "filename": function () {
+         return "gene-data-" + getSelectedRowData(experimentList).label + ".csv";
+      }
+   });
+
+   $("#factorExport").localDownload({
+      "func": function () {
+         var headers = headerCreate(factorCols);
+         var data = dataToCsv(factorList.fnGetData(), factorCols);
+         return data && data.length != 0 ? headers + data : false;
+      },
+      "filename": function () {
+         return "factor-data-" + getSelectedRowData(geneList).geneabbrev + ".csv";
+      }
+   });
+
    fixAllTableWidths();
 
    var regInput = Brovine.newRegInput("#regFilter", function() {

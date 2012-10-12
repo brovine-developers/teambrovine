@@ -84,6 +84,11 @@
    <div class="span8">
       <a class="btn btn-warning disabled" id="editGene"><i class="icon-pencil icon-white"></i> Edit Gene</a>
       <a class="btn btn-danger disabled hideButton" id="hideGene"><i class="icon-minus-sign icon-white"></i><span> Hide Gene</span></a>
+      <a class="btn" id="geneExport"><i class="icon-download"></i>Export Data</a>
+   </div>
+
+   <div class="span4">
+      <a class="btn" id="factorExport"><i class="icon-download"></i>Export Data</a>
    </div>
 </div>
 <div class="row">
