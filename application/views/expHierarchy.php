@@ -56,18 +56,10 @@
    </div>
 </div>
 <div class="row">
-   <div class="span8">
-         <div class="row" id="geneFilterOptions">
-            <label class="radio span2">
-               <input type="radio" name="regulationRadio" value="all" checked> Show All Genes
-            </label>
-            <label class="radio span2">
-               <input type="radio" name="regulationRadio" value="up"> Up Regulated Only
-            </label>
-            <label class="radio span2">
-               <input type="radio" name="regulationRadio" value="down"> Down Regulated Only
-            </label>
-         </div>
+   <div class="span2"><h4>Filter by Regulation: </h4></div>
+   <div class="span6">
+         <input type="text" id="regFilter" placeholder="Search for Regulations" />
+         <br />
    </div>
 </div>
 <div class="row">
@@ -92,6 +84,11 @@
    <div class="span8">
       <a class="btn btn-warning disabled" id="editGene"><i class="icon-pencil icon-white"></i> Edit Gene</a>
       <a class="btn btn-danger disabled hideButton" id="hideGene"><i class="icon-minus-sign icon-white"></i><span> Hide Gene</span></a>
+      <a class="btn" id="geneExport"><i class="icon-download"></i>Export Data</a>
+   </div>
+
+   <div class="span4">
+      <a class="btn" id="factorExport"><i class="icon-download"></i>Export Data</a>
    </div>
 </div>
 <div class="row">

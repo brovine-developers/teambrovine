@@ -1,4 +1,5 @@
 var curGeneid;
+var regInput;
 var geneModal;
 var sequenceModal;
 var matchModal;
@@ -6,6 +7,7 @@ var comparisonModal;
 var experimentModal;
 var showHidden;
 var objShowHidden;
+var Brovine = Brovine || {};
 
 function getTimestamp() {
    // http://www.perturb.org/display/786_Javascript_Unixtime.html
@@ -70,7 +72,8 @@ function getSelectedRowData(table) {
 function colorDeletedAndEdited(nRow, aData) {
    if (aData.hidden == "1") {
       $(nRow).addClass('hiddenRow');
-   } else if (aData.date_edited > 0) {
+   } 
+   else if (aData.date_edited > 0) {
       $(nRow).addClass('editedRow');
    }
 }
@@ -753,12 +756,21 @@ function setupExperimentHierarchy() {
       },
       "aoColumns": [
          {"sTitle": "Experiment", "mDataProp": "label"},
-         {"sTitle": "Genes", "mDataProp": "genecount_all"},
-         {"sTitle": "Up", "mDataProp": "genecount_up"},
-         {"sTitle": "Down", "mDataProp": "genecount_down"},
+         {"sTitle": "Gene Count", "mDataProp": "genecount_all"},
          {"sTitle": "Experimentid", "mDataProp": "experimentid", "bVisible": false}
       ]
    });
+
+   geneCols = [
+      {"sTitle": "Gene", "mDataProp": "geneabbrev"},
+      {"sTitle": "Chr", "mDataProp": "chromosome"},
+      {"sTitle": "Start", "mDataProp": "start"},
+      {"sTitle": "End", "mDataProp": "end"},
+      {"sTitle": "Reg", "mDataProp": "regulation"},
+      {"sTitle": "Factors", "mDataProp": "numFactors"},
+      {"sTitle": "Geneid", "mDataProp": "geneid", "bVisible": false},
+      {"sTitle": "GeneName", "mDataProp": "genename", "bVisible": false}
+   ];
 
    geneList = $('#geneList').dataTable({
       "sDom": "<'row'<'span8'f>r>t<'row'<'span3'i>>",
@@ -782,6 +794,11 @@ function setupExperimentHierarchy() {
       ]
    
    });
+
+   factorCols = [
+      {"sTitle": "Factor", "mDataProp": "transfac"},
+      {"sTitle": "(#) Occurs", "mDataProp": "numTimes"}
+   ];
    
    factorList = $('#factorList').dataTable({
       "sDom": "<'row'<'span4'f>r>t<'row'<'span4'i>>",
@@ -797,8 +814,6 @@ function setupExperimentHierarchy() {
          {"sTitle": "AllRow", "mDataProp": "allRow", "bVisible": false}
       ],
       "aaSortingFixed": [[2,'desc']]
-      
-   
    });
    
    sequenceList = $('#sequenceList').dataTable({
@@ -818,12 +833,6 @@ function setupExperimentHierarchy() {
          {"sTitle": "Lq", "mDataProp": "lq", "sType": "numeric"},
          {"sTitle": "Ld", "mDataProp": "ld", "sType": "numeric"},
          {"sTitle": "Lpv", "mDataProp": "lpv", "sType": "numeric"},
-         /*
-         {"sTitle": "Sc", "mDataProp": "sc", "sType": "numeric"},
-         {"sTitle": "Sm", "mDataProp": "sm", "sType": "numeric"},
-         {"sTitle": "Spv", "mDataProp": "spv", "sType": "numeric"},
-         {"sTitle": "Ppv", "mDataProp": "ppv", "sType": "numeric"},
-         */
          {"sTitle": "Sequence", "mDataProp": "sequence"},
          {"sTitle": "Factor", "mDataProp": "transfac"},
          {"sTitle": "Study", "mDataProp": "studyPretty"},
@@ -915,27 +924,6 @@ function setupExperimentHierarchy() {
    
    $("#factorList_wrapper tr th:contains('#')").tooltip({
       title: "Number of matching regulatory elements"
-   });
-
-   // Setup Gene filter
-   var geneFilterVal = $("#geneFilterOptions input[type='radio']:checked").val();
-
-   var filterGeneList = function(oSettings, aData, iDataIndex) {
-      if (oSettings.sTableId != "geneList") {
-         return true;
-      }
-
-      // aData[4] is regulation.
-      return (geneFilterVal == 'all' || geneFilterVal == aData[4]);
-   };
-
-   $.fn.dataTableExt.afnFiltering.push(filterGeneList);
-
-   // Add radio button listener to redraw table.
-   $('#geneFilterOptions input').change(function() {
-      // Find button val outside the loop for speed purposes.
-      geneFilterVal = $("#geneFilterOptions input[type='radio']:checked").val();
-      geneList.fnDraw();
    });
 
    // Setup Regulatory Sequence filter
@@ -1095,5 +1083,63 @@ $(document).ready(function() {
 
 // Work around for chrome. Sometimes, it doesn't properly fix tables.
 $(window).load(function() {
+   var dataToCsv = function (data, objs) {
+      var ans = "";
+      var start = true;
+
+      for (var i = 0; i < data.length; i++) {
+         start = true;
+
+         for (key in objs) {
+            if (!start)
+               ans += ", ";
+
+            ans += data[i][objs[key].mDataProp];
+            start = false;
+         }
+
+         ans += "\n";
+      }
+
+      return ans;
+   }
+
+   var headerCreate = function (objs) {
+      var ans = "";
+
+      for (key in objs)
+         ans += objs[key].mDataProp + ", ";
+
+      return ans + "\n";
+   }
+
+   $("#geneExport").localDownload({
+      "func": function () {
+         var headers = headerCreate(geneCols);
+         var data = dataToCsv(geneList.fnGetData(), geneCols);
+         return data && data.length != 0 ? headers + data : false;
+      },
+      "filename": function () {
+         return "gene-data-" + getSelectedRowData(experimentList).label + ".csv";
+      }
+   });
+
+   $("#factorExport").localDownload({
+      "func": function () {
+         var headers = headerCreate(factorCols);
+         var data = dataToCsv(factorList.fnGetData(), factorCols);
+         return data && data.length != 0 ? headers + data : false;
+      },
+      "filename": function () {
+         return "factor-data-" + getSelectedRowData(geneList).geneabbrev + ".csv";
+      }
+   });
+
    fixAllTableWidths();
+
+   var regInput = Brovine.newRegInput("#regFilter", function() {
+      geneList.fnDraw();
+   });
+
+   $.fn.dataTableExt.afnFiltering.push(regInput.filter("geneList", 4));
 });

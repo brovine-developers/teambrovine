@@ -47,7 +47,10 @@ class Main extends CI_Controller {
       $this->template->write_view('content', 'expHierarchy.php', array(
          'showHidden' => $showHidden   
       ));
+      $this->template->add_js('js/jquery.tokeninput.js');
+      $this->template->add_js('js/tokeninput-loader.js');
       $this->template->add_js('js/experimentHierarchy.js');
+      $this->template->add_js('js/scripture.js');
       $this->_renderPage('Experiment Hierarchy');
    }
 
@@ -55,6 +58,8 @@ class Main extends CI_Controller {
       $this->_initPage();
       $this->template->write_view('content', 'geneSumm.php');
       $this->template->add_js('js/geneSummary.js');
+      $this->template->add_js('js/jquery.tokeninput.js');
+      $this->template->add_js('js/tokeninput-loader.js');
       $this->_renderPage('Gene Summary');
    }
    
@@ -62,14 +67,17 @@ class Main extends CI_Controller {
       $this->_initPage();
       $this->template->write_view('content', 'tfSumm.php');
       $this->template->add_js('js/tfSummary.js');
+      $this->template->add_js('js/jquery.tokeninput.js');
+      $this->template->add_js('js/tokeninput-loader.js');
       $this->_renderPage('Transcription Factor Summary');
    }
 
-   /*Ryan*/
    public function GeneSearch() {
 	$this->_initPage();
 	$this->template->write_view('content', 'geneSearch.php');
 	$this->template->add_js('js/geneSearch.js');
+         $this->template->add_js('js/jquery.tokeninput.js');
+         $this->template->add_js('js/tokeninput-loader.js');
 	$this->_renderPage('Gene Search');
    }
    
@@ -90,6 +98,8 @@ class Main extends CI_Controller {
       $this->template->add_css('css/jquery.dataTables.css');
       $this->template->add_css('bootstrap/css/bootstrap.min.css');
       $this->template->add_css('css/DT_bootstrap.css');
+      $this->template->add_css('css/token-input-facebook.css');
+      $this->template->add_css('css/token-input.css');
       $this->template->add_js('js/jquery-1.7.1.min.js');
       $this->template->add_js('bootstrap/js/bootstrap.js');
       $this->template->add_js('js/jquery.dataTables.min.js');
