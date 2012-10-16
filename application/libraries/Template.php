@@ -427,20 +427,29 @@ class CI_Template {
     * @param   string   script to import or embed
     * @param   string  'import' to load external file or 'embed' to add as-is
     * @param   boolean  TRUE to use 'defer' attribute, FALSE to exclude it
+    * @param   boolean  TRUE to use auto-versioning, FALSE otherwise
     * @return  TRUE on success, FALSE otherwise
     */
-   
-   function add_js($script, $type = 'import', $defer = FALSE)
+
+   function add_js($script, $type = 'import', $defer = FALSE, $autoVersion = FALSE)
    {
       $success = TRUE;
       $js = NULL;
       
       $this->CI->load->helper('url');
+      $this->CI->load->helper('autoVersioning');
+      $filepath = "";
+
+      if ($autoVersion) {
+         $filepath = base_url() . version($script);
+      }
+      else {
+         $filepath = base_url() . $script;
+      }
       
       switch ($type)
       {
          case 'import':
-            $filepath = base_url() . $script;
             $js = '<script type="text/javascript" src="'. $filepath .'"';
             if ($defer)
             {
@@ -476,6 +485,24 @@ class CI_Template {
    }
    
    // --------------------------------------------------------------------
+
+   /**
+    * Dynamically include javascript in the template - with auto-versioning
+    * 
+    * NOTE: This function does NOT check for existence of .js file
+    *
+    * @access  public
+    * @param   string   script to import or embed
+    * @param   string  'import' to load external file or 'embed' to add as-is
+    * @param   boolean  TRUE to use 'defer' attribute, FALSE to exclude it
+    * @return  TRUE on success, FALSE otherwise
+    */
+
+   function add_versioned_js($script, $type = 'import', $defer = FALSE) {
+      $this->add_js($script, $type, $defer, TRUE);
+   }
+   
+   // --------------------------------------------------------------------
    
    /**
     * Dynamically include CSS in the template
@@ -486,16 +513,25 @@ class CI_Template {
     * @param   string   CSS file to link, import or embed
     * @param   string  'link', 'import' or 'embed'
     * @param   string  media attribute to use with 'link' type only, FALSE for none
+    * @param   boolean  TRUE to use auto-versioning, FALSE otherwise
     * @return  TRUE on success, FALSE otherwise
     */
-   
-   function add_css($style, $type = 'link', $media = FALSE)
+
+   function add_css($style, $type = 'link', $media = FALSE, $autoVersion = FALSE)
    {
       $success = TRUE;
       $css = NULL;
       
       $this->CI->load->helper('url');
-      $filepath = base_url() . $style;
+      $this->CI->load->helper('autoVersioning');
+      $filepath = "";
+
+      if ($autoVersion) {
+         $filepath = base_url() . version($style);
+      }
+      else {
+         $filepath = base_url() . $style;
+      }
       
       switch ($type)
       {
@@ -532,6 +568,25 @@ class CI_Template {
       }
       
       return $success;
+   }
+
+   // --------------------------------------------------------------------
+
+   /**
+    * Dynamically include CSS in the template - with auto-versioning
+    * 
+    * NOTE: This function does NOT check for existence of .css file
+    *
+    * @access  public
+    * @param   string   CSS file to link, import or embed
+    * @param   string  'link', 'import' or 'embed'
+    * @param   string  media attribute to use with 'link' type only, FALSE for none
+    * @return  TRUE on success, FALSE otherwise
+    */
+
+   function add_versioned_css($style, $type = 'link', $media = FALSE)
+   {
+      $this->add_css($style, $type, $media, TRUE);
    }
       
    // --------------------------------------------------------------------

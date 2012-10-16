@@ -26,14 +26,14 @@ class Main extends CI_Controller {
       // Just keep adding views. Make sure each view is in a tab-pane div
       // with the proper link in the header.
       $this->template->write_view('content', 'home.php');
-      $this->template->add_js('js/mainPage.js');
+      $this->template->add_versioned_js('js/mainPage.js');
       $this->_renderPage('Home');
 	}
 
    public function Upload() {
       $this->_initPage();
       $this->template->write_view('content', 'upload.php');
-      $this->template->add_js('js/upload.js');
+      $this->template->add_versioned_js('js/upload.js');
       $this->_renderPage('Upload');
 
    }
@@ -47,44 +47,44 @@ class Main extends CI_Controller {
       $this->template->write_view('content', 'expHierarchy.php', array(
          'showHidden' => $showHidden   
       ));
-      $this->template->add_js('js/jquery.tokeninput.js');
-      $this->template->add_js('js/tokeninput-loader.js');
-      $this->template->add_js('js/experimentHierarchy.js');
-      $this->template->add_js('js/scripture.js');
+      $this->template->add_versioned_js('js/jquery.tokeninput.js');
+      $this->template->add_versioned_js('js/tokeninput-loader.js');
+      $this->template->add_versioned_js('js/experimentHierarchy.js');
+      $this->template->add_versioned_js('js/scripture.js');
       $this->_renderPage('Experiment Hierarchy');
    }
 
    public function GeneSummary() {
       $this->_initPage();
       $this->template->write_view('content', 'geneSumm.php');
-      $this->template->add_js('js/geneSummary.js');
-      $this->template->add_js('js/jquery.tokeninput.js');
-      $this->template->add_js('js/tokeninput-loader.js');
+      $this->template->add_versioned_js('js/geneSummary.js');
+      $this->template->add_versioned_js('js/jquery.tokeninput.js');
+      $this->template->add_versioned_js('js/tokeninput-loader.js');
       $this->_renderPage('Gene Summary');
    }
    
    public function TranscriptionFactorSummary() {
       $this->_initPage();
       $this->template->write_view('content', 'tfSumm.php');
-      $this->template->add_js('js/tfSummary.js');
-      $this->template->add_js('js/jquery.tokeninput.js');
-      $this->template->add_js('js/tokeninput-loader.js');
+      $this->template->add_versioned_js('js/tfSummary.js');
+      $this->template->add_versioned_js('js/jquery.tokeninput.js');
+      $this->template->add_versioned_js('js/tokeninput-loader.js');
       $this->_renderPage('Transcription Factor Summary');
    }
 
    public function GeneSearch() {
 	$this->_initPage();
 	$this->template->write_view('content', 'geneSearch.php');
-	$this->template->add_js('js/geneSearch.js');
-         $this->template->add_js('js/jquery.tokeninput.js');
-         $this->template->add_js('js/tokeninput-loader.js');
+	$this->template->add_versioned_js('js/geneSearch.js');
+         $this->template->add_versioned_js('js/jquery.tokeninput.js');
+         $this->template->add_versioned_js('js/tokeninput-loader.js');
 	$this->_renderPage('Gene Search');
    }
    
    public function TfPop() {
       $this->_initPage();
       $this->template->write_view('content', 'tfPop.php');
-      $this->template->add_js('js/tfPop.js');
+      $this->template->add_versioned_js('js/tfPop.js');
       $this->_renderPage('TF Popularity');
    }
    
@@ -94,19 +94,19 @@ class Main extends CI_Controller {
     * @author Sterling Hirsh
     */
    private function _initPage() {
-      $this->template->add_css('css/mainstyles.css');
-      $this->template->add_css('css/jquery.dataTables.css');
-      $this->template->add_css('bootstrap/css/bootstrap.min.css');
-      $this->template->add_css('css/DT_bootstrap.css');
-      $this->template->add_css('css/token-input-facebook.css');
-      $this->template->add_css('css/token-input.css');
-      $this->template->add_js('js/jquery-1.7.1.min.js');
-      $this->template->add_js('bootstrap/js/bootstrap.js');
-      $this->template->add_js('js/jquery.dataTables.min.js');
-      $this->template->add_js('js/DT_bootstrap.js');
-      $this->template->add_js('js/swfobject.js');
-      $this->template->add_js('js/jquery.uploadify.v2.1.4.min.js');
-      $this->template->add_js('js/common.js');
+      $this->template->add_versioned_css('css/mainstyles.css');
+      $this->template->add_versioned_css('css/jquery.dataTables.css');
+      $this->template->add_versioned_css('bootstrap/css/bootstrap.min.css');
+      $this->template->add_versioned_css('css/DT_bootstrap.css');
+      $this->template->add_versioned_css('css/token-input-facebook.css');
+      $this->template->add_versioned_css('css/token-input.css');
+      $this->template->add_versioned_js('js/jquery-1.7.1.min.js');
+      $this->template->add_versioned_js('bootstrap/js/bootstrap.js');
+      $this->template->add_versioned_js('js/jquery.dataTables.min.js');
+      $this->template->add_versioned_js('js/DT_bootstrap.js');
+      $this->template->add_versioned_js('js/swfobject.js');
+      $this->template->add_versioned_js('js/jquery.uploadify.v2.1.4.min.js');
+      $this->template->add_versioned_js('js/common.js');
    }
 
    /**
