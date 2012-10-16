@@ -33,7 +33,6 @@
       </table>
    </div>
 </div>
-
 <div class="row ruleRow">
  <div class ="span12">
       <h6>Ctrl+Click or AppleKey+Click to add multiple Transfacs.</h6>
@@ -86,6 +85,14 @@
             </div>
          </fieldset>
       </form>
+   </div>
+</div>
+
+<div class="row">
+   <div class="span2"><h4>Filter by Regulation: </h4></div>
+   <div class="span6">
+         <input type="text" id="regFilter" placeholder="Search for Regulations" />
+         <br />
    </div>
 </div>
 

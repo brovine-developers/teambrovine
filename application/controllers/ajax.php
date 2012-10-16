@@ -35,6 +35,47 @@ class Ajax extends CI_Controller {
       echo json_encode($sets);
    }
 
+   public function saveFile() {
+      $filename = $this->input->get_post('filename');
+      $data = $this->input->get_post('data');
+
+      $this->load->helper('download');
+      force_download($filename, $data);
+   }
+
+   public function getRegHints() {
+      $this->load->database();
+      $showHidden = $this->showHidden();
+
+      $guess = $this->input->get('q');
+
+      if (!$guess)
+         $guess = '';
+
+      $sql = <<<EOT
+         SELECT DISTINCT(regulation), MAX(geneid) as gid
+         FROM genes
+         WHERE regulation LIKE '%$guess%'
+           AND hidden <= $showHidden
+EOT;
+
+      $query = $this->db->query($sql);
+      $ret = $query->result();
+      $out = array();
+      $i = 0;
+
+      foreach ($ret as $row) {
+         $out[] = array(
+            'id' => $row->gid,
+            'name' => $row->regulation
+         );
+
+         $i++;
+      }
+      
+      echo json_encode($out);
+   }
+
    // Returns 1 when we should show hidden, 0 otherwise.
    public function showHidden() {
       return $this->input->get_post('showHidden') ? 1 : 0;
@@ -140,19 +181,7 @@ EOT;
          FROM genes
          WHERE genes.experimentid = experiments.experimentid
          AND hidden <= $showHidden
-      ) as genecount_all,
-       (SELECT COUNT(*)
-         FROM genes
-         WHERE genes.experimentid = experiments.experimentid
-         AND genes.regulation = 'up'
-         AND hidden <= $showHidden
-      ) as genecount_up,
-       (SELECT COUNT(*)
-         FROM genes
-         WHERE genes.experimentid = experiments.experimentid
-         AND genes.regulation = 'down'
-         AND hidden <= $showHidden
-      ) as genecount_down
+      ) as genecount_all
       FROM experiments
       WHERE 
       hidden <= $showHidden AND (
@@ -220,23 +249,7 @@ EOT;
       $sql = <<<EOT
        SELECT geneabbrev, genename, chromosome, start, end,
         COUNT(DISTINCT e.comparisontypeid) as numComps,
-        COUNT(g.geneid) as numExps, geneid,
-        (SELECT COUNT(DISTINCT experimentid)
-         FROM genes 
-         WHERE regulation = 'down'
-         AND genename = g.genename) as numExpsDown,
-        (SELECT COUNT(DISTINCT experimentid)
-         FROM genes 
-         WHERE regulation = 'up'
-         AND genename = g.genename) as numExpsUp,
-        (SELECT COUNT(DISTINCT comparisontypeid)
-         FROM genes INNER JOIN experiments USING (experimentid)
-         WHERE regulation = 'down'
-         AND genename = g.genename) as numCompsDown,
-        (SELECT COUNT(DISTINCT comparisontypeid)
-         FROM genes INNER JOIN experiments USING (experimentid)
-         WHERE regulation = 'up'
-         AND genename = g.genename) as numCompsUp
+        COUNT(g.geneid) as numExps, geneid
        FROM genes g INNER JOIN experiments e USING (experimentid)
        WHERE g.hidden <= $showHidden AND e.hidden <= $showHidden
        GROUP BY genename
@@ -398,7 +411,7 @@ EOT;
 
 
       $sql = <<<EOT
-       SELECT distinct celltype, species, label, genename, geneabbrev, study, beginning, length, sense
+       SELECT distinct celltype, species, label, genename, geneabbrev, study, beginning, length, sense, regulation
        FROM factor_matches
          inner join regulatory_sequences using (seqid)
          inner join genes using (geneid)
@@ -458,10 +471,11 @@ EOT;
             'genename' => $row->genename,
             'geneabbrev' => $row->geneabbrev,
             'study' => $row->study,
-            'studyPretty' => str_replace('/', ' /<br>', $row->study),
+            'studyPretty' => str_replace('/', ', ', $row->study),
             'beginning' => $row->beginning,
             'length' => $row->length,
-            'sense' => $row->sense
+            'sense' => $row->sense,
+            'regulation' => $row->regulation
          );
       }
       
