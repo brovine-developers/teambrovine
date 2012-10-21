@@ -475,7 +475,7 @@ function setupExperimentHierarchy() {
 
    // Setup tooltips on gene rows in the sequence table.
    $('#sequenceList').tooltip({
-      selector: 'td:first-child',
+      selector: 'td:nth-child(2)',
       title: function() {
          if ($(this).hasClass('dataTables_empty')) {
             return "Select a factor first.";
