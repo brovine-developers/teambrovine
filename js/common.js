@@ -10,6 +10,9 @@
  *              rows selected.
  */
 function updateMultiselectList(table, id, loc, params, clears, calls) {
+   clears();
+   table.fnClearTable();
+
    jQuery.get("ajax/" + loc,
       params,
       function(data) {
@@ -27,8 +30,6 @@ function updateMultiselectList(table, id, loc, params, clears, calls) {
                var rowData = table.fnGetData(this);
                specs[i] = rowData[id];
             });
-
-            clears();
 
             if (specs.length > 0) {
                calls(specs);

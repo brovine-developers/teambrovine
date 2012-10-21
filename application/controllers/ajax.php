@@ -211,23 +211,40 @@ EOT;
    public function getGeneList($asArray = false, $experimentid = false) {
       $this->load->database();
       $experimentid = $experimentid ?: $this->input->get('experimentid');
+
+      if ($experimentid) {
+         $experimentid = (array) $experimentid;
+      } else {
+         $experimentid = array();
+      }
+
       $showHidden = $this->showHidden();
       // Count(DISTINCT) is slow, but it works well here.
       $sql = <<<EOT
        SELECT geneid, genes.date_edited, FROM_UNIXTIME(genes.date_edited) as date_edited_pretty,
         genename, geneabbrev, chromosome, genes.hidden,
-        start, end, regulation, experimentid,
+        start, end, regulation, experimentid, species, celltype, label,
         COUNT(DISTINCT transfac, study) as numFactors
        FROM genes
          INNER JOIN regulatory_sequences USING (geneid)
          INNER JOIN factor_matches USING(seqid)
-       WHERE experimentid = ?
-       AND genes.hidden <= $showHidden
-       AND regulatory_sequences.hidden <= $showHidden
-       AND factor_matches.hidden <= $showHidden
-       GROUP BY geneid
+         INNER JOIN experiments USING(experimentid)
+         INNER JOIN comparison_types USING(comparisontypeid)
+       WHERE (
 EOT;
-      $query = $this->db->query($sql, array($experimentid));
+
+      for ($i = 0; $i < count($experimentid); $i++) {
+         if ($i != 0)
+            $sql .= " OR ";
+         $sql .= "experimentid = ?";
+      }
+       
+      $sql .=  ") AND genes.hidden <= $showHidden 
+       AND regulatory_sequences.hidden <= $showHidden 
+       AND factor_matches.hidden <= $showHidden 
+       GROUP BY geneid";
+
+      $query = $this->db->query($sql, $experimentid);
       $results = $query->result();
 
       foreach ($results as $result) {
@@ -486,26 +503,56 @@ EOT;
       $this->load->database();
       $geneid = $geneid ?: $this->input->get('geneid');
       $expid = $this->input->get('expid');
+
+      if ($expid) {
+         $expid = (array) $expid;
+      } else {
+         $expid = array();
+      }
+
+      if ($geneid) {
+         $geneid = (array) $geneid;
+      } else {
+         $geneid = array();
+      }
+
       $showHidden = $this->showHidden();
       $sql = <<<EOT
        SELECT transfac, COUNT(seqid) as numTimes,
-       (MIN(factor_matches.hidden) || MIN(regulatory_sequences.hidden)) as hidden
+        (MIN(factor_matches.hidden) || MIN(regulatory_sequences.hidden)) as hidden,
+        COUNT(DISTINCT geneid) as numGenes
        FROM regulatory_sequences
        INNER JOIN genes using(geneid)
        INNER JOIN factor_matches USING(seqid)
        INNER JOIN experiments using(experimentid)
-       WHERE geneid = ?
+       WHERE (
 EOT;
 
-      if ($expid)
-         $sql .= " AND experimentid = ? ";
+      for ($i = 0; $i < count($geneid); $i++) {
+         if ($i != 0)
+            $sql .= " OR ";
+         $sql .= "geneid = ?";
+      }
       
-      $sql .= <<<EOT
-       AND regulatory_sequences.hidden <= $showHidden
+      $sql .= " ) ";
+
+      if ($expid) {
+        $sql .= " AND ( ";
+
+        for ($i = 0; $i < count($expid); $i++) {
+           if ($i != 0)
+              $sql .= " OR ";
+           $sql .= "experimentid = ?";
+        }
+
+        $sql .= " ) ";
+      }
+      
+      $sql .= " AND regulatory_sequences.hidden <= $showHidden
        AND factor_matches.hidden <= $showHidden
-       GROUP BY transfac
-EOT;
-      $query = $this->db->query($sql, array($geneid, $expid));
+       GROUP BY transfac";
+
+      $query = $this->db->query($sql, array_merge($geneid, $expid));
 
       $result = $query->result_array();
       foreach ($result as &$row) {
@@ -514,20 +561,45 @@ EOT;
 
       // Get All Count
       $sql = <<<EOT
-       SELECT COUNT(seqid) as numTimes
-       FROM regulatory_sequences INNER JOIN factor_matches USING(seqid)
-       WHERE geneid = ?
-       AND regulatory_sequences.hidden <= $showHidden
-       AND factor_matches.hidden <= $showHidden
-
+       SELECT COUNT(seqid) as numTimes, COUNT(DISTINCT geneid) as numGenes
+       FROM regulatory_sequences 
+       INNER JOIN factor_matches USING(seqid)
+       INNER JOIN genes using(geneid)
+       INNER JOIN experiments using(experimentid)
+       WHERE (
 EOT;
-      $query = $this->db->query($sql, array($geneid));
+
+      for ($i = 0; $i < count($geneid); $i++) {
+         if ($i != 0)
+            $sql .= " OR ";
+         $sql .= "geneid = ?";
+      }
+      
+      $sql .= " ) ";
+
+      if ($expid) {
+        $sql .= " AND ( ";
+
+        for ($i = 0; $i < count($expid); $i++) {
+           if ($i != 0)
+              $sql .= " OR ";
+           $sql .= "experimentid = ?";
+        }
+
+        $sql .= " ) ";
+      }
+
+      $sql .= "AND regulatory_sequences.hidden <= $showHidden
+       AND factor_matches.hidden <= $showHidden";
+
+      $query = $this->db->query($sql, array_merge($geneid, $expid));
       $countInfo = $query->row();
 
       // Add "All" Row.
       $result[] = array(
          'transfac' => 'All',
          'numTimes' => $countInfo->numTimes,
+         'numGenes' => $countInfo->numGenes,
          'allRow' => 1
       );
 
@@ -791,30 +863,25 @@ EOT;
       $sql = <<<EOT
        SELECT sequence
        FROM promoter_sequences 
-       WHERE geneid = ?
+       WHERE 
 EOT;
-      $query = $this->db->query($sql, array($geneid));
-      return $query->row()->sequence;
-   }
 
-   private function calculateSingleSequenceFromPromoter(&$row, $promoter) {
-      $row['sequence'] = substr($promoter, $row['beginning'], $row['length']);
-   }
-
-   /**
-    * This takes the info in regulatory_sequences (begin, length) and 
-    * gets the data out of sequenceData. We might want to store this instead of
-    * calculating it, but it does save space to not duplicate it. Maybe.
-    * If we have to store the promoter anyway, it does. I doubt that we'll
-    * ever hit a point where this is the slow part, especially because we will
-    * likely never do any serious analysis on the sequence while it's in the DB
-    * and it should take very little time to calculate.
-    */
-   private function calculateSequencesFromPromoter(&$sequenceData, $promoter) {
-      // We don't store the individual sequences in the db, so we calculate them here.
-      foreach ($sequenceData as &$row) {
-         $this->calculateSingleSequenceFromPromoter($row, $promoter);
+      for ($i = 0; $i < count($geneid); $i++) {
+         if ($i != 0)
+            $sql .= " OR ";
+         $sql .= "geneid = ?";
       }
+
+      $query = $this->db->query($sql, $geneid);
+      $results = $query->result();
+
+      $sequences = array();
+
+      foreach ($results as $row) {
+         $sequences[] = $row->sequence;
+      }
+
+      return $sequences;
    }
 
    public function getSequenceList($asArray = false, $geneid = false, 
@@ -822,30 +889,61 @@ EOT;
       $this->load->database();
       $geneid = $geneid ?: $this->input->get('geneid');
       $transfac = $transfac ?: $this->input->get('transfac');
-      $study = $study ?: $this->input->get('study');
+
+      if ($transfac) {
+         $transfac = (array) $transfac;
+      } else {
+         $transfac = array();
+      }
+
+      if ($geneid) {
+         $geneid = (array) $geneid;
+      } else {
+         $geneid = array();
+      }
 
       $transfacFilter = '';
-      $params = array($geneid);
 
       // If $allRowSelected, don't apply the filter.
-      if ($transfac != 'All' && $study != '-' && !$allRowSelected) {
-         $transfacFilter = 'AND transfac = ? AND study = ?';
-         $params[] = $transfac;
-         $params[] = $study;
+      if ($transfac[0] != 'All' && !$allRowSelected) {
+         $transfacFilter = ' AND ( ';
+
+          for ($i = 0; $i < count($transfac); $i++) {
+             if ($i != 0)
+                $transfacFilter .= " OR ";
+             $transfacFilter .= "transfac = ?";
+          }
+
+         $transfacFilter .= ' ) ';
       }
 
       $showHidden = $this->showHidden();
 
       $sql = <<<EOT
-      SELECT *, regulatory_sequences.date_edited, 
-       regulatory_sequences.hidden,
-       FROM_UNIXTIME(regulatory_sequences.date_edited) as date_edited_pretty
-       FROM regulatory_sequences INNER JOIN factor_matches USING(seqid)
-       WHERE geneid = ? $transfacFilter
-       AND regulatory_sequences.hidden <= $showHidden
-       AND factor_matches.hidden <= $showHidden
+      SELECT *, r.date_edited, r.hidden, substr(p.sequence, r.beginning, r.length) as sequence,
+       FROM_UNIXTIME(r.date_edited) as date_edited_pretty,
+       g.genename, c.species, g.geneabbrev
+
+       FROM regulatory_sequences r 
+        INNER JOIN factor_matches f USING(seqid)
+        INNER JOIN promoter_sequences p USING(geneid)
+        INNER JOIN genes g USING(geneid)
+        INNER JOIN experiments e USING(experimentid)
+        INNER JOIN comparison_types c USING(comparisontypeid)
+       WHERE (
 EOT;
-      $query = $this->db->query($sql, $params);
+
+      for ($i = 0; $i < count($geneid); $i++) {
+         if ($i != 0)
+            $sql .= " OR ";
+         $sql .= "geneid = ?";
+      }
+       
+      $sql .=  ") $transfacFilter 
+       AND r.hidden <= $showHidden
+       AND f.hidden <= $showHidden";
+
+      $query = $this->db->query($sql, array_merge($geneid, $transfac));
 
       $sequences = $query->result_array();
 
@@ -856,8 +954,6 @@ EOT;
          }
       }
 
-      $promoter = $this->fetchPromoter($geneid);
-      $this->calculateSequencesFromPromoter($sequences, $promoter);
       if ($asArray) {
          return $sequences;
       } else {
@@ -872,8 +968,9 @@ EOT;
       $showHidden = $this->showHidden();
 
       $sql = <<<EOT
-       SELECT regulatory_sequences.*
-       FROM regulatory_sequences
+       SELECT *, substr(p.sequence, r.beginning, r.length) as sequence
+       FROM regulatory_sequences r
+        INNER JOIN promoter_sequences p USING(geneid)
        WHERE geneid = ?
        AND seqid != ?
        AND beginning = ?
@@ -894,8 +991,6 @@ EOT;
 
       $query = $this->db->query($sql, $params);
       $sequences = $query->result_array();
-      $promoter = $this->fetchPromoter($sequenceInfo['geneid']);
-      $this->calculateSequencesFromPromoter($sequences, $promoter);
 
       return $sequences;
    }
@@ -915,7 +1010,9 @@ EOT;
 
       $showHidden = $this->showHidden();
       $sql = <<<EOT
-       SELECT regulatory_sequences.*,
+       SELECT regulatory_sequences.*, 
+        substr(p.sequence, regulatory_sequences.beginning, regulatory_sequences.length)
+         as sequence,
         genes.geneabbrev,
         genes.genename,
         experiments.label,
@@ -927,6 +1024,7 @@ EOT;
         INNER JOIN genes USING (geneid)
         INNER JOIN experiments USING (experimentid)
         INNER JOIN comparison_types USING (comparisontypeid)
+        INNER JOIN promoter_sequences p USING (geneid)
        WHERE seqid = ?
        AND genes.hidden <= $showHidden
        AND regulatory_sequences.hidden <= $showHidden
@@ -945,10 +1043,6 @@ EOT;
    
       $query = $this->db->query($sql, array($seqid));
       $factorMatchInfo = $query->result_array();
-      
-
-      $promoter = $this->fetchPromoter($sequenceInfo['geneid']);
-      $this->calculateSingleSequenceFromPromoter($sequenceInfo, $promoter);
 
       $sequenceInfo['transfacs'] = array_unique(explode('/', $sequenceInfo['transfacs']));
       $sequenceInfo['studies'] = array_unique(explode('/', $sequenceInfo['studies']));
