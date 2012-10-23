@@ -60,6 +60,9 @@
 </div>
 <div class="row ruleRow">
    <div class="span8">
+      <a class="btn btn-info" id="selectAllGenes">
+         <i class="icon-tags icon-white"></i>Select All
+      </a>
       <a class="btn" id="geneExport"><i class="icon-download"></i>Export Data</a>
    </div>
 

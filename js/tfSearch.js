@@ -676,7 +676,7 @@ var strFlatten = function (delim, arr, elem) {
    });
 
    return str;
-}
+};
 
 // Work around for chrome. Sometimes, it doesn't properly fix tables.
 $(window).load(function() {
@@ -735,6 +735,24 @@ $(window).load(function() {
          return "factor-data-" + strFlatten("-", getSelectedRowsData(geneList),
             "geneabbrev") + ".csv";
       }
+   });
+
+   $("#selectAllGenes").click(function (e) {
+      var specs = [];
+      var items = $("#geneList").find("tr");
+
+      items.removeClass("selected");
+      items.addClass("selected");
+
+      geneList.$('tr.selected').each(function(i) {
+         var rowData = geneList.fnGetData(this);
+         specs[i] = rowData["geneid"];
+      });
+
+      curGeneid = specs;
+
+      updateFactorList(specs);
+      fixAllTableWidths();
    });
 
    fixAllTableWidths();
