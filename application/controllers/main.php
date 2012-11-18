@@ -85,7 +85,7 @@ class Main extends CI_Controller {
       $this->template->add_versioned_js('js/tfSummary.js');
       $this->template->add_versioned_js('js/jquery.tokeninput.js');
       $this->template->add_versioned_js('js/tokeninput-loader.js');
-      $this->_renderPage('Transcription Factor Summary');
+      $this->_renderPage('TF Summary');
    }
 
    public function GeneSearch() {
@@ -137,7 +137,7 @@ class Main extends CI_Controller {
          'ExperimentHierarchy' => 'Experiment Hierarchy',
          'TFSearch' => 'TF Search',
          'GeneSummary' => 'Gene Summary',
-         'TranscriptionFactorSummary' => 'Transcription Factor Summary',
+         'TranscriptionFactorSummary' => 'TF Summary',
    	   'GeneSearch' => 'Gene Search',
          'TFPop' => 'TF Popularity'
       );
