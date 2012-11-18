@@ -44,6 +44,7 @@ $route['404_override'] = '';
 $route['Upload'] = '/main/Upload';
 $route['ExperimentHierarchy'] = '/main/ExperimentHierarchy';
 $route['TFSearch'] = '/main/TFSearch';
+$route['TFSub'] = '/main/TFSub';
 $route['GeneSummary'] = '/main/GeneSummary';
 $route['TranscriptionFactorSummary'] = '/main/TranscriptionFactorSummary';
 $route['GeneSearch'] = '/main/GeneSearch';

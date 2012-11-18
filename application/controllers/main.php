@@ -70,6 +70,24 @@ class Main extends CI_Controller {
       $this->_renderPage('TF Search');
    }
 
+  public function TFSub() {
+      $this->_initPage();
+      $showHidden = $this->input->get('showHidden');
+
+      $showHidden = $showHidden ? 'checked' : '';
+
+      $this->template->write_view('content', 'tfSub.php', array(
+         'showHidden' => $showHidden   
+      ));
+      $this->template->add_versioned_js('js/jquery.tokeninput.js');
+      $this->template->add_versioned_js('js/tokeninput-loader.js');
+      //$this->template->add_versioned_js('js/tfSub.js');
+      //$this->template->add_versioned_js('js/scripture.js');
+      //$this->template->add_versioned_js('js/commonjs/bin/brovine.js');
+      $this->template->add_versioned_js('js/commonjs/dist/tf-sub.js');
+      $this->_renderPage('TF Subtract');
+   }
+
    public function GeneSummary() {
       $this->_initPage();
       $this->template->write_view('content', 'geneSumm.php');
@@ -136,6 +154,7 @@ class Main extends CI_Controller {
          'Upload' => 'Upload',
          'ExperimentHierarchy' => 'Experiment Hierarchy',
          'TFSearch' => 'TF Search',
+         'TFSub' => 'TF Subtract',
          'GeneSummary' => 'Gene Summary',
          'TranscriptionFactorSummary' => 'TF Summary',
    	   'GeneSearch' => 'Gene Search',

@@ -504,6 +504,37 @@ EOT;
       $geneid = $geneid ?: $this->input->get('geneid');
       $expid = $this->input->get('expid');
 
+      $minLa = $this->input->get('minla');
+      $minLaSlash = $this->input->get('minlaslash');
+      $minLq = $this->input->get('minlq');
+      $maxLd = $this->input->get('maxld');
+
+      $minBeg = $this->input->get('minbeg');
+      $maxBeg = $this->input->get('maxbeg'); 
+      $sense = $this->input->get('sense'); 
+
+      if (!isset($minLa) || trim($minLa) == "")
+         $minLa = -99999;
+
+      if (!isset($minLaSlash) || trim($minLaSlash) == "")
+         $minLaSlash = -99999;
+      
+      if (!isset($minLq) || trim($minLq) == "")
+         $minLq = -99999;
+      
+      if (!isset($maxLd) || trim($maxLd) == "")
+         $maxLd = 99999;
+
+      if (!isset($minBeg) || trim($minBeg) == "")
+         $minBeg = -99999;
+
+      if (!isset($maxBeg) || trim($maxBeg) == "")
+         $maxBeg = 99999;
+
+      if (!isset($sense) || trim($sense) == "" || trim($sense) == "All"
+        || trim($sense) == "all")
+         $sense = "%";
+
       if ($expid) {
          $expid = (array) $expid;
       } else {
@@ -548,11 +579,14 @@ EOT;
         $sql .= " ) ";
       }
       
-      $sql .= " AND regulatory_sequences.hidden <= $showHidden
+      $sql .= "AND la > ? AND la_slash > ? AND lq > ? AND 
+        ld <= ? AND beginning > ? AND beginning < ?
+        AND sense LIKE ? AND regulatory_sequences.hidden <= $showHidden
        AND factor_matches.hidden <= $showHidden
        GROUP BY transfac";
 
-      $query = $this->db->query($sql, array_merge($geneid, $expid));
+      $query = $this->db->query($sql, array_merge(array_merge($geneid, $expid),
+       array($minLa, $minLaSlash, $minLq, $maxLd, $minBeg, $maxBeg, $sense)));
 
       $result = $query->result_array();
       foreach ($result as &$row) {
@@ -589,10 +623,13 @@ EOT;
         $sql .= " ) ";
       }
 
-      $sql .= "AND regulatory_sequences.hidden <= $showHidden
+      $sql .= "AND la > ? AND la_slash > ? AND lq > ? AND 
+        ld <= ? AND beginning > ? AND beginning < ? AND sense LIKE ?
+        AND regulatory_sequences.hidden <= $showHidden
        AND factor_matches.hidden <= $showHidden";
 
-      $query = $this->db->query($sql, array_merge($geneid, $expid));
+      $query = $this->db->query($sql, array_merge(array_merge($geneid, $expid),
+       array($minLa, $minLaSlash, $minLq, $maxLd, $minBeg, $maxBeg, $sense)));
       $countInfo = $query->row();
 
       // Add "All" Row.
