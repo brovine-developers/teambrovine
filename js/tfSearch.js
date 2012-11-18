@@ -311,7 +311,7 @@ function setupExperimentHierarchy() {
    var secondRowHeight = "150px";
    var thirdRowHeight = "150px";
    speciesList = $('#speciesList').dataTable({
-      "sDom": "<'row'<'span2'f>r>t<'row'<'span2'i>>",
+      "sDom": "<<f>r>t<i>>",
       "sPaginationType": "bootstrap",
       "bPaginate": false,
       "bInfo": false,
@@ -326,7 +326,7 @@ function setupExperimentHierarchy() {
    });
 
    comparisonList = $('#comparisonList').dataTable({
-      "sDom": "<'row'<'span4'f>r>t<'row'<'span4'i>>",
+      "sDom": "<<f>r>t<i>>",
       "sPaginationType": "bootstrap",
       "bPaginate": false,
       "bInfo": false,
