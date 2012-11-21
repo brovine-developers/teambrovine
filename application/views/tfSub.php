@@ -195,7 +195,7 @@ and scroll. */ ?>
 </div>
 
 <!-- 4th row: Factor Subtraction list -->
-<div class="row ruleRow">
+<div class="row">
   <div class="span2">&nbsp;</div>
 
   <div class="span8">
@@ -207,8 +207,18 @@ and scroll. */ ?>
 
   <div class="span2">&nbsp;</div>
 </div>
+&nbsp;
+<div class="row ruleRow">
+  <div class="span2">&nbsp;</div>
 
-<div class="row">
+   <div class="span8">
+      <a class="btn" id="subtractExport"><i class="icon-download"></i>Export Data</a>
+   </div>
+
+  <div class="span2">&nbsp;</div>
+</div>
+
+<div class="row hide">
    <div class="span12">
       <table class="table table-striped table-bordered" id="sequenceList">
          <thead>
