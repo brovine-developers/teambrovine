@@ -15,7 +15,7 @@ $(window).load(function () {
        factorList1 = new Table("#factorList1", schemas.factor, "150px"),
        factorList2 = new Table("#factorList2", schemas.factor, "150px"),
        subtractList = new Table("#subtractList", schemas.factor, "150px");
-       
+
    // Set up regulation filters
    var regFilter1 = new RegFilter("#regFilter1", geneList1.dt, 4),
        regFilter2 = new RegFilter("#regFilter2", geneList2.dt, 4);
@@ -62,6 +62,8 @@ $(window).load(function () {
       }
    };
 
+   // Register some more update handlers, and a special handler to update the
+   // gene lists when the l-value filter is changed.
    bread.registerTableUpdate(geneList1, [], factorList1, updateSubtract);
    bread.registerTableUpdate(geneList2, [], factorList2, updateSubtract);
    bread.register('#sequenceFilterOptions', function () {
@@ -71,6 +73,7 @@ $(window).load(function () {
       bread.emit(geneList2);
    });
 
+   // Future thoughts: make dependency registration as easy as a nested array.
    var depList = [
       [speciesList],
       [comparisonList],
@@ -78,6 +81,22 @@ $(window).load(function () {
       [geneList1, geneList2],
       [factorList1, factorList2]
    ];
+
+   // Set up local download buttons
+   $("#geneExport1").localDownload({
+      "func": geneList1.getCSVData.bind(geneList1),
+      "filename": experimentList.getUniqueName.bind(experimentList, "label", "gene-data-")
+   });
+
+   $("#geneExport2").localDownload({
+      "func": geneList2.getCSVData.bind(geneList2),
+      "filename": experimentList.getUniqueName.bind(experimentList, "label", "gene-data-")
+   });
+
+   $("#subtractExport").localDownload({
+      "func": subtractList.getCSVData.bind(subtractList),
+      "filename": geneList1.getUniqueName.bind(geneList1, "geneabbrev", "factor-data-")
+   });
 
    // Get the initial data for the species list
    jQuery.get("ajax/getSpeciesList",

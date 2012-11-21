@@ -532,61 +532,6 @@ var tableSchema = {
    }
 };
 
-var setupPlaceholder = function (table) {
-   var label = table.parents(".dataTables_wrapper").find(".dataTables_filter label");
-   var text = label.text();
-   var input = label.children('input');
-
-   for (var i = 0; i < label[0].childNodes.length; i++) {
-      var child = label[0].childNodes[i];
-      if (child.nodeType == 3) {
-         label[0].removeChild(child);
-      }
-   } 
-
-   input.attr('placeholder', text);
-   input.width($(this).parent().width() - 10);
-};
-
-var fixWidth = function (table) {
-   table.css('width', '100%');
-
-   $('.dataTables_filter input').each(function () {
-      $(this).width($(this).parent().width() - 10);
-   });
-};
-
-var fixAllWidths = function () {
-   $('table.dataTable').each(function (i, item) {
-      fixWidth($(item));
-   });
-};
-
-var findColumn = function (mDataProp, schema) {
-   var ret = -1;
-
-   schema.aoColumns.forEach(function (val, idx) {
-      if (val.mDataProp === mDataProp)
-         ret = idx;
-   });
-
-   return ret;
-};
-
-var updateCrumb = function (table) {
-   var specs = [];
-
-   table.dt.$('tr.selected').each(function (i) {
-      var row = table.dt.fnGetData(this);
-      specs[i] = row[table.schema.crumb];
-   });
-
-   if (specs.length > 0) {
-      breadcrumb.update(table.schema.crumb, specs, table);
-      fixAllWidths();
-   }
-};
-
 var NewTable = function (id, schema, height) {
    var that = this;
 
@@ -617,15 +562,142 @@ var NewTable = function (id, schema, height) {
    this.schema = schema;
    this.id = id;
 
-   this.fixWidth = fixWidth.bind(this, this.dt);
-   this.findColumn = function (mDataProp) { findColumn(mDataProp, that.dt); };
-   this.updateCrumb = updateCrumb.bind(this, this);
-
    this.fixWidth();
    setupPlaceholder(this.dt);
 
    return this;
 };
+
+// Private
+var setupPlaceholder = function (table) {
+   var label = table.parents(".dataTables_wrapper").find(".dataTables_filter label");
+   var text = label.text();
+   var input = label.children('input');
+
+   for (var i = 0; i < label[0].childNodes.length; i++) {
+      var child = label[0].childNodes[i];
+      if (child.nodeType == 3) {
+         label[0].removeChild(child);
+      }
+   } 
+
+   input.attr('placeholder', text);
+   input.width($(this).parent().width() - 10);
+};
+
+NewTable.prototype.fixWidth = function () {
+   this.dt.css('width', '100%');
+
+   $('.dataTables_filter input').each(function () {
+      $(this).width($(this).parent().width() - 10);
+   });
+};
+
+var fixAllWidths = function () {
+   $('table.dataTable').each(function (i, item) {
+      //fixWidth($(item));
+   });
+};
+
+NewTable.prototype.findColumn = function (mDataProp) {
+   var ret = -1;
+
+   this.schema.aoColumns.forEach(function (val, idx) {
+      if (val.mDataProp === mDataProp)
+         ret = idx;
+   });
+
+   return ret;
+};
+
+NewTable.prototype.getSelectedData = function (col) {
+   var specs = [],
+       that = this;
+
+   this.dt.$('tr.selected').each(function (i) {
+      var row = that.dt.fnGetData(this);
+      specs[i] = row[col];
+   });
+
+   return specs;
+};
+
+NewTable.prototype.updateCrumb = function () {
+   var specs = this.getSelectedData(this.schema.crumb);
+
+   if (specs.length > 0) {
+      breadcrumb.update(this.schema.crumb, specs, this);
+      fixAllWidths();
+   }
+
+   return specs;
+};
+
+// Gets the visible columns of the table.
+NewTable.prototype.getVisibleColumns = function () {
+   var vis = [];
+
+   this.schema.aoColumns.forEach(function (col) {
+      if (col.bVisible === undefined || col.bVisible)
+         vis.push(col);
+   });
+
+   return vis;
+};
+
+// Returns a list of the header names for the table. Ignores columns that
+// aren't visible.
+NewTable.prototype.getVisibleColumnNames = function () {
+   var headers = [],
+       columns = this.getVisibleColumns();
+
+   columns.forEach(function (col) {
+      headers.push(col.mDataProp);
+   });
+
+   return headers;
+};
+
+// Transforms table data into CSV format. Ignores columns that aren't visible.
+NewTable.prototype.getCSVData = function (includeHeaders) {
+   var data = this.dt.fnGetData(),
+      visCols = this.getVisibleColumnNames(),
+      csvData = "",
+      start = true,
+      inclHdrs = includeHeaders || true,
+      hdrData;
+
+   hdrData = visCols.reduce(function (prev, cur) {
+      return "" + prev + ", " + cur;
+   }) + "\n";
+
+   for (var i = 0; i < data.length; i++) {
+      start = true;
+
+      visCols.forEach(function (val) {
+         if (!start)
+            csvData += ", ";
+
+         csvData += data[i][val];
+         start = false;
+      });
+
+      csvData += "\n";
+   }
+
+   return inclHdrs ? (hdrData || "") + (csvData || "") : (csvData || "");
+};
+
+// Constructs a unique name for the data in this table based on the rows of the
+// table that are selected.
+NewTable.prototype.getUniqueName = function (col, prefix) {
+   var prefix = prefix || "brovine-data-",
+       selected = this.getSelectedData(col);
+
+   return prefix + selected.reduce(function (prev, cur) {
+      return "" + prev + "-" + cur;
+   });
+};   
 
 module.exports = {
    "Table": NewTable,
@@ -652,7 +724,7 @@ $(window).load(function () {
        factorList1 = new Table("#factorList1", schemas.factor, "150px"),
        factorList2 = new Table("#factorList2", schemas.factor, "150px"),
        subtractList = new Table("#subtractList", schemas.factor, "150px");
-       
+
    // Set up regulation filters
    var regFilter1 = new RegFilter("#regFilter1", geneList1.dt, 4),
        regFilter2 = new RegFilter("#regFilter2", geneList2.dt, 4);
@@ -699,6 +771,8 @@ $(window).load(function () {
       }
    };
 
+   // Register some more update handlers, and a special handler to update the
+   // gene lists when the l-value filter is changed.
    bread.registerTableUpdate(geneList1, [], factorList1, updateSubtract);
    bread.registerTableUpdate(geneList2, [], factorList2, updateSubtract);
    bread.register('#sequenceFilterOptions', function () {
@@ -708,6 +782,7 @@ $(window).load(function () {
       bread.emit(geneList2);
    });
 
+   // Future thoughts: make dependency registration as easy as a nested array.
    var depList = [
       [speciesList],
       [comparisonList],
@@ -715,6 +790,22 @@ $(window).load(function () {
       [geneList1, geneList2],
       [factorList1, factorList2]
    ];
+
+   // Set up local download buttons
+   $("#geneExport1").localDownload({
+      "func": geneList1.getCSVData.bind(geneList1),
+      "filename": experimentList.getUniqueName.bind(experimentList, "label", "gene-data-")
+   });
+
+   $("#geneExport2").localDownload({
+      "func": geneList2.getCSVData.bind(geneList2),
+      "filename": experimentList.getUniqueName.bind(experimentList, "label", "gene-data-")
+   });
+
+   $("#subtractExport").localDownload({
+      "func": subtractList.getCSVData.bind(subtractList),
+      "filename": geneList1.getUniqueName.bind(geneList1, "geneabbrev", "factor-data-")
+   });
 
    // Get the initial data for the species list
    jQuery.get("ajax/getSpeciesList",
