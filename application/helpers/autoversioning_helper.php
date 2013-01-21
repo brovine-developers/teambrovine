@@ -13,13 +13,13 @@
  *  @param $file  The file to be loaded.  Must be an absolute path (i.e.
  *                starting with slash).
  */
-function version($file)
-{
-	if (!file_exists($_SERVER['DOCUMENT_ROOT'] . '/' . $file))
-    	return $file;
+function version($file) {
+   if (!file_exists($_SERVER['DOCUMENT_ROOT'] . '/' . $file)) {
+      return $file;
+   }
 
-	$mtime = filemtime($_SERVER['DOCUMENT_ROOT'] . '/' . $file);
-	return preg_replace('{\\.([^./]+)$}', ".$mtime.\$1", $file);
+   $mtime = filemtime($_SERVER['DOCUMENT_ROOT'] . '/' . $file);
+   return preg_replace('{\\.([^./]+)$}', ".$mtime.\$1", $file);
 }
 
 ?>
