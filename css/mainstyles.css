@@ -71,3 +71,7 @@ body {
 .row.pad {
    margin-bottom: 10px;
 }
+
+small.bigspace {
+   padding-left: 10px;
+}

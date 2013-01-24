@@ -49,6 +49,7 @@ $route['GeneSummary'] = '/main/GeneSummary';
 $route['TranscriptionFactorSummary'] = '/main/TranscriptionFactorSummary';
 $route['GeneSearch'] = '/main/GeneSearch';
 $route['TFPop'] = '/main/TfPop';
+$route['Login'] = '/auth/Login';
 
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */

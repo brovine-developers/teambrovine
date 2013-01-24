@@ -108,7 +108,7 @@ function setupDelete() {
             isHidden: rowData.hidden
          };
 
-         jQuery.post('ajax/toggleRow', serverData, function(responseData) {
+         jQuery.post('edit/toggleRow', serverData, function(responseData) {
             location.reload(true);
          }, 'json');
       }
@@ -190,7 +190,7 @@ function setupEdit() {
          showHidden: showHidden
       });
 
-      jQuery.post('ajax/updateGene', serverData, function(experimentData) {
+      jQuery.post('edit/gene', serverData, function(experimentData) {
          // Update experiment data on save. The numbers might change.
          updateExperimentListData(experimentData);
          var matchData = {
@@ -245,7 +245,7 @@ function setupEdit() {
          showHidden: showHidden
       });
 
-      jQuery.post('ajax/updateComparison', serverData, function(data) {
+      jQuery.post('edit/comparison', serverData, function(data) {
          // Update species list on update.
          updateSpeciesListData(data);
          matchData = {
@@ -292,7 +292,7 @@ function setupEdit() {
 
       var serverData = $.extend({}, newExperimentData, objShowHidden);
 
-      jQuery.post('ajax/updateExperiment', serverData);
+      jQuery.post('edit/experiment', serverData);
    });
    
    // Sequence Modal ////////////////////////////////////////////////////////
@@ -336,7 +336,7 @@ function setupEdit() {
 
       var serverData = $.extend({}, newSequenceData, objShowHidden);
 
-      jQuery.post('ajax/updateSequence', serverData, function(sequenceInfoData) {
+      jQuery.post('edit/sequence', serverData, function(sequenceInfoData) {
          updateSequenceInfoData(sequenceInfoData);
          newSequenceData.sequence = sequenceInfoData.sequenceInfo.sequence;
          sequenceList.fnUpdate(newSequenceData, row);
@@ -413,7 +413,7 @@ function setupEdit() {
          showHidden: showHidden
       });
 
-      jQuery.post('ajax/updateMatch', serverData, function(data) {
+      jQuery.post('edit/match', serverData, function(data) {
          updateGeneListData(data.geneData);
          selectTableRow(geneList, { geneid: selectedGeneid });
          

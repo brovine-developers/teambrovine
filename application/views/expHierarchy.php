@@ -47,12 +47,16 @@
 </div>
 <div class="row ruleRow">
    <div class="span4 offset2">
+      <?php if ($user['can_write']): ?>
       <a class="btn btn-warning disabled" id="editComparison"><i class="icon-pencil icon-white"></i> Edit Comparison</a>
       <a class="btn btn-danger disabled hideButton" id="hideComparison"><i class="icon-minus-sign icon-white"></i><span> Hide Comparison</span></a>
+      <?php endif; ?>
    </div>
    <div class="span6">
+      <?php if ($user['can_write']): ?>
       <a class="btn btn-warning disabled" id="editExperiment"><i class="icon-pencil icon-white"></i> Edit Experiment</a>
       <a class="btn btn-danger disabled hideButton" id="hideExperiment"><i class="icon-minus-sign icon-white"></i><span> Hide Experiment</span></a>
+      <?php endif; ?>
    </div>
 </div>
 <div class="row">
@@ -82,8 +86,10 @@
 </div>
 <div class="row ruleRow">
    <div class="span8">
+      <?php if ($user['can_write']): ?>
       <a class="btn btn-warning disabled" id="editGene"><i class="icon-pencil icon-white"></i> Edit Gene</a>
       <a class="btn btn-danger disabled hideButton" id="hideGene"><i class="icon-minus-sign icon-white"></i><span> Hide Gene</span></a>
+      <?php endif; ?>
       <a class="btn" id="geneExport"><i class="icon-download"></i>Export Data</a>
    </div>
 
@@ -169,8 +175,10 @@ and scroll. */ ?>
 </div>
 <div class="row ruleRow">
    <div class="span12">
+      <?php if ($user['can_write']): ?>
       <a class="btn btn-warning disabled" id="editSequence"><i class="icon-pencil icon-white"></i> Edit Sequence</a>
       <a class="btn btn-danger disabled hideButton" id="hideSequence"><i class="icon-minus-sign icon-white"></i><span> Hide Sequence</span></a>
+      <?php endif; ?>
    </div>
 </div>
 <div class="row hidden" id="sequenceInfo">
@@ -239,8 +247,10 @@ and scroll. */ ?>
       </table>
       <div class="row">
          <div class="span12">
+            <?php if ($user['can_write']): ?>
             <a class="btn btn-warning disabled" id="editMatch"><i class="icon-pencil icon-white"></i> Edit Factor</a>
             <a class="btn btn-danger disabled hideButton" id="hideMatch"><i class="icon-minus-sign icon-white"></i><span> Hide Factor</span></a>
+            <?php endif; ?>
          </div>
       </div>
    </div>

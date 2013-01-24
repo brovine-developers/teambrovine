@@ -3,6 +3,22 @@
 class Import extends CI_Controller {
    private static $targetPath = '/var/www/html/genedata-uploads/';
 
+   public function __construct() {
+      parent::__construct();
+
+      $this->load->helper('privilege', 'http_error');
+      $this->load->library('render');
+
+      if (!$this->access_control->check(Privilege::Write)) {
+         $this->render->initPage();
+         $this->template->write_view('content', 'error.php', HTTP_Error::E401());
+         $this->render->renderPage('error');
+      }
+      else if (!$this->access_control->logged_in()) {
+         redirect('auth');
+      }
+   }
+
    public function importExisting() {
       $this->load->database();
       $files = glob(self::$targetPath . "*.csv");
