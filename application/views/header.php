@@ -23,7 +23,7 @@
                   <li><a href="/auth/logout">Log out</a></li>
                   <?php if ($user['can_write']): ?>
                   <li class="divider"></li>
-                  <li><a href="Upload">Upload</a></li>
+                  <li><a href="/Upload">Upload</a></li>
                   <?php endif; ?>
                   <? /* Not yet supported
                   <?php if ($user['can_admin']): ?>
