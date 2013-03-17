@@ -512,11 +512,7 @@ EOT;
       echo json_encode($out);
    }
 
-   public function getFactorList($asArray = false, $geneid = false) {
-      $this->load->database();
-      $geneid = $geneid ?: $this->input->get('geneid');
-      $expid = $this->input->get('expid');
-
+   private function getRestrictionSQL() {
       $minLa = $this->input->get('minla');
       $minLaSlash = $this->input->get('minlaslash');
       $minLq = $this->input->get('minlq');
@@ -547,6 +543,16 @@ EOT;
       if (!isset($sense) || trim($sense) == "" || trim($sense) == "All"
         || trim($sense) == "all")
          $sense = "%";
+
+      return " la > $minLa AND la_slash > $minLaSlash AND lq > $minLq AND 
+        ld <= $maxLd AND beginning > $minBeg AND beginning < $maxBeg
+        AND sense LIKE '$sense' ";
+   }
+
+   public function getFactorList($asArray = false, $geneid = false) {
+      $this->load->database();
+      $geneid = $geneid ?: $this->input->get('geneid');
+      $expid = $this->input->get('expid');
 
       if ($expid) {
          $expid = (array) $expid;
@@ -592,9 +598,8 @@ EOT;
         $sql .= " ) ";
       }
       
-      $sql .= "AND la > ? AND la_slash > ? AND lq > ? AND 
-        ld <= ? AND beginning > ? AND beginning < ?
-        AND sense LIKE ? AND regulatory_sequences.hidden <= $showHidden
+      $restr = $this->getRestrictionSQL();
+      $sql .= "AND $restr AND regulatory_sequences.hidden <= $showHidden
        AND factor_matches.hidden <= $showHidden
        GROUP BY transfac";
 
