@@ -117,6 +117,43 @@ EOT;
          echo json_encode($ret[0]);
    }
 
+   public function getFactorSubtract() {
+      $include = (array) $this->input->get('include', true);
+      $exclude = (array) $this->input->get('exclude', true);
+      $include_str = "'" . implode("', '", $include) . "'";
+      $exclude_str = "'" . implode("', '", $exclude) . "'";
+
+      $this->load->database();
+      $restr = $this->getRestrictionSQL();
+
+      $ts_sub = <<<EOT
+SELECT distinct p.transfac, COUNT(p.seqid) as numTimes,
+        COUNT(DISTINCT p.geneid) as numGenes, 0 as allRow FROM (
+  select transfac, seqid, geneid, la, la_slash, lq, ld, beginning, sense
+  from `factor_matches`
+    inner join `regulatory_sequences` using (seqid)
+    inner join `genes` using (geneid)
+  where geneid in ($include_str)
+) p
+left join (
+   select transfac from `factor_matches`
+     inner join `regulatory_sequences` using (seqid)
+     inner join `genes` using (geneid)
+   where geneid in ($exclude_str)
+) q
+on (p.transfac = q.transfac) WHERE
+q.transfac is null and $restr
+group by p.transfac
+order by p.transfac
+EOT;
+
+
+      $query = $this->db->query($ts_sub);
+      $result = $query->result();
+
+      echo json_encode($result);
+   }
+
    public function getSpeciesList() {
       $this->load->database();
       $sql =<<<EOT
