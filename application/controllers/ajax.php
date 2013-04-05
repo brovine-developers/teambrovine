@@ -4,6 +4,9 @@ define("ASCII_A", 97);
 define("CSV_PATH", "/home/tcirwin/prj/brovine/genedata-uploads/");
 
 class Ajax extends CI_Controller {
+   const FrqItmsetPort = 8100;
+   const FrqItmsetHost = 'tcp://localhost';
+   const MaxReadLen = 10000;
 
    public function __construct() {
       parent::__construct();
@@ -16,6 +19,45 @@ class Ajax extends CI_Controller {
       else {
          $this->load->library('render');
       }
+   }
+
+   public function getFrequentItemsets() {
+      $min_sup = $this->input->get_post('min_sup');
+      $max_sup = $this->input->get_post('max_sup');
+
+      $write_buf = "get $min_sup $max_sup\n";
+      $errno = 0;
+      $errstr = '';
+
+      // Open a new socket
+      $socket = stream_socket_client(self::FrqItmsetHost . ':' . self::FrqItmsetPort, $errno, $errstr);
+
+      // Log any error messages
+      if ($errno != 0 || $errstr != '') {
+         log_message('error', "stream_socket_client: $errstr ($errno)<br />\n");
+      }
+
+      /*// Attempt to connect to the frequent itemset server
+      if (!socket_connect($socket, self::FrqItmsetHost, self::FrqItmsetPort)) {
+         socket_strerror(socket_last_error());
+      }
+
+      // Write the get request to the server
+      socket_write($socket, $write_buf);
+
+      // Read the results (the frequent itemsets)
+      $data = socket_read($socket, self::MaxReadLen);
+
+      if (socket_read($socket, self::MaxReadLen)) {
+         $data = "error: result itemsets too long\n";
+      }
+*/
+      // Write the `get` request and flush
+      fwrite($socket, $write_buf);
+      fflush($socket);
+
+      // Read and return the result
+      echo fread($socket, self::MaxReadLen);
    }
 
    /**
