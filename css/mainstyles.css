@@ -30,6 +30,18 @@ body {
    color: #aaaaaa;
 }
 
+#factorList td {
+   max_width: 60px;
+   overflow:hidden;
+   text-overflow: ellipsis;
+}
+
+.geneList.dataTable td {
+   max-width: 110px;
+   overflow:hidden;
+   text-overflow: ellipsis;
+}
+
 .ruleRow {
    border-bottom: 1px solid #eee;
    padding-bottom: 20px;
