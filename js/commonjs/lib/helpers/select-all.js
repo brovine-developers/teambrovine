@@ -19,7 +19,7 @@ module.exports = function (button, table) {
 
       table.dt.$('tr.selected').each(function (i) {
          var row = table.dt.fnGetData(this);
-         specs[i] = row[table.schema.crumb];
+         specs[i] = row[table.schema.dataProp];
       });
 
       if (specs.length > 0) {

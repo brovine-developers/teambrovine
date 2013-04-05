@@ -41,8 +41,25 @@ var tableSchema = {
       ]
    },
 
-   "gene": {
-      "crumb": "geneid",
+   "geneInclude": {
+      "crumb": "include",
+      "dataProp": "geneid",
+      "url": "getGeneList",
+      "sSearch": "Search Genes",
+      "aoColumns": [
+         {"sTitle": "Gene", "mDataProp": "geneabbrev"},
+         {"sTitle": "Species", "mDataProp": "species"},
+         {"sTitle": "Comparison", "mDataProp": "celltype"},
+         {"sTitle": "Experiment", "mDataProp": "label"},
+         {"sTitle": "Reg", "mDataProp": "regulation"},
+         {"sTitle": "Geneid", "mDataProp": "geneid", "bVisible": false},
+         {"sTitle": "GeneName", "mDataProp": "genename", "bVisible": false}
+      ]
+   },
+
+   "geneExclude": {
+      "crumb": "exclude",
+      "dataProp": "geneid",
       "url": "getGeneList",
       "sSearch": "Search Genes",
       "aoColumns": [
@@ -58,7 +75,7 @@ var tableSchema = {
 
    "factor": {
       "crumb": "transfac",
-      "url": "getFactorList",
+      "url": "getFactorSubtract",
       "sSearch": "Search Transfacs",
       "aoColumns": [
          {"sTitle": "Factor", "mDataProp": "transfac"},
@@ -160,10 +177,13 @@ NewTable.prototype.getSelectedData = function (col) {
 };
 
 NewTable.prototype.updateCrumb = function () {
-   var specs = this.getSelectedData(this.schema.crumb);
+   var schm = this.schema;
+   // If dataProp is set, use that as data column; otherwise use the crumb
+   var propName = (schm.dataProp)? schm.dataProp : schm.crumb;
+   var specs = this.getSelectedData(propName);
 
    if (specs.length > 0) {
-      breadcrumb.update(this.schema.crumb, specs, this);
+      breadcrumb.update(schm.crumb, specs, this);
       fixAllWidths();
    }
 

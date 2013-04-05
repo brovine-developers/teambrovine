@@ -640,8 +640,7 @@ EOT;
        AND factor_matches.hidden <= $showHidden
        GROUP BY transfac";
 
-      $query = $this->db->query($sql, array_merge(array_merge($geneid, $expid),
-       array($minLa, $minLaSlash, $minLq, $maxLd, $minBeg, $maxBeg, $sense)));
+      $query = $this->db->query($sql, array_merge($geneid, $expid));
 
       $result = $query->result_array();
       foreach ($result as &$row) {
@@ -678,13 +677,10 @@ EOT;
         $sql .= " ) ";
       }
 
-      $sql .= "AND la > ? AND la_slash > ? AND lq > ? AND 
-        ld <= ? AND beginning > ? AND beginning < ? AND sense LIKE ?
-        AND regulatory_sequences.hidden <= $showHidden
+      $sql .= "AND $restr AND regulatory_sequences.hidden <= $showHidden
        AND factor_matches.hidden <= $showHidden";
 
-      $query = $this->db->query($sql, array_merge(array_merge($geneid, $expid),
-       array($minLa, $minLaSlash, $minLq, $maxLd, $minBeg, $maxBeg, $sense)));
+      $query = $this->db->query($sql, array_merge($geneid, $expid));
       $countInfo = $query->row();
 
       // Add "All" Row.
