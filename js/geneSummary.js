@@ -12,7 +12,7 @@ function updateGeneSummary() {
             $(this).addClass('selected');
             var rowData = geneSummary.fnGetData(this);
 
-            var geneId = rowData.genename;
+            var geneId = rowData.geneabbrev;
             updateExpsPerGene(geneId);
          });
       },
@@ -32,22 +32,6 @@ function updateExpsPerGene(geneId) {
       },
       'json'
    );
-
-   jQuery.get("ajax/getLongGene",
-    {
-       "geneid": geneId
-    },
-    function (data) {
-       $("#gene-display").css("display", "block");
-       $("#gene-abbrev").html(data[0].geneabbrev);
-       $("#gene-name").html(data[0].genename);
-       $("#gene-chrom").html(data[0].chromosome);
-       $("#gene-start").html(data[0].start);
-       $("#gene-end").html(data[0].end);
-       $("#gene-length").html(data[0].length);
-    },
-    'json'
-   );
 }
 
 function setupGeneSummary() {
@@ -65,9 +49,6 @@ function setupGeneSummary() {
       "aoColumns": [
          {"sTitle": "Gene", "mDataProp": "genename"},
          {"sTitle": "Abbrev", "mDataProp": "geneabbrev"},
-         {"sTitle": "Chr", "mDataProp": "chromosome"},
-         {"sTitle": "Start", "mDataProp": "start"},
-         {"sTitle": "End", "mDataProp": "end"},
          {"sTitle": "Comps", "mDataProp": "numComps"},
          {"sTitle": "Exps", "mDataProp": "numExps"}
       ]
@@ -87,7 +68,10 @@ function setupGeneSummary() {
          {"sTitle": "Experiment", "mDataProp": "label"},
          {"sTitle": "Comparison", "mDataProp": "celltype"},
          {"sTitle": "Species", "mDataProp": "species"},
-         {"sTitle": "Regulation", "mDataProp": "regulation"}
+         {"sTitle": "Regulation", "mDataProp": "regulation"},
+         {"sTitle": "Chr", "mDataProp": "chromosome"},
+         {"sTitle": "Start", "mDataProp": "start"},
+         {"sTitle": "End", "mDataProp": "end"}
       ]
 
    });

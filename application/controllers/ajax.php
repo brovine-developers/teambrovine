@@ -356,29 +356,14 @@ EOT;
       $this->load->database();
       $showHidden = $this->showHidden();
       $sql = <<<EOT
-       SELECT geneabbrev, genename, chromosome, start, end,
+       SELECT UPPER(geneabbrev) as geneabbrev, genename,
         COUNT(DISTINCT e.comparisontypeid) as numComps,
-        COUNT(g.geneid) as numExps, geneid
+        COUNT(g.geneid) as numExps
        FROM genes g INNER JOIN experiments e USING (experimentid)
-       WHERE g.hidden <= $showHidden AND e.hidden <= $showHidden
-       GROUP BY genename
+       GROUP BY UPPER(geneabbrev);
 EOT;
 
       $query = $this->db->query($sql, array());
-      
-      echo json_encode($query->result());
-   }
-
-   public function getLongGene() {
-      $this->load->database();
-      $geneid = $this->input->get('geneid');
-      $sql = <<<EOT
-       SELECT geneabbrev, genename, chromosome, start, end, ABS(start - end)+1 as length, sequence
-       FROM genes INNER JOIN promoter_sequences USING (geneid)
-       WHERE genename = ? 
-EOT;
-
-      $query = $this->db->query($sql, array($geneid));
       
       echo json_encode($query->result());
    }
@@ -400,7 +385,7 @@ EOT;
        SELECT label, celltype, species, regulation
        FROM genes INNER JOIN experiments USING (experimentid)
        INNER JOIN comparison_types USING (comparisontypeid)
-       WHERE genename = ?
+       WHERE UPPER(geneabbrev) = ?
        AND genes.hidden <= $showHidden
        AND experiments.hidden <= $showHidden
 EOT;
