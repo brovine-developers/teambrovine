@@ -382,7 +382,7 @@ EOT;
       $geneid = $this->input->get('geneid');
       $showHidden = $this->showHidden();
       $sql = <<<EOT
-       SELECT label, celltype, species, regulation
+       SELECT label, celltype, species, regulation, chromosome, start, end
        FROM genes INNER JOIN experiments USING (experimentid)
        INNER JOIN comparison_types USING (comparisontypeid)
        WHERE UPPER(geneabbrev) = ?
