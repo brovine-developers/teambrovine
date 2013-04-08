@@ -30,13 +30,13 @@ class Edit extends CI_Controller {
 
       $geneData = array();
       foreach ($fields as $field) {
-         $geneData[] = $this->input->post($field);
+         $geneData[] = strip_tags($this->input->post($field, true));
       }
 
       $geneData[] = time();
       $geneData[] = $geneid = $this->input->post('geneid');
 
-      $promoter = $this->input->post('promoter');
+      $promoter = strip_tags($this->input->post('promoter', true));
 
       $sql = <<<EOT
        UPDATE genes SET
@@ -68,9 +68,12 @@ EOT;
       $this->load->database();
       $this->db->trans_start();
 
-      $celltype = $this->input->post('celltype');
-      $species = $this->input->post('species');
+      $celltype = $this->input->post('celltype', true);
+      $species = $this->input->post('species', true);
       $compid = $this->input->post('comparisontypeid');
+
+      $celltype = strip_tags($celltype);
+      $species = strip_tags($species);
 
       $comparisonData = array($celltype, $species, time(), $compid);
 
@@ -130,7 +133,7 @@ EOT;
       $this->load->database();
       $this->db->trans_start();
 
-      $label = $this->input->post('label');
+      $label = strip_tags($this->input->post('label', true));
       $expid = $this->input->post('experimentid');
 
       $sql = <<<EOT
@@ -148,22 +151,26 @@ EOT;
       $this->load->database();
       $this->db->trans_start();
 
-      $beginning = $this->input->post('beginning');
-      $length = $this->input->post('length');
-      $sense = $this->input->post('sense');
-      $seqid = $this->input->post('seqid');
+      $seqData = array();
+      $fields = array('beginning', 'length', 'sense', 'seqid');
+
+      foreach ($fields as $field) {
+         $seqData[] = strip_tags($this->input->post($field, true));
+      }
+
+      // Splice in the edited time
+      array_splice($seqData, count($seqData - 1), 0, array(time()));
 
       $sql = <<<EOT
        UPDATE regulatory_sequences SET
+        beginning = ?,
         length = ?,
         sense = ?,
-        beginning = ?,
         date_edited = ?
        WHERE
         seqid = ?
 EOT;
-      $query = $this->db->query($sql, 
-       array($length, $sense, $beginning, time(), $seqid));
+      $query = $this->db->query($sql, $seqData);
       $this->db->trans_complete();
    }
    
@@ -178,7 +185,7 @@ EOT;
       $updateData = array();
       $sqlParts = '';
       foreach ($fields as $name) {
-         $updateData[] = $this->input->post($name);
+         $updateData[] = strip_tags($this->input->post($name, true));
          $sqlParts .= "$name = ?,\n";
       }
 
@@ -224,7 +231,8 @@ EOT;
        WHERE {$field} = ?
 EOT;
 
-      $this->db->query($sql, array($newHidden, $this->input->post('value')));
+      $this->db->query($sql, array($newHidden,
+        $this->input->post('value', true)));
       $this->db->trans_complete();
    }
 }
