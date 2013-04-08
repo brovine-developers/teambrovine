@@ -54,14 +54,16 @@ EOT;
       $this->load->database();
       $query = $this->db->query($sql, $geneData);
 
-      $sql = <<<EOT
-       UPDATE promoter_sequences SET
-        sequence = ?
-       WHERE
-        geneid = ?
+      if ($promoter) {
+         $sql = <<<EOT
+          UPDATE promoter_sequences SET
+           sequence = ?
+          WHERE
+           geneid = ?
 EOT;
 
-      $this->db->query($sql, array($promoter, $geneid));
+         $this->db->query($sql, array($promoter, $geneid));
+      }
    }
 
    public function comparison() {
