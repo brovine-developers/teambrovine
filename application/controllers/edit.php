@@ -65,11 +65,8 @@ EOT;
    }
 
    public function comparison() {
-      echo "before";
       $this->load->database();
       $this->db->trans_start();
-
-      echo "1";
 
       $celltype = $this->input->post('celltype');
       $species = $this->input->post('species');
@@ -202,7 +199,7 @@ EOT;
    public function toggleRow() {
       $this->load->database();
       $this->db->trans_start();
-      
+
       $field = $this->input->post('field');
       $tablesByField = array(
          'comparisontypeid' => 'comparison_types',
