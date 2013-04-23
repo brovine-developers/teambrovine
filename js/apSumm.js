@@ -1,8 +1,22 @@
 function updateAPSummary(tf) {
-   jQuery.get("ajax/getApriori",
+   jQuery.get("ajax/getFrequentItemsets",
+      { 'min_sup': 0.85, 'max_sup': 0.95 },
       function(data) {
+         var total = data.itemCnt;
+         var tableData = [];
          apSumm.fnClearTable();
-         apSumm.fnAddData(data);
+
+         for (var name in data.data) {
+            var cnt = data.data[name];
+            tableData.push({
+               "items": name,
+               "count": cnt,
+               "sup": (Math.round((cnt / total) * 10000) / 100).toString() + "%",
+               "numItems": name.split(",").length
+            });
+         }
+
+         apSumm.fnAddData(tableData);
          fixTableWidth(apSumm);
       },
       'json'
