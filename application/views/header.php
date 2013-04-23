@@ -4,14 +4,6 @@
          <span class="brand">Brovine</span>
          <?php if ($user !== false): ?>
          <ul class="nav">
-            <? foreach ($tabs as $url => $tab) : ?>
-               <li <?if ($tab == $activeTab) :?>class="active"<? endif; ?>>
-                  <a href="<?=$url?>"><?=$tab?></a>
-               </li>
-            <? endforeach; ?>
-
-            <li class="divider"></li>
-
             <li class="dropdown">
                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                   <? echo $user['display_name'] ?>
