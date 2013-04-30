@@ -45,13 +45,13 @@
 
 <!-- Regulation filtering row -->
 <div class="row">
-   <div class="span2"><h4>Filter by Regulation: </h4></div>
+   <div class="span2 filter-label"><h4>Filter by Regulation: </h4></div>
    <div class="span4">
          <input type="text" id="regFilter1" placeholder="Search for Regulations" />
          <br />
    </div>
 
-   <div class="span2"><h4>Filter by Regulation: </h4></div>
+   <div class="span2 filter-label"><h4>Filter by Regulation: </h4></div>
    <div class="span4">
          <input type="text" id="regFilter2" placeholder="Search for Regulations" />
          <br />
