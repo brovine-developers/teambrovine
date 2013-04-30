@@ -97,3 +97,10 @@ small.bigspace {
    background: white;
    z-index: 1000;
 }
+
+div.filter-label h4 {
+   font-size: 17px;
+   text-align: right;
+   margin: 5px 0px;
+   margin-right: -10px;
+}
