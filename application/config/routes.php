@@ -50,6 +50,7 @@ $route['TranscriptionFactorSummary'] = '/main/TranscriptionFactorSummary';
 $route['GeneSearch'] = '/main/GeneSearch';
 $route['TFPop'] = '/main/TfPop';
 $route['Login'] = '/auth/Login';
+$route['FreqTransfacs'] = '/main/FreqTransfacs';
 
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */

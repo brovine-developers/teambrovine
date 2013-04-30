@@ -30,6 +30,10 @@ body {
    color: #aaaaaa;
 }
 
+input.placeholder {
+   padding-right: 2px !important;
+}
+
 #factorList td {
    max_width: 60px;
    overflow:hidden;
@@ -86,4 +90,21 @@ body {
 
 small.bigspace {
    padding-left: 10px;
+}
+
+#navigation ul {
+   border-radius: 5px;
+   padding-left: 20px;
+   margin-top: 10px;
+   left: -6px;
+   border: 1px solid grey;
+   background: white;
+   z-index: 1000;
+}
+
+div.filter-label h4 {
+   font-size: 17px;
+   text-align: right;
+   margin: 5px 0px;
+   margin-right: -10px;
 }

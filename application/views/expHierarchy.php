@@ -2,17 +2,15 @@
    <div class="span12">
       <h1>Experiment Hierarchy</h1>
       <p>
-         Begin by selecting a species.
-      </p>
-      <p>
-         <form action="ExperimentHierarchy" method="get" id="showHiddenForm">
+         <form action="ExperimentHierarchy" method="get" id="showHiddenForm" class="form-inline">
             <label class="checkbox">
                <input type="checkbox" id="showHidden" name="showHidden" value="1" <?=$showHidden?>>
-               Show hidden entries 
+               Show Hidden
             </label>
+            &nbsp;&nbsp;
             <label class="checkbox">
                <input type="checkbox" id="colorRows" name="colorRows" value="1">
-               Color edited rows yellow and hidden rows red
+               Color Edited and Hidden
             </label>
          </form>
       </p>
@@ -60,7 +58,7 @@
    </div>
 </div>
 <div class="row">
-   <div class="span2"><h4>Filter by Regulation: </h4></div>
+   <div class="span2 filter-label"><h4>Filter by Regulation: </h4></div>
    <div class="span6">
          <input type="text" id="regFilter" placeholder="Search for Regulations" />
          <br />

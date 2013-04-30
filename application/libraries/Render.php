@@ -33,13 +33,14 @@ class Render {
       $CI =& get_instance();
 
       $tabs = array(
-         '/ExperimentHierarchy' => 'Experiment Hierarchy',
+         '/ExperimentHierarchy' => 'Exp. Hierarchy',
          '/TFSearch' => 'TF Search',
          '/TFSub' => 'TF Subtract',
          '/GeneSummary' => 'Gene Summary',
          '/TranscriptionFactorSummary' => 'TF Summary',
          '/GeneSearch' => 'Gene Search',
-         '/TFPop' => 'TF Popularity'
+         '/TFPop' => 'TF Popularity',
+         '/FreqTransfacs' => 'Frequent TFs'
       );
 
       $data = array(

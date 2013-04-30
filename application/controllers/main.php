@@ -64,7 +64,7 @@ class Main extends CI_Controller {
       $this->template->add_versioned_js('js/tokeninput-loader.js');
       $this->template->add_versioned_js('js/experimentHierarchy.js');
       $this->template->add_versioned_js('js/scripture.js');
-      $this->render->renderPage('Experiment Hierarchy');
+      $this->render->renderPage('Exp. Hierarchy');
    }
 
   public function TFSearch() {
@@ -133,6 +133,13 @@ class Main extends CI_Controller {
       $this->template->write_view('content', 'tfPop.php');
       $this->template->add_versioned_js('js/tfPop.js');
       $this->render->renderPage('TF Popularity');
+   }
+
+   public function FreqTransfacs() {
+      $this->render->initPage();
+      $this->template->write_view('content', 'apSumm.php');
+      $this->template->add_js('js/apSumm.js');
+      $this->render->renderPage('Frequent TFs');
    }
 }
 
