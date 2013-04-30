@@ -30,6 +30,10 @@ body {
    color: #aaaaaa;
 }
 
+input.placeholder {
+   padding-right: 2px !important;
+}
+
 #factorList td {
    max_width: 60px;
    overflow:hidden;
