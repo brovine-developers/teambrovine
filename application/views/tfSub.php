@@ -1,18 +1,7 @@
 <div class="row">
-   <div class="span5">
-      <div class="well" style="height:125px"><h2>Transcription Factor Subtract</h2></div>
+   <div class="span12">
+      <h2>Transcription Factor Subtract</h2>
    </div>
-
-  <div class="span7"><div class="well" style="height:125px">
-      <h2>Instructions</h2>
-      <ol>
-        <li>Begin by selecting a species, comparison, and experiment(s).</li>
-        <li>Select the two genes you want to compare.</li>
-        <li>The results will show up in the next table.</li>
-      </ol>
-      All of the transcription factors present in the genes selected on the right will be removed from all of the TFs present in the genes selected on the left.
-    </div></div>
-  </div>
 </div>
 
 <!-- 1st row of tables: Species, comparison, and experiment. -->
