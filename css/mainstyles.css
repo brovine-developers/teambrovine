@@ -124,3 +124,23 @@ div.filter-label h4 {
 h3.filter-label {
    float: left;
 }
+
+.form-inline span.control-group {
+   margin: 0px 0px 0px 20px;
+}
+
+.form-inline label {
+   font-size: 16px;
+   font-weight: bold;
+   text-align: center;
+}
+
+.form-inline .sense-label {
+   font-size: 16px;
+   font-weight: bold;
+   text-align: center;
+}
+
+#sequenceFilterOptions input[type=radio] {
+   margin-left: 10px;
+}

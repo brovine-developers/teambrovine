@@ -101,8 +101,8 @@
       <div class="well">
          <h3 class="filter-label">Regulatory Sequence Filter: </h3>
 
-         <div id="sequenceFilterOptions">
-            <div class="control-group">
+         <div id="sequenceFilterOptions" class="form-inline">
+            <span class="control-group">
                <label>Min La<br />
                   <input type="text" class="span1" id="minla">
                </label>
@@ -118,9 +118,9 @@
                <label>Max Ld<br>
                   <input type="text" class="span1" id="maxld">
                </label>
-            </div>
+            </span>
 
-            <div class="control-group">
+            <span class="control-group">
                <label>Min Beg<br>
                   <input type="text" class="span1" id="minbeg">
                </label>
@@ -128,10 +128,10 @@
                <label>Max Beg<br>
                   <input type="text" class="span1" id="maxbeg">
                </label>
-            </div>
+            </span>
 
-            <div class="control-group">
-               <span class="sense-label">Sense</span>
+            <span class="control-group">
+               <span class="sense-label">Sense: </span>
 
                <label class="radio">
                   <input type="radio" name="senseFilter" value="all" checked>
@@ -147,7 +147,7 @@
                   <input type="radio" name="senseFilter" value="R">
                   R
                </label>
-            </div>
+            </span>
          </div>
       </div>
    </div>
