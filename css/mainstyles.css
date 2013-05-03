@@ -108,3 +108,15 @@ div.filter-label h4 {
    margin: 5px 0px;
    margin-right: -10px;
 }
+
+@media only screen and (min-width: 1450px) {
+   div.bs-docs-sidebar {
+      display: inline;
+      visibility: visible;
+   }
+
+   ul.nav .main-menu {
+      display: none;
+      visibility: hidden;
+   }
+}

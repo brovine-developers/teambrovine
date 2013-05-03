@@ -11,7 +11,7 @@
    </div>
 
    <?php if ($user !== false): ?>
-   <div id="navigation" class="bs-docs-sidebar">
+   <div id="navigation" class="bs-docs-sidebar hidden">
       <ul class="nav nav-list bs-docs-sidenav affix">
          <? foreach ($tabs as $url => $tab) : ?>
             <li <?if ($tab == $activeTab) :?>class="active"<? endif; ?>>

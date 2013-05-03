@@ -3,6 +3,7 @@
       <div class="container">
          <span class="brand">Brovine</span>
          <?php if ($user !== false): ?>
+
          <ul class="nav">
             <li class="dropdown">
                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -25,7 +26,22 @@
                   */ ?>
                </ul>
             </li>
+
+            <li class="main-menu dropdown">
+               <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                  Navigation <b class="caret"></b>
+               </a>
+
+               <ul class="dropdown-menu">
+                  <? foreach ($tabs as $url => $tab) : ?>
+                     <li <?if ($tab == $activeTab) :?>class="active"<? endif; ?>>
+                        <a href="<?=$url?>"><?=$tab?></a>
+                     </li>
+                  <? endforeach; ?>
+               </ul>
+            </li>
          </ul>
+
          <?php endif ?>
       </div>
    </div>
