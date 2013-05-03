@@ -120,3 +120,7 @@ div.filter-label h4 {
       visibility: hidden;
    }
 }
+
+h3.filter-label {
+   float: left;
+}
