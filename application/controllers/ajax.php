@@ -711,12 +711,14 @@ EOT;
       $countInfo = $query->row();
 
       // Add "All" Row.
-      $result[] = array(
-         'transfac' => 'All',
-         'numTimes' => $countInfo->numTimes,
-         'numGenes' => $countInfo->numGenes,
-         'allRow' => 1
-      );
+      if (!empty($result)) {
+         $result[] = array(
+            'transfac' => 'All',
+            'numTimes' => $countInfo->numTimes,
+            'numGenes' => $countInfo->numGenes,
+            'allRow' => 1
+         );
+      }
 
 
       if ($asArray) {
@@ -826,13 +828,15 @@ EOT;
       $countInfo = $query->row();
 
       // Add "All" Row.
-      $result[] = array(
-         'transfac' => 'All',
-         'numOccs' => $countInfo->numO,
-         'numGenes' => $countInfo->numG,
-         'numStudies' => $countInfo->numS,
-         'allRow' => 1
-      );
+      if (!empty($result)) {
+         $result[] = array(
+            'transfac' => 'All',
+            'numOccs' => $countInfo->numO,
+            'numGenes' => $countInfo->numG,
+            'numStudies' => $countInfo->numS,
+            'allRow' => 1
+         );
+      }
 
 
       echo json_encode($result);
