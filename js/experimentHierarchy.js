@@ -979,7 +979,7 @@ function setupExperimentHierarchy() {
          maxBegVal = maxBegVal * 1.0;
       }
 
-      senseFilterVal = $("#senseFilters input[type='radio']:checked").val();
+      senseFilterVal = $("#sequenceFilterOptions input[type='radio']:checked").val();
    };
 
    updateSequenceFilter();
