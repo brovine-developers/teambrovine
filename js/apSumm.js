@@ -1,6 +1,6 @@
-function updateAPSummary(tf) {
+function updateAPSummary(minSup, maxSup) {
    jQuery.get("ajax/getFrequentItemsets",
-      { 'min_sup': 0.85, 'max_sup': 0.95 },
+      { 'min_sup': minSup, 'max_sup': maxSup },
       function(data) {
          var total = data.itemCnt;
          var tableData = [];
@@ -44,11 +44,31 @@ function setupAPSummary() {
       "aaSortingFixed": [[3, "desc"]]
    });
 
-   updateAPSummary();
+   updateAPSummary($("#min_sup").val() / 100, $("#max_sup").val() / 100);
 }
+
+var setupSupportTriggers = function () {
+   var minSup = $("#min_sup");
+   var maxSup = $("#max_sup");
+
+   var fixMinMax = function () {
+      var min = minSup.attr("value");
+      var max = maxSup.attr("value");
+
+      minSup.attr("max", max);
+      maxSup.attr("min", min);
+   };
+
+   minSup.change(fixMinMax);
+   maxSup.change(fixMinMax);
+
+   $("#change_sup").click(function () {
+      updateAPSummary(minSup.val() / 100, maxSup.val() / 100);
+   });
+};
 
 $(document).ready(function() {
    setupAPSummary();
    setupPlaceholders();
+   setupSupportTriggers();
 });
-
