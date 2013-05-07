@@ -1,4 +1,27 @@
+var emptyMessage = "No frequent itemsets in the range requested.";
+var spinner = '<div id="floatingCirclesG">' +
+         '<div class="f_circleG" id="frotateG_01">' +
+         '</div>' +
+         '<div class="f_circleG" id="frotateG_02">' +
+         '</div>' +
+         '<div class="f_circleG" id="frotateG_03">' +
+         '</div>' +
+         '<div class="f_circleG" id="frotateG_04">' +
+         '</div>' +
+         '<div class="f_circleG" id="frotateG_05">' +
+         '</div>' + 
+         '<div class="f_circleG" id="frotateG_06">' +
+         '</div>' + 
+         '<div class="f_circleG" id="frotateG_07">' +
+         '</div>' + 
+         '<div class="f_circleG" id="frotateG_08">' +
+         '</div>' + 
+         '</div>';
+
 function updateAPSummary(minSup, maxSup) {
+   apSumm.fnSettings().oLanguage.sEmptyTable = spinner;
+   apSumm.fnClearTable();
+
    jQuery.get("ajax/getFrequentItemsets",
       { 'min_sup': minSup, 'max_sup': maxSup },
       function(data) {
@@ -14,6 +37,10 @@ function updateAPSummary(minSup, maxSup) {
                "sup": (Math.round((cnt / total) * 10000) / 100).toString() + "%",
                "numItems": name.split(",").length
             });
+         }
+
+         if (data.data.length < 1) {
+            apSumm.fnSettings().oLanguage.sEmptyTable = emptyMessage;
          }
 
          apSumm.fnAddData(tableData);
@@ -32,13 +59,14 @@ function setupAPSummary() {
       "oLanguage": {
          "sSearch": "Search Frequently Occurring Factors",
          "sInfo": "Showing _TOTAL_ associations",
-         "sInfoFiltered": " of _MAX_"
+         "sInfoFiltered": " of _MAX_",
+         "sEmptyTable": spinner
       },
       "sScrollY": height,
       "aoColumns": [
-         {"sTitle": "Transfacs", "mDataProp": "items"},
-         {"sTitle": "Count", "mDataProp": "count"},
-         {"sTitle": "Support", "mDataProp": "sup"},
+         {"sTitle": "Transfacs Occurring Together", "mDataProp": "items"},
+         {"sTitle": "Number of Genes", "mDataProp": "count"},
+         {"sTitle": "Occurring %", "mDataProp": "sup"},
          {"sTitle": "Num Items", "mDataProp": "numItems", "bVisible": false}
       ],
       "aaSortingFixed": [[3, "desc"]]
