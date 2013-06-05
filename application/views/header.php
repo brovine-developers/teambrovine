@@ -2,9 +2,10 @@
    <div class="navbar-inner">
       <div class="container">
          <span class="brand">Brovine</span>
-         <?php if ($user !== false): ?>
 
          <ul class="nav">
+            <?php if ($user !== false): /* User logged in? */ ?>
+
             <li class="dropdown">
                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                   <? echo $user['display_name'] ?>
@@ -34,15 +35,19 @@
 
                <ul class="dropdown-menu">
                   <? foreach ($tabs as $url => $tab) : ?>
-                     <li <?if ($tab == $activeTab) :?>class="active"<? endif; ?>>
+                     <li <?= ($tab == $activeTab) ? 'class="active"' : '' ?>>
                         <a href="<?=$url?>"><?=$tab?></a>
                      </li>
                   <? endforeach; ?>
                </ul>
             </li>
-         </ul>
 
-         <?php endif ?>
+         <?php else: /* User not logged in? */ ?>
+            <li class="main-menu"><a href="/auth">Log In</a></li>
+         <?php endif; /* User logged in? */ ?>
+
+            <li class="main-menu"><a href="/help">Help</a></li>
+         </ul>
       </div>
    </div>
 </div>
