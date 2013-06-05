@@ -142,6 +142,3 @@ class Main extends CI_Controller {
       $this->render->renderPage('Frequent TFs');
    }
 }
-
-/* End of file welcome.php */
-/* Location: ./application/controllers/welcome.php */
