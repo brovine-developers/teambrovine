@@ -312,3 +312,28 @@ h3.filter-label {
       background-color:#FFFFFF}
 
 }
+
+div.img-left {
+   margin: 5px;
+   padding: 10px 20px 10px 5px;
+   float:left;
+   width: 550px;
+}
+
+div.img-left img {
+   width: 550px;
+}
+
+ul.glossary {
+   list-style-type: none;
+}
+
+ul.glossary li {
+   padding: 10px 0;
+}
+
+ul.glossary .term {
+   padding: 0 5px 0 0;
+   font-weight: bold;
+   font-size: 1.2em;
+}
