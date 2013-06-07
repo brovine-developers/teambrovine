@@ -1,4 +1,5 @@
 body {
+   margin-top: 40px;
    padding-top: 40px;
    background-color: #d0e4f7; /* Old browsers */
 }
@@ -336,4 +337,32 @@ ul.glossary .term {
    padding: 0 5px 0 0;
    font-weight: bold;
    font-size: 1.2em;
+}
+
+ol li {
+   line-height: 30px;
+}
+
+div.use-case {
+   margin: 20px 0;
+}
+
+div.use-case img {
+   width: 550px;
+   margin: 0px;
+}
+
+div.use-case .caption.right {
+   float: right;
+   width: 590px;
+}
+
+div.use-case .caption.left {
+   float: left;
+   width: 590px;
+}
+
+div.use-case h3 {
+   margin-top: -5px;
+   padding-top: 0px;
 }

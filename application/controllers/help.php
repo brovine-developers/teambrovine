@@ -11,11 +11,16 @@ class Help extends CI_Controller {
    /**
     * Help Pages.
     */
-   public function index() { Help::renderHelpPage('index.php'); }
-   public function ProjectGoals() { Help::renderHelpPage('project-goals.php'); }
-   public function Glossary() { Help::renderHelpPage('glossary.php'); }
+   public function index() { Help::renderPage('index.php'); }
+   public function ProjectGoals() { Help::renderPage('project-goals.php'); }
+   public function Glossary() { Help::renderPage('glossary.php'); }
+   public function Technical() { Help::renderPage('brovine-technical.php'); }
+   public function DevSetup() { Help::renderPage('dev-setup.php'); }
+   public function SQLSchema() { Help::renderPage('sql-schema.php'); }
+   public function FreqItemsetGen() { Help::renderPage('freq-itemset-gen.php'); }
+   public function UsingBrovine() { Help::renderPage('using-brovine.php'); }
 
-   private function renderHelpPage($pageLocation) {
+   private function renderPage($pageLocation) {
       $this->config->load('glossary');
       $this->render->initPage();
       $data['defs'] = $this->config->item('glossary');
