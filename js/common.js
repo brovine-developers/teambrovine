@@ -122,3 +122,11 @@ function fixTableWidth(table) {
    });
 }
 
+/**
+ * Fix for in-page section links being hidden by nav bar
+ */
+$(window).load(function () {
+   var shiftWindow = function() { scrollBy(0, -50) };
+   if (location.hash) shiftWindow();
+   window.addEventListener("hashchange", shiftWindow);
+});
