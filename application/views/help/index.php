@@ -10,37 +10,33 @@
    <ul class="thumbnails">
       <li class="span6">
          <h2><a href="/help/UsingBrovine">Using Brovine</a></h2>
-         <ul>
-            <li>Basics</li>
-            <li>Uploading TESS Data</li>
-         </ul>
 
-         <h3>Page Descriptions</h3>
+         <h3><a href="/help/ViewDescriptions">View Descriptions</a></h3>
          <ul>
-            <li><a href="/help/UsingBrovine#experiment_hierarchy">
+            <li><a href="/help/ViewDescriptions#experiment_hierarchy">
                Experiment Hierarchy</a></li>
-            <li><a href="/help/UsingBrovine#tf_search">
+            <li><a href="/help/ViewDescriptions#tf_search">
                Transcription Factor Search</a></li>
-            <li><a href="/help/UsingBrovine#tf_subtract">
+            <li><a href="/help/ViewDescriptions#tf_subtract">
                Transcription Factor Subtract</a></li>
-            <li><a href="/help/UsingBrovine#gene_summary">
+            <li><a href="/help/ViewDescriptions#gene_summary">
                Gene Summary</a></li>
-            <li><a href="/help/UsingBrovine#tf_summary">
+            <li><a href="/help/ViewDescriptions#tf_summary">
                Transcription Factor Summary</a></li>
-            <li><a href="/help/UsingBrovine#gene_search">
+            <li><a href="/help/ViewDescriptions#gene_search">
                Gene Search</a></li>
-            <li><a href="/help/UsingBrovine#tf_popularity">
+            <li><a href="/help/ViewDescriptions#tf_popularity">
                Transcription Factor Popularity</a></li>
-            <li><a href="/help/UsingBrovine#freq_transcription_factors">
+            <li><a href="/help/ViewDescriptions#freq_transcription_factors">
                Frequent Transcription Factors</a></li>
          </ul>
 
-         <h3><a href="/help/UsingBrovine">Account Management</a></h3>
+         <h3><a href="/help/UsingBrovine#account_management">Account Management</a></h3>
          <ul>
-            <li>Privilege Types</li>
-            <li>Adding/Removing User Accounts</li>
-            <li>Changing your Password</li>
-            <li>Changing your Display Name</li>
+            <li><a href="/help/UsingBrovine#privilege_types">Privilege Types</a></li>
+            <li><a href="/help/UsingBrovine#add_remove_users">Adding/Removing User Accounts</a></li>
+            <li><a href="/help/UsingBrovine#settings">Changing your Password</a></li>
+            <li><a href="/help/UsingBrovine#settings">Changing your Display Name</a></li>
          </ul>
       </li>
 

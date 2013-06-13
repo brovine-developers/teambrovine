@@ -21,7 +21,10 @@ set up Brovine on your local box.</p>
        You have to enable <code>mod_rewrite</code>, which lets you define rules
        in <code>.htaccess</code> that modify incoming request URLs:
        <pre>LoadModule rewrite_module /usr/lib/apache2/modules/mod_rewrite.so</pre></li>
-   <li>Start Apache and MySQL. Check that you can reach the log in page of Brovine.</li>
+   <li>Start Apache and MySQL. Check that you can reach the log in page of Brovine.
+       If you can't, try changing the file attributes and group. Each folder in Brovine
+       should be in the group which the Apache HTTPD user is in. This is
+       generally <code>_www</code>.</li>
    <li>Create the <code>brovine</code> database in MySQL. Make sure at least
        one user (preferrably not root) can read and write to the database.</li>
    <li>Copy the sample <code>passwd.php</code> file from <a href="https://github.com/tcirwin/teambrovine/blob/master/README.md">the repository's README</a>

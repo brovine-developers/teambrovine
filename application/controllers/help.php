@@ -19,6 +19,7 @@ class Help extends CI_Controller {
    public function SQLSchema() { Help::renderPage('sql-schema.php'); }
    public function FreqItemsetGen() { Help::renderPage('freq-itemset-gen.php'); }
    public function UsingBrovine() { Help::renderPage('using-brovine.php'); }
+   public function ViewDescriptions() { Help::renderPage('view-desc.php'); }
 
    private function renderPage($pageLocation) {
       $this->config->load('glossary');
