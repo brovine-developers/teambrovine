@@ -25,7 +25,7 @@ class Render {
    }
 
    /**
-    * _renderPage is a function I wrote to simplify rendering a page. 
+    * Simplify rendering a page. 
     * See its use in Main::index().
     * @author Sterling Hirsh
     */

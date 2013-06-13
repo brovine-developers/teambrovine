@@ -6,11 +6,7 @@
    To get an account, contact the person in charge of Brovine.</p>
 
 <p>After you get an account and log in, you will be presented with the
-<<<<<<< HEAD
    <a href="/help/ViewDescriptions#experiment_hierarchy">Experiment Hierarchy page</a>, as well as a
-=======
-   <a href="#experiment_hierarchy">Experiment Hierarchy page</a>, as well as a
->>>>>>> eb002a95311ac3f0303dea7bf0b2bd48ae76c4bc
    navigation bar at the top of the page. Click the <em>Navigation</em> link
    to see a list of <em>views</em> available. Each <em>view</em> is explained on the
    <a href="/help/ViewDescriptions#experiment_hierarchy">View Descriptions

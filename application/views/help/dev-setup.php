@@ -24,9 +24,14 @@ set up Brovine on your local box.</p>
    <li>Start Apache and MySQL. Check that you can reach the log in page of Brovine.
        If you can't, try changing the file attributes and group. Each folder in Brovine
        should be in the group which the Apache HTTPD user is in. This is
-       generally <code>_www</code>.</li>
-   <li>Create the <code>brovine</code> database in MySQL. Make sure at least
-       one user (preferrably not root) can read and write to the database.</li>
+       generally <code>_www</code>:
+       <pre>chown -R :_www /brovine</pre>
+       All folders should have <code>rwx</code> access for group; files at least
+       <code>r</code>:
+       <pre>chmod -R g+rwx /brovine</pre></li>
+   <li>Create the <code>brovine</code> database in MySQL.</li>
+   <li>Make sure at least one user has the following privileges to the database:
+       <code>insert, update, delete, select, index</code> (preferrably not root)</li>
    <li>Copy the sample <code>passwd.php</code> file from <a href="https://github.com/tcirwin/teambrovine/blob/master/README.md">the repository's README</a>
        into the <code>brovine/application/config</code> directory. Edit the
        file to match the settings you used in the previous step.</li>

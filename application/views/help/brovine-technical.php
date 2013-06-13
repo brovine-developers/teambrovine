@@ -49,3 +49,20 @@ using <a href="/files/brovine_schema.sql">SQL schema</a> and import the <a href=
 password, server name, and port that are used for Brovine are stored in the
 <code>passwd.php</code> file, which is not uploaded to the repository. There is
 an example of the file in <a href="https://github.com/tcirwin/teambrovine/blob/master/README.md">the repository's README</a>.</p>
+
+<h2>FAQ</h2>
+</p>
+<h3>General Questions</h3>
+<p>
+<strong>What are we looking to get out of this project?</strong> - We're really looking for the ability of something to compare "the list of stuff" from one gene to another (how strong of a match)
+</p>
+<h3>Genetics Questions</h3>
+<p>
+<strong>For our purposes, what is a gene?</strong> - A gene is the 2000 base pairs that we get, for our purposes (even though this is not actually the case, the 2000 base pairs are the promoter region in front of the gene)
+</p>
+<h3>Technical Questions</h3>
+<ul>
+   <li><strong>Could a factor have the same Beg, Sns, Len and a different Sequence?</strong> - No</li>
+   <li><strong>Can there be a different beg/len for the opposite sns that would still match?</strong> - No</li>
+   <li><strong>What are L factors used for?</strong> - These are different measures of the probability of this seq actually interacting with this factor.</li>
+</ul>

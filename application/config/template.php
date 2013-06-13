@@ -62,6 +62,15 @@ $template['default']['regions'] = array(
    'content',
    'footer',
 );
+
+$template['help']['template'] = 'help_template';
+$template['help']['regions'] = array(
+   'header',
+   'help_nav',
+   'content',
+   'footer',
+);
+
 $template['default']['parser'] = 'parser';
 $template['default']['parser_method'] = 'parse';
 $template['default']['parse_template'] = FALSE;
