@@ -354,12 +354,12 @@ div.use-case img {
 
 div.use-case .caption.right {
    float: right;
-   width: 590px;
+   max-width: 590px;
 }
 
 div.use-case .caption.left {
    float: left;
-   width: 590px;
+   max-width: 590px;
 }
 
 div.use-case h3 {

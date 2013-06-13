@@ -10,12 +10,8 @@
    <ul class="thumbnails">
       <li class="span6">
          <h2><a href="/help/UsingBrovine">Using Brovine</a></h2>
-         <ul>
-            <li>Basics</li>
-            <li>Uploading TESS Data</li>
-         </ul>
 
-         <h3>Page Descriptions</h3>
+         <h3>View Descriptions</h3>
          <ul>
             <li><a href="/help/UsingBrovine#experiment_hierarchy">
                Experiment Hierarchy</a></li>
