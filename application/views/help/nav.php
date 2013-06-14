@@ -4,6 +4,8 @@
       <li><a href="/help/UsingBrovine">Using Brovine</a></li>
       <li><a href="/help/UsingBrovine#account_management">Account Management</a></li>
 
+   <li class="divider"></li>
+
    <li class="nav-header">View Descriptions</li>
       <li><a href="/help/ViewDescriptions#experiment_hierarchy">
          Experiment Hierarchy</a></li>
@@ -26,23 +28,21 @@
 
    <li class="nav-header">For Brovine Developers</li>
       <li><a href="/help/Technical#overview">Techincal Overview</a></li>
-      <li><a href="/help/Technical#frontend">Front-end Description</a></li>
-      <li><a href="/help/Technical#backend">Back-end Description</a></li>
+      <li><a href="/help/Technical#serverside">Front-end Description</a></li>
+      <li><a href="/help/Technical#clientside">Back-end Description</a></li>
       <li><a href="/help/Technical#config">Server Configuration</a></li>
-      <li><a href="/help/SQLSchema">SQL Schema Description</a></li>
-      <li><a href="http://github.com/tcirwin/teambrovine">The GitHub repository</a>
-   where Brovine is stored.</li>
-
-   <li><a href="/help/DevSetup">Setting Up a Development Box</a></li>
+      <li><a href="/help/DevSetup">Setting Up a Development Box</a></li>
+      <li><a href="http://github.com/tcirwin/teambrovine">GitHub Repository</a></li>
 
    <li class="divider"></li>
 
    <li class="nav-header">Frequent Itemset Generator</li>
       <li><a href="/help/FreqItemsetGen#overview">Technical Overview</a></li>
-      <li><a href="http://github.com/tcirwin/freq-itemset-gen">The GitHub repository</a>
-   where the Frequent Itemset Generator used by Brovine is stored.</a></li>
+      <li><a href="http://github.com/tcirwin/freq-itemset-gen">GitHub Repository</a></li>
 
    <li class="divider"></li>
 
-   <li><a href="/help/Glossary">Brovine Glossary</a></li>
+   <li class="nav-header">Reference</li>
+      <li><a href="/help/SQLSchema">SQL Schema Description</a></li>
+      <li><a href="/help/Glossary">Brovine Glossary</a></li>
 </ul>
