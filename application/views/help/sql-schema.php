@@ -4,7 +4,7 @@
 <p>Download <a href="/files/brovine_schema.sql">the Brovine database schema</a>.</p>
 
 <div class="row">
-   <div class="span6">
+   <div class="span4">
       <table class="table table-striped">
          <thead>
             <tr>
@@ -75,7 +75,7 @@
       </table>
    </div>
 
-   <div class="span6">
+   <div class="span5">
       <h2>ER Diagram</h2>
       <img src="/files/er-diagram.png" alt="an entity-relationship model of the data
       modeled with Brovine." />
@@ -84,7 +84,7 @@
 
 <h2>Table Schemas</h2>
 <div class="row">
-   <div class="span6">
+   <div class="span5">
       <a name="comparison_types"></a>
       <h3>Comparison Types</h3>
       <table class="table table-striped">
@@ -257,7 +257,7 @@
       </table>
    </div>
 
-   <div class="span6">
+   <div class="span4">
       <a name="experiments"></a>
       <h3>Experiments</h3>
       <table class="table table-striped">
