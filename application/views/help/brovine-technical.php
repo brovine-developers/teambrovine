@@ -1,17 +1,24 @@
 <h1>Brovine Technical Description</h1>
 
+<a name="overview"></a>
 <h2>Overview</h2>
-<a href="#overview"></a>
-<p>The Brovine gene database is built upon the CodeIgniter framework on the backend, an MVC framework written in PHP. This runs on an Apache HTTP server, and it uses a MySQL database to store all of the genetic data. On the front end, the application is entirely in Javascript, using several open source projects, including JQuery, DataTables, and TokenInput.</p>
-<p>Each page, which represents a “view” which the customers find useful, contains tables that display the genetic data to the user, as well as let the user drill down to more specific data. For example, on each page there are tables which show the species and experiments the customers have uploaded to the application. Customers can select one or more species, and Brovine will filter the experiment table to show only experiments with the selected species.</p>
-
-<h1 id="brovinearchitecture">BROVINE ARCHITECTURE</h1> 
 <p>The Brovine gene database is built upon the CodeIgniter framework on the 
-server side, an MVC framework written in PHP. This runs on an Apache HTTP server 
-and stores data in MySQL. On the front end, the application is entirely in 
-Javascript, with a little help from several open source projects.</p> <h2 
-  id="server-side">Server-Side</h2> <p><a 
-  href="http://ellislab.com/codeigniter">CodeIgniter</a> is a powerful MVC 
+backend, an MVC framework written in PHP. This runs on an Apache HTTP server, 
+and it uses a MySQL database to store all of the genetic data. On the front 
+end, the application is entirely in Javascript, using several open source 
+projects, including JQuery, DataTables, and TokenInput.</p>
+
+<p>Each page, which represents a “view” which the customers find useful, 
+contains tables that display the genetic data to the user, as well as let the 
+user drill down to more specific data. For example, on each page there are 
+tables which show the species and experiments the customers have uploaded to 
+the application. Customers can select one or more species, and Brovine will 
+filter the experiment table to show only experiments with the selected 
+species.</p>
+
+<a name="serverside"></a>
+<h2>Server-Side</h2>
+<p><a href="http://ellislab.com/codeigniter">CodeIgniter</a> is a powerful MVC 
 framework that Brovine uses. Almost all of the data transfer is done using AJAX, 
 which gives the user the effect of a seamless desktop application with few 
 complete page reloads.</p> <p>Brovine"s MySQL data store is a highly joined set 
@@ -36,8 +43,11 @@ system:</p> <ul> <li><strong>Job parameters</strong>: contains information about
   information about the promoter sequence for the gene; populates the 
   promoter_sequence table</li> <li><strong>HITS–1</strong>: contains information 
   about the regulatory elements discovered in prior research; populates the 
-  regulatory_sequences, factor_matches, and study_pages tables.</li> </ul> <h2 
-  id="client-side">Client-Side</h2> <p>The following libraries are used to enhance 
+  regulatory_sequences, factor_matches, and study_pages tables.</li> </ul> 
+
+<a name="clientside"></a>
+<h2>Client-Side</h2>
+<p>The following libraries are used to enhance 
 the user experience:</p> <ul> <li><a href="http://jquery.com/">JQuery</a>: a 
   powerful Javascript client library</li> <li><a 
     href="http://www.datatables.net/">DataTables</a>: a JQuery plugin that provides 
@@ -64,14 +74,17 @@ box is to allow users to filter their results by <a
   href="/help/glossary#regulation">regulation</a>. As the user starts typing, the 
 TokenInput library sends whatever prefix they have typed to the 
 <code>getRegHints</code> method on the ajax controller, which attempts to match 
-their prefix term with any of the regulation types in the database.</p> <h2 
-  id="cachecontrol">Cache Control</h2> <p>Another feature of Brovine is the cache 
+their prefix term with any of the regulation types in the database.</p> <h3>
+Cache Control</h3> <p>Another feature of Brovine is the cache 
 control mechanism. All static files (JS and CSS) have a timestamp appended to 
 their name using the Apache <code>mod_rewrite</code> module. The timestamp is 
 the last modify time on the file, so each time a static file is modified, the 
 browser will think it is a brand new file and download the new version. This 
 eliminates issues where cached versions of static files are used by the client's 
-browser.</p> <h2 id="javascriptarchitecture">Javascript Architecture</h2> 
+browser.</p> 
+
+<a name="js_arch"></a>
+<h3>Javascript Architecture</h3>
 <p>Each view has its own javascript file - for example, the ExperimentHierarchy 
 javascript code is held inside <code>experimentHierarchy.js</code>. However, 
 there is also the <code>common.js</code> code which holds methods useful for all 
@@ -81,7 +94,7 @@ handle the AJAX calls for each table.</p> <p>Here is a list of views and their
 corresponding Javascript code:</p> <ul> <li><strong>Experiment 
     Hierarchy</strong>: <code>experimentHierarchy.js</code></li> 
   <li><strong>Transcription Factor Search</strong>: <code>tfSearch.js</code></li> 
-  <li><strong>Transcription Factor Subtract</strong>: <a href="#js_arch">See the 
+  <li><strong>Transcription Factor Subtract</strong>: <a href="#new_js_arch">See the 
     next section</a></li> <li><strong>Gene Summary</strong>: 
   <code>geneSummary.js</code></li> <li><strong>Transcription Factor 
     Summary</strong>: <code>tfSummary.js</code></li> <li><strong>Gene 
@@ -96,8 +109,11 @@ the user, this Javascript code generates a <code>data:octet-stream</code> link
 which lets the user extract the data without making another AJAX call.</p> 
 <p>The file <code>upload.js</code> talks to the Uploadify flash software to 
 notify the user about the status of file uploads on <a href="/Upload">the Upload 
-  page</a>.</p> <h2 id="newjavascriptarchitecture">New Javascript 
-  Architecture</h2> <p>The creators of Brovine recognized that the current 
+  page</a>.</p>
+
+<a name="new_js_arch"></a>
+<h3>New Javascript Architecture</h3>
+<p>The creators of Brovine recognized that the current 
 Javascript code is a huge mess, but under the weight of deadlines found no 
 reason to change the design. However, a significant effort has been made to 
 create a system that was more reasonable. This effort is located in the 
@@ -114,8 +130,8 @@ file, but the file size per page is much smaller. Browserbuild lets us
 concatenate and minify all necessary files into one unit, which reduces load 
 time for the user.</p>
 
-<h2>Server Configuration</h2>
 <a href="#config"></a>
+<h2>Server Configuration</h2>
 
 <p>Brovine is currently hosted on a VM managed by the Cal Poly Computer Science
 department. Check with the CSL sysadmins to get access to the box via the shell.
@@ -137,8 +153,6 @@ generated is displayed on the <a href="/help/PageDescriptions">Frequent
   Transcription Factors page</a>.</p>
 
 <p>On the box, the server root is located at <code>/var/www/html</code>.</p>
-
-<h3>PHP Configuration</h3>
 
 <h3>Apache Configuration</h3>
 <p>Brovine and CodeIgniter use the <code>mod_rewrite</code> package to edit incoming URLs. This
