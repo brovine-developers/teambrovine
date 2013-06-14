@@ -1,5 +1,5 @@
 Options -Indexes
 RewriteEngine on
-RewriteCond $1 !^(index\.php|js|css|images|phpMyAdmin|bootstrap|files|robots\.txt)
+RewriteCond $1 !^(index\.php|js|css|images|phpMyAdmin|bootstrap|robots\.txt)
 RewriteRule ^(.*)$ /index.php/$1 [L]
 RewriteRule ^(.*)\.[\d]{10}\.(css|js)$ $1.$2 [L]

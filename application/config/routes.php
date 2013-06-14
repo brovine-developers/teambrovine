@@ -52,5 +52,7 @@ $route['TFPop'] = '/main/TfPop';
 $route['Login'] = '/auth/Login';
 $route['FreqTransfacs'] = '/main/FreqTransfacs';
 
+$route['files/:any'] = '/files/Download';
+
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */
