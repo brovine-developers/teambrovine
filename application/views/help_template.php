@@ -25,11 +25,11 @@
    <div class="container">
       <div id="content" class="tab-content">
          <div class="row">
-            <div class="span8">
+            <div class="span9">
                <?=$content?>
             </div>
 
-            <div class="span4">
+            <div class="span3">
                <?=$help_nav?>
             </div>
          </div>
