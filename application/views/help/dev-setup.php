@@ -51,5 +51,8 @@ Transcription Factors page</a>.</p>
        into your development directory.
        <pre>git clone https://github.com/tcirwin/freq-itemset-gen</pre></li>
    <li>Start the service:
-       <pre>make start</pre></li>
+       <pre>make start</pre>
+       On startup, the service opens port 8100 and waits for messages - see
+       <a href="/help/FreqItemsetGen#api">the API</a> for how to get data or
+       test the service manually.</li>
 </ol>

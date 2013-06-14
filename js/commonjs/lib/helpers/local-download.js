@@ -1,5 +1,5 @@
 (function ($) {
-    
+
     /**
      * Create a link with embedded data which the user can download.
      * Useful when there's already local data that the user may want

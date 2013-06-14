@@ -1,10 +1,12 @@
+<a href="/help"><p><i class="icon-arrow-left"></i> Back to Help Home</a>
+
 <h2>View Descriptions</h2>
 
 <div class="thumbnail use-case">
    <div class="caption left">
       <a name="experiment_hierarchy"></a>
       <h3>Experiment Hierarchy</h3>
-      <p><strong>The <em>flow</em> of this page proceeds as follows:</strong></p>
+      <p><strong>How to use this view:</strong></p>
 
       <ol>
          <li>Select a Species from <span class="badge badge-warning">1</span>.
@@ -50,7 +52,7 @@
    <div class="caption right">
       <h3>Transcription Factor Search</h3>
 
-      <p><strong>The <em>flow</em> of this page proceeds as follows:</strong></p>
+      <p><strong>How to use this view:</strong></p>
 
       <ol>
          <li>Select one or more Species from <span class="badge badge-warning">1
@@ -92,7 +94,7 @@
          <span class="badge badge-warning">5</span>, then
          <span class="badge badge-warning">6</span> would show M and N only.
 
-      <p><strong>The <em>flow</em> of this page proceeds as follows:</strong></p>
+      <p><strong>How to use this view:</strong></p>
 
       <ol>
          <li>Select one or more Species from <span class="badge badge-warning">1
@@ -120,7 +122,7 @@
 <div class="thumbnail use-case">
    <div class="caption right">
       <h3>Gene Summary</h3>
-      <p><strong>The <em>flow</em> of this page proceeds as follows:</strong></p>
+      <p><strong>How to use this view:</strong></p>
 
       <ol>
          <li>Select a Gene from <span class="badge badge-warning">1</span>.</li>
@@ -137,7 +139,7 @@
    <div class="caption left">
       <h3>Transcription Factor Summary</h3>
 
-      <p><strong>The <em>flow</em> of this page proceeds as follows:</strong></p>
+      <p><strong>How to use this view:</strong></p>
 
       <ol>
          <li>Select a Transcription Factor from
@@ -155,7 +157,7 @@
    <div class="caption right">
       <h3>Gene Search</h3>
 
-      <p><strong>The <em>flow</em> of this page proceeds as follows:</strong></p>
+      <p><strong>How to use this view:</strong></p>
 
       <ol>
          <li>Select one or more Species from <span class="badge badge-warning">1
@@ -186,7 +188,7 @@
    <div class="caption left">
       <h3>Transcription Factor Popularity</h3>
 
-      <p><strong>The <em>flow</em> of this page proceeds as follows:</strong></p>
+      <p><strong>How to use this view:</strong></p>
 
       <ol>
          <li>Select a Species from <span class="badge badge-warning">1</span>.
@@ -225,7 +227,7 @@
          wisely. Choosing too wide of a range, or selecting maximum greater than
          96%, may not yield any results. Try to choose a range close
          to the default (85 - 95%).</p>
-      <p><strong>The <em>flow</em> of this page proceeds as follows:</strong></p>
+      <p><strong>How to use this view:</strong></p>
 
       <ol>
          <li>If <span class="badge badge-warning">1</span> is loading data, wait
@@ -242,3 +244,5 @@
    <img src="/images/examples/freq-transfacs.png" />
 </div>
    <div class="clear"></div>
+
+<a href="/help"><p><i class="icon-arrow-left"></i> Back to Help Home</a>
