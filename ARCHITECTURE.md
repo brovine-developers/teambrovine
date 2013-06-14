@@ -73,6 +73,15 @@ typing, the TokenInput library sends whatever prefix they have typed to the
 `getRegHints` method on the  ajax controller, which attempts to match their
 prefix term with any of the regulation types in the database.
 
+Cache Control
+-------------
+Another feature of Brovine is the cache control mechanism. All static files (JS
+and CSS) have a timestamp appended to their name using the Apache `mod_rewrite`
+module. The timestamp is the last modify time on the file, so each time a static
+file is modified, the browser will think it is a brand new file and download
+the new version. This eliminates issues where cached versions of static files
+are used by the client&apos;s browser.
+
 Javascript Architecture
 -----------------------
 Each view has its own javascript file - for example, the ExperimentHierarchy
@@ -85,7 +94,7 @@ Here is a list of views and their corresponding Javascript code:
 
  + **Experiment Hierarchy**: `experimentHierarchy.js`
  + **Transcription Factor Search**: `tfSearch.js`
- + **Transcription Factor Subtract**: [See the next section]()
+ + **Transcription Factor Subtract**: [See the next section](#js_arch)
  + **Gene Summary**: `geneSummary.js`
  + **Transcription Factor Summary**: `tfSummary.js`
  + **Gene Search**: `geneSearch.js`
@@ -111,4 +120,11 @@ reasonable. This effort is located in the `commonjs` folder in the Javascript
 folder. Currently, the Transcription Factor Subtract page is the only view to
 use the new Javascript architecture.
 
-
+This new architecture uses [CommonJS Modules](http://wiki.commonjs.org/wiki/Modules/1.1.1)
+and [browserbuild](https://github.com/LearnBoost/browserbuild) to create a
+modular Javascript system that greatly increases code reuse and maintainability
+within Brovine. Javascript files that are shared among pages belong in the `lib`
+folder, while view-specific files belong in the `init-pages` folder. Each Brovine
+view still has its own Javascript file, but the file size per page is much
+smaller. Browserbuild lets us concatenate and minify all necessary files into
+one unit, which reduces load time for the user.
