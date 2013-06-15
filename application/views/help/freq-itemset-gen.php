@@ -63,6 +63,7 @@ dataset if you want to use it for a different purpose.
    </li>
 
    <li><strong>Set request:</strong> <code>set [BasketIterator] [ItemsetGenerator]</code>
+   <p>Changes the algorithm and the dataset used when computing frequent item sets.</p>
    <p>If the request is successful, <code>res</code> will be set to SUCCESS and
 <code>reason</code> will be "SET". Any subsequent queries by client will use the
  BasketIterator and ItemsetGenerator specified.<br />
